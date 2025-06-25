@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from "react";
 import CustomInput from "../components/CustomInput";
 import CustomLabel from "../components/CustomLabel";
 import SectionHeading from "../components/SectionHeading";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 import toast from "react-hot-toast";
-import { Eye, EyeOff } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { useEffect, useState } from "react";
+import { Camera, Eye, EyeOff } from "lucide-react";
+
 import useGetAuth from "../hooks/useGetAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 // Imports End
@@ -14,7 +15,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 const ProfilePage = () => {
   const [isShowCurrentPassword, setIsShowCurrentPassword] = useState(false);
   const [isShowConfirmNewPassword, setIsConfirmNewPassword] = useState(false);
-  const [profileImgPreview, setProfileImgPreview] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+
   const [formData, setFormData] = useState({
     profileImg: "",
     fullName: "",
@@ -25,7 +28,35 @@ const ProfilePage = () => {
   });
 
   const queryClient = useQueryClient();
+  const { data: authUser } = useGetAuth();
 
+  useEffect(() => {
+    if (authUser) {
+      setFormData({
+        fullName: authUser.fullName,
+        mobile: authUser.mobile,
+        email: authUser.email,
+        currentPassword: "",
+        newPassword: "",
+      });
+
+      setPreviewUrl(authUser.profileImg?.url || "/avatar-placeholder.png");
+    }
+  }, [authUser]);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Update Profile Mutation
   const {
     mutateAsync: updateProfile,
     isPending,
@@ -34,9 +65,14 @@ const ProfilePage = () => {
   } = useMutation({
     mutationFn: async () => {
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach((key) => {
-        formDataToSend.append(key, formData[key]);
+
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
       });
+
+      if (selectedImage) {
+        formDataToSend.append("profileImg", selectedImage);
+      }
 
       const res = await fetch(`/api/auth/profile/update`, {
         method: "PUT",
@@ -44,7 +80,6 @@ const ProfilePage = () => {
       });
 
       const data = await res.json();
-
       if (!res.ok)
         throw new Error(data.error || "Failed to update user profile");
 
@@ -61,52 +96,12 @@ const ProfilePage = () => {
     },
   });
 
-  const { data: authUser } = useGetAuth();
-
-  useEffect(() => {
-    if (authUser) {
-      setFormData({
-        profileImg: authUser.profileImg?.url || "",
-        fullName: authUser.fullName,
-        mobile: authUser.mobile,
-        email: authUser.email,
-        currentPassword: "",
-        newPassword: "",
-      });
-      setProfileImgPreview(
-        authUser.profileImg?.url || "/avatar-placeholder.png"
-      );
-    }
-  }, [authUser]);
-
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const profileImgRef = useRef(null);
-
-  const handleImgChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, profileImg: file });
-      const reader = new FileReader();
-      reader.onload = () => setProfileImgPreview(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!isPending) {
-      updateProfile(formData);
+      updateProfile();
     }
   };
-
-  const toggleCurrentPassword = () =>
-    setIsShowCurrentPassword(!isShowCurrentPassword);
-
-  const toggleConfirmPassword = () =>
-    setIsConfirmNewPassword(!isShowConfirmNewPassword);
 
   return (
     <>
@@ -127,36 +122,48 @@ const ProfilePage = () => {
           content="https://jemzy.pk/assets/profile.jpg"
         />
       </Helmet>
-      <div className="max-w-2xl sm:max-w-xl mx-auto px-2 py-6 sm:py-2">
+      <div className="max-w-2xl sm:max-w-xl mx-auto px-2 py-6 sm:py-2 select-none">
         <div className="mb-2">
           <SectionHeading text1={"Update"} text2={"Profile"} />
         </div>
 
         <form className="space-y-1" onSubmit={handleSubmit}>
           {/* Profile Image */}
-          <div>
-            <CustomLabel label="Profile Image" />
-            <div
-              onClick={() => profileImgRef.current.click()}
-              className="mb-4 cursor-pointer"
-            >
-              <input
-                type="file"
-                hidden
-                accept="image/*"
-                ref={profileImgRef}
-                onChange={handleImgChange}
-              />
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
               <img
-                src={profileImgPreview || "/avatar-placeholder.png"}
-                alt="Profile"
-                className="w-32 h-32 object-cover rounded-full mx-auto"
+                src={previewUrl || formData.profileImg || "/avatar.png"}
+                alt="Profile Image"
+                className="size-32 rounded-full object-cover border-4"
               />
+
+              <label
+                htmlFor="avatar-upload"
+                className={`absolute bottom-0 right-0 bg-base-content hover:scale-105 p-2 rounded-full cursor-pointer transition-all duration-200 ${
+                  isPending ? "animate-pulse pointer-events-none" : ""
+                }`}
+              >
+                <Camera className="w-5 h-5 text-base-200" />
+
+                <input
+                  type="file"
+                  id="avatar-upload"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={isPending}
+                />
+              </label>
             </div>
+            <p className="text-sm text-zinc-400 mb-8">
+              {isPending
+                ? "Uploading..."
+                : "Click the camera icon to update your photo"}
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2">
-            {/* Name */}
+            {/* Full Name */}
             <div>
               <CustomLabel label="Full Name" />
               <CustomInput
@@ -207,7 +214,7 @@ const ProfilePage = () => {
               />
 
               <div
-                onClick={toggleCurrentPassword}
+                onClick={() => setIsShowCurrentPassword((prev) => !prev)}
                 className="absolute top-12 right-5 transform -translate-y-1/2 flex items-center justify-center cursor-pointer text-gray-700"
               >
                 {formData.currentPassword && (
@@ -235,7 +242,7 @@ const ProfilePage = () => {
               />
 
               <div
-                onClick={toggleConfirmPassword}
+                onClick={() => setIsConfirmNewPassword((prev) => !prev)}
                 className="absolute top-12 right-5 transform -translate-y-1/2 flex items-center justify-center cursor-pointer text-gray-700 "
               >
                 {formData.newPassword && (

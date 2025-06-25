@@ -3,11 +3,10 @@ import ProductCard from "./ProductCard";
 import ProductSlider from "./ProductSlider";
 import SectionHeading from "./SectionHeading";
 import InViewAnimation from "./InViewAnimation";
-import ProductCardSkeleton from "./Skeleton/ProductCardSkeleton";
 import { useGetAllProducts } from "../hooks/useGetAllProducts";
 
 const SpecialProducts = () => {
-  const { products = [], productIsLoading } = useGetAllProducts();
+  const { products = [] } = useGetAllProducts();
 
   const specialProducts = products?.filter((product) =>
     product.tags.includes("Special")
@@ -25,22 +24,14 @@ const SpecialProducts = () => {
         </div>
       )}
 
-      {productIsLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <ProductCardSkeleton key={index} />
+      {specialProducts.length > 0 && (
+        <ProductSlider>
+          {specialProducts.map((product, index) => (
+            <Animation key={product._id} delay={index * 0.1}>
+              <ProductCard product={product} />
+            </Animation>
           ))}
-        </div>
-      ) : (
-        specialProducts.length > 0 && (
-          <ProductSlider>
-            {specialProducts.map((product, index) => (
-              <Animation key={product._id} delay={index * 0.1}>
-                <ProductCard product={product} />
-              </Animation>
-            ))}
-          </ProductSlider>
-        )
+        </ProductSlider>
       )}
     </div>
   );

@@ -19,7 +19,7 @@ const ProductCardSkeleton = () => {
           <div className="flex gap-5">
             <Skeleton height={20} width={50} />
             <Skeleton height={20} width={45} />
-            <Skeleton height={20} width={70} />
+            <Skeleton height={20} width={40} />
           </div>
         </div>
       </div>

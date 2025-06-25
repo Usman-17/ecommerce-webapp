@@ -48,7 +48,7 @@ const ForgotPasswordPage = () => {
 
   return (
     <div className="flex justify-center items-center py-36 sm:py-28">
-      <div className="w-full max-w-sm bg-white px-4 py-8 rounded">
+      <div className="w-full max-w-sm bg-[#fffaf5] px-4 py-8 rounded">
         <div className="grid gap-0 sm:gap-1 text-center mb-8">
           <h1 className="text-3xl font-bold">Forgot Password</h1>
           <p className="text-sm px-6 text-gray-500">

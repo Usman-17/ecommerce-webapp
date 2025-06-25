@@ -16,13 +16,11 @@ const PopularProduct = () => {
   return (
     <>
       <div className="mt-4 sm:mt-10">
-        {popularProducts.length > 0 && (
-          <InViewAnimation delay={0.1}>
-            <div className="py-1 text-3xl">
-              <SectionHeading text1={"Our"} text2={"Popular Products"} />
-            </div>
-          </InViewAnimation>
-        )}
+        <InViewAnimation delay={0.1}>
+          <div className="py-1 text-3xl">
+            <SectionHeading text1={"Our"} text2={"Popular Products"} />
+          </div>
+        </InViewAnimation>
 
         <div>
           <ProductSlider>
