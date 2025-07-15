@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 
-import model from "../assets/model.png";
+import model from "../assets/model.webp";
 import banner_s_1 from "../assets/banner_s_1.png";
 import banner_s_2 from "../assets/banner_s_2.png";
 import banner_s_3 from "../assets/banner_s_3.png";
@@ -69,6 +69,7 @@ const Hero = () => {
                 src={model}
                 alt="Jewelry Model"
                 className="w-full h-full sm:h-auto object-cover"
+                loading="eager"
                 onError={(e) => {
                   e.currentTarget.src = "";
                   e.currentTarget.style.backgroundColor = "#f0f0f0";

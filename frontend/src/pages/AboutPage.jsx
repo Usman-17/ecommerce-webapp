@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import SectionHeading from "../components/SectionHeading";
-import img from "../assets/model.png";
+import img from "../assets/model.webp";
 
 const AboutPage = () => {
   return (
