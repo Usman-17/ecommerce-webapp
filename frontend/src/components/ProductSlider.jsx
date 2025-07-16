@@ -51,7 +51,11 @@ const ProductSlider = ({ children, slidesToShow = 6 }) => {
   function CustomPrevArrow(props) {
     const { onClick } = props;
     return (
-      <button className="slick-prev custom-arrow" onClick={onClick}>
+      <button
+        className="slick-prev custom-arrow"
+        onClick={onClick}
+        aria-label="Previous Slide"
+      >
         <ChevronLeft />
       </button>
     );
@@ -60,7 +64,11 @@ const ProductSlider = ({ children, slidesToShow = 6 }) => {
   function CustomNextArrow(props) {
     const { onClick } = props;
     return (
-      <button className="slick-next custom-arrow" onClick={onClick}>
+      <button
+        className="slick-next custom-arrow"
+        onClick={onClick}
+        aria-label="Next Slide"
+      >
         <ChevronRight />
       </button>
     );

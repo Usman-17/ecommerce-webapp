@@ -45,7 +45,7 @@ const ProductCard = ({ product }) => {
             {product?.brand?.name || ""}
           </p>
 
-          <h3
+          <h2
             className="font-medium text-xs sm:text-sm md:text-sm tracking-tight text-gray-800"
             style={{
               display: "-webkit-box",
@@ -56,7 +56,7 @@ const ProductCard = ({ product }) => {
             }}
           >
             {product?.title}
-          </h3>
+          </h2>
 
           {/* Price */}
           <div className="flex items-center gap-1 text-nowrap">

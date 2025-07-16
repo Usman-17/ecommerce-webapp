@@ -76,7 +76,7 @@ const ProfileDropdown = () => {
               {/* Logout */}
               <div
                 onClick={() => {
-                  closeDropdown;
+                  closeDropdown();
                   logoutMutation();
                 }}
                 className="flex items-center gap-3 py-1 px-3 rounded-full hover:bg-red-500  hover:text-white cursor-pointer transition-colors duration-150 mt-1 text-sm sm:text-base"
@@ -88,7 +88,12 @@ const ProfileDropdown = () => {
           </div>
         </div>
       ) : (
-        <Link to="/login">
+        <Link
+          to="/login"
+          className="relative flex items-center"
+          aria-label="Login"
+        >
+          <span className="sr-only">Login</span>
           <UserRound className="cursor-pointer" />
         </Link>
       )}

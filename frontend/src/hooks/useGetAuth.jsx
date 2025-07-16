@@ -2,7 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 
 const fetchAuthUser = async () => {
   const res = await fetch("/api/auth/user", { credentials: "include" });
-  if (!res.ok) return null;
+  if (res.status === 401) {
+    // Not authorized
+    return null;
+  }
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch user");
+  }
+
   return res.json();
 };
 
@@ -13,6 +21,7 @@ const useGetAuth = () => {
     staleTime: 0,
     refetchOnMount: true,
     refetchOnReconnect: true,
+    retry: false,
   });
 };
 

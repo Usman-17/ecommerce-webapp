@@ -33,7 +33,7 @@ const Header = () => {
           <img
             src={logo}
             alt="jemzy.pk"
-            className="w-20 sm:w-24"
+            className="w-20 sm:w-24 h-auto"
             loading="lazy"
             decoding="async"
           />
@@ -41,39 +41,49 @@ const Header = () => {
 
         {/* NavLinks */}
         <ul className="hidden sm:flex gap-5 text-sm text-gray-700">
-          <NavLink to="/" className="flex flex-col items-center gap-1">
-            <p>HOME</p>
-            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
-          </NavLink>
+          <li>
+            <NavLink to="/" className="flex flex-col items-center gap-1">
+              <p>HOME</p>
+              <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+            </NavLink>
+          </li>
 
-          <NavLink
-            to="/collection"
-            className="flex flex-col items-center gap-1"
-          >
-            <p>ALL PRODUCTS</p>
-            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
-          </NavLink>
+          <li>
+            <NavLink
+              to="/collection"
+              className="flex flex-col items-center gap-1"
+            >
+              <p>ALL PRODUCTS</p>
+              <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+            </NavLink>
+          </li>
 
-          <NavLink to="/about" className="flex flex-col items-center gap-1">
-            <p>ABOUT</p>
-            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
-          </NavLink>
+          <li>
+            <NavLink to="/about" className="flex flex-col items-center gap-1">
+              <p>ABOUT</p>
+              <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+            </NavLink>
+          </li>
 
-          <NavLink to="/contact" className="flex flex-col items-center gap-1">
-            <p>CONTACT</p>
-            <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
-          </NavLink>
+          <li>
+            <NavLink to="/contact" className="flex flex-col items-center gap-1">
+              <p>CONTACT</p>
+              <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+            </NavLink>
+          </li>
         </ul>
 
         <div className="flex items-center gap-4 sm:gap-5 justify-center">
           {/* Search  */}
           <div>
-            <Search
-              className="cursor-pointer hover:text-red-600 transition-colors duration-150"
+            <button
               onClick={toggleSearchBar}
               aria-expanded={isSearchVisible}
               aria-label="Toggle Search Bar"
-            />
+              className="hover:text-red-600 transition-colors duration-150"
+            >
+              <Search className="cursor-pointer" />
+            </button>
 
             {isSearchVisible && (
               <div ref={searchRef}>
@@ -110,54 +120,68 @@ const Header = () => {
         {/* Bottom Navigation (visible on small screens) */}
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#fffaf5] shadow-md sm:hidden px-2 border-t border-[#fffaf1] py-1">
           <ul className="flex justify-around items-center h-12 text-gray-600">
-            <NavLink
-              to="/"
-              className="flex items-center gap-1 text-black"
-              onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
-            >
-              <div className="flex items-center gap-1">
-                <img src={home} alt="home" className="w-7" />
-                <p className="hidden mt-1.5 text-md">Home</p>
-              </div>
-            </NavLink>
+            <li>
+              <NavLink
+                to="/"
+                className="flex items-center gap-1 text-black"
+                onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
+              >
+                <div className="flex items-center gap-1">
+                  <img src={home} alt="home" className="w-7" />
+                  <p className="hidden mt-1.5 text-md">Home</p>
+                </div>
+              </NavLink>
+            </li>
 
-            <NavLink
-              to="/collection"
-              className="flex items-center gap-1 text-gray-700 hover:text-black"
-              onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
-            >
-              <img src={collection} alt="collection" className="w-7" />
-              <p className="hidden mt-1.5 text-md">ALL PRODUCTS</p>
-            </NavLink>
+            <li>
+              <NavLink
+                to="/collection"
+                className="flex items-center gap-1 text-gray-700 hover:text-black"
+                onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
+              >
+                <img src={collection} alt="collection" className="w-7" />
+                <p className="hidden mt-1.5 text-md">ALL PRODUCTS</p>
+              </NavLink>
+            </li>
 
             {authUser ? (
-              <NavLink
-                to="/order"
-                className="flex items-center gap-1 text-gray-700 hover:text-black"
-                onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
-              >
-                <img src={tracking} alt="order" className="w-8" />
-                <p className="hidden mt-1.5 text-md">Orders</p>
-              </NavLink>
+              <li>
+                <NavLink
+                  to="/order"
+                  className="flex items-center gap-1 text-gray-700 hover:text-black"
+                  onClick={() =>
+                    window.scrollTo({ top: 0, behavior: "instant" })
+                  }
+                >
+                  <img src={tracking} alt="order" className="w-8" />
+                  <p className="hidden mt-1.5 text-md">Orders</p>
+                </NavLink>
+              </li>
             ) : (
-              <NavLink
-                to="/login"
-                className="flex items-center gap-1 text-gray-700 hover:text-black"
-                onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
-              >
-                <UserRound size={24} />
-                <p className="hidden mt-1.5 text-md">Login</p>
-              </NavLink>
+              <li>
+                <NavLink
+                  to="/login"
+                  className="flex items-center gap-1 text-gray-700 hover:text-black"
+                  onClick={() =>
+                    window.scrollTo({ top: 0, behavior: "instant" })
+                  }
+                >
+                  <UserRound size={24} />
+                  <p className="hidden mt-1.5 text-md">Login</p>
+                </NavLink>
+              </li>
             )}
 
-            <NavLink
-              to="/contact"
-              className="flex items-center gap-1 text-gray-700 hover:text-black"
-              onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
-            >
-              <img src={inbox} alt="contact" className="w-7" />
-              <p className="hidden mt-1.5 text-md">Contact</p>
-            </NavLink>
+            <li>
+              <NavLink
+                to="/contact"
+                className="flex items-center gap-1 text-gray-700 hover:text-black"
+                onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
+              >
+                <img src={inbox} alt="contact" className="w-7" />
+                <p className="hidden mt-1.5 text-md">Contact</p>
+              </NavLink>
+            </li>
           </ul>
         </nav>
       </div>

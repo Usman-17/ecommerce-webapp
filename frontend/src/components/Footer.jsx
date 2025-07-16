@@ -25,29 +25,21 @@ const Footer = () => {
           <div>
             <p className="uppercase text-xl font-medium mb-5">Company</p>
             <ul className="flex flex-col gap-2 text-gray-600">
-              <Link to="/">
-                <li className="hover:text-black transition-colors duration-300">
-                  Home
-                </li>
-              </Link>
+              <li className="hover:text-black transition-colors duration-300">
+                <Link to="/">Home</Link>
+              </li>
 
-              <Link to="/order">
-                <li className="hover:text-black transition-colors duration-300">
-                  Delivery
-                </li>
-              </Link>
+              <li className="hover:text-black transition-colors duration-300">
+                <Link to="/order">Delivery</Link>
+              </li>
 
-              <Link to="about">
-                <li className="hover:text-black transition-colors duration-300">
-                  About Us
-                </li>
-              </Link>
+              <li className="hover:text-black transition-colors duration-300">
+                <Link to="about">About Us</Link>
+              </li>
 
-              <Link to="/contact">
-                <li className="hover:text-black transition-colors duration-300">
-                  Contact Us
-                </li>
-              </Link>
+              <li className="hover:text-black transition-colors duration-300">
+                <Link to="/contact">Contact Us</Link>
+              </li>
             </ul>
           </div>
         </InViewAnimation>
@@ -55,6 +47,7 @@ const Footer = () => {
         <InViewAnimation delay={0.2}>
           <div>
             <p className="uppercase text-xl font-medium mb-5">Get in Touch</p>
+
             <ul className="flex flex-col gap-2 text-gray-600">
               <li className="hover:text-black transition-colors duration-300">
                 <a href="tel:+923274243417">0327 4243417</a>
@@ -66,17 +59,13 @@ const Footer = () => {
                 </a>
               </li>
 
-              <Link to="">
-                <li className="hover:text-black transition-colors duration-300">
-                  INSTAGRAM
-                </li>
-              </Link>
+              <li className="hover:text-black transition-colors duration-300">
+                <Link to="">INSTAGRAM</Link>
+              </li>
 
-              <Link to="">
-                <li className="hover:text-black transition-colors duration-300">
-                  FACEBOOK
-                </li>
-              </Link>
+              <li className="hover:text-black transition-colors duration-300">
+                <Link to="">FACEBOOK</Link>
+              </li>
             </ul>
           </div>
         </InViewAnimation>
