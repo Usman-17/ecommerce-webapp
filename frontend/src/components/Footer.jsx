@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import InViewAnimation from "./InViewAnimation";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo.webp";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();

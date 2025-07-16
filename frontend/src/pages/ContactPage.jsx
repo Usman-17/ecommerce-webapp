@@ -1,4 +1,4 @@
-import img from "../assets/contact.png";
+import contactUsImage from "../assets/contact.webp";
 
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -98,11 +98,9 @@ const ContactPage = () => {
       <div className="my-2 flex flex-col lg:flex-row sm:gap-16 px-0 lg:px-6">
         {/* Contact Image */}
         <img
-          src={img}
+          src={contactUsImage}
           alt="Contact Us"
           className="w-full lg:max-w-[450px] object-cover rounded-md"
-          loading="lazy"
-          decoding="async"
         />
 
         {/* Contact Content */}
@@ -191,7 +189,7 @@ const ContactPage = () => {
             name="name"
             id="name"
             required
-            placeholder="Muhammad Usman"
+            placeholder="Enter your full name"
             value={formData.name}
             onChange={handleInputChange}
           />

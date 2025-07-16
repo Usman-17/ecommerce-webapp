@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 
 import model from "../assets/model.webp";
-import banner_s_1 from "../assets/banner_s_1.png";
-import banner_s_2 from "../assets/banner_s_2.png";
-import banner_s_3 from "../assets/banner_s_3.png";
+import banner_s_1 from "../assets/banner_s_1.webp";
+import banner_s_2 from "../assets/banner_s_2.webp";
+import banner_s_3 from "../assets/banner_s_3.webp";
 
 const Hero = () => {
   return (

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { PartyPopper } from "lucide-react";
-import banner from "../assets/banner_1.png";
+import banner from "../assets/banner_1.webp";
 
 const AdBanner = () => {
   return (

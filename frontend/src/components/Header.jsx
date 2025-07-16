@@ -3,11 +3,11 @@ import { useState, useRef } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { Search, ShoppingBag } from "lucide-react";
 
-import logo from "../assets/logo.png";
-import home from "../assets/home.png";
-import inbox from "../assets/inbox.png";
-import tracking from "../assets/tracking.png";
-import collection from "../assets/products.png";
+import logo from "../assets/logo.webp";
+import home from "../assets/home.webp";
+import inbox from "../assets/inbox.webp";
+import tracking from "../assets/tracking.webp";
+import collection from "../assets/products.webp";
 
 import SearchModal from "./SearchModal";
 import ProfileDropdown from "./ProfileDropdown";

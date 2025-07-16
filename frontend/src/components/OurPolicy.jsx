@@ -1,6 +1,6 @@
-import exchange from "../assets/exchange.png";
-import verified from "../assets/verified.png";
-import support from "../assets/support.png";
+import exchange from "../assets/exchange.webp";
+import verified from "../assets/verified.webp";
+import support from "../assets/support.webp";
 
 const OurPolicy = () => {
   return (
