@@ -74,21 +74,45 @@ const ProductSlider = ({ children, slidesToShow = 6 }) => {
     );
   }
 
-  // Accessibility Fix: Prevent focus in cloned slides
   useEffect(() => {
-    const hiddenSlides = document.querySelectorAll('[aria-hidden="true"]');
-
-    hiddenSlides.forEach((slide) => {
-      const focusables = slide.querySelectorAll(
-        "a, button, input, textarea, select, [tabindex]"
+    const disableFocusableInHiddenSlides = () => {
+      const hiddenSlides = document.querySelectorAll(
+        '.slick-slide[aria-hidden="true"]'
       );
 
-      focusables.forEach((el) => {
-        el.setAttribute("tabindex", "-1");
-        el.setAttribute("aria-hidden", "true");
-        el.style.pointerEvents = "none";
+      hiddenSlides.forEach((slide) => {
+        const focusables = slide.querySelectorAll(
+          "a, button, input, textarea, select, iframe, [tabindex]"
+        );
+
+        focusables.forEach((el) => {
+          el.setAttribute("tabindex", "-1");
+          el.setAttribute("aria-hidden", "true");
+          el.style.pointerEvents = "none";
+
+          if (
+            el.tagName === "BUTTON" ||
+            el.tagName === "INPUT" ||
+            el.tagName === "SELECT"
+          ) {
+            el.disabled = true;
+          }
+        });
       });
+    };
+
+    // Run once initially
+    disableFocusableInHiddenSlides();
+
+    // Set up a MutationObserver to handle DOM changes from Slick
+    const observer = new MutationObserver(disableFocusableInHiddenSlides);
+
+    observer.observe(document.querySelector(".slider-container"), {
+      childList: true,
+      subtree: true,
     });
+
+    return () => observer.disconnect();
   }, []);
 
   return (

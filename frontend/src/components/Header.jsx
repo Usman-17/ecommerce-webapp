@@ -126,10 +126,8 @@ const Header = () => {
                 className="flex items-center gap-1 text-black"
                 onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
               >
-                <div className="flex items-center gap-1">
-                  <img src={home} alt="home" className="w-7" />
-                  <p className="hidden mt-1.5 text-md">Home</p>
-                </div>
+                <img src={home} alt="" className="w-7" />
+                <p className="hidden mt-1.5 text-md">Home</p>
               </NavLink>
             </li>
 
@@ -139,8 +137,8 @@ const Header = () => {
                 className="flex items-center gap-1 text-gray-700 hover:text-black"
                 onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
               >
-                <img src={collection} alt="collection" className="w-7" />
-                <p className="hidden mt-1.5 text-md">ALL PRODUCTS</p>
+                <img src={collection} alt="" className="w-7" />
+                <p className="hidden mt-1.5 text-md">All Products</p>
               </NavLink>
             </li>
 
@@ -153,7 +151,7 @@ const Header = () => {
                     window.scrollTo({ top: 0, behavior: "instant" })
                   }
                 >
-                  <img src={tracking} alt="order" className="w-8" />
+                  <img src={tracking} alt="" className="w-8" />
                   <p className="hidden mt-1.5 text-md">Orders</p>
                 </NavLink>
               </li>
@@ -178,7 +176,7 @@ const Header = () => {
                 className="flex items-center gap-1 text-gray-700 hover:text-black"
                 onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}
               >
-                <img src={inbox} alt="contact" className="w-7" />
+                <img src={inbox} alt="" className="w-7" />
                 <p className="hidden mt-1.5 text-md">Contact</p>
               </NavLink>
             </li>

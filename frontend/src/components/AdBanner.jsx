@@ -23,7 +23,7 @@ const AdBanner = () => {
         </p>
 
         <Link to="/collection">
-          <button className="mt-4 inline-flex items-center gap-2 bg-[#CC0D39] hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition duration-300 hover:shadow-red-500/50 animate-pulse shake-on-hover">
+          <button className="mt-4 inline-flex items-center gap-2 bg-[#B3002D] hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition duration-300 hover:shadow-red-500/50 animate-pulse shake-on-hover">
             Claim Now
             <PartyPopper className="w-5 h-5" />
           </button>
