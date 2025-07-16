@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import Slider from "react-slick";
@@ -73,6 +73,23 @@ const ProductSlider = ({ children, slidesToShow = 6 }) => {
       </button>
     );
   }
+
+  // Accessibility Fix: Prevent focus in cloned slides
+  useEffect(() => {
+    const hiddenSlides = document.querySelectorAll('[aria-hidden="true"]');
+
+    hiddenSlides.forEach((slide) => {
+      const focusables = slide.querySelectorAll(
+        "a, button, input, textarea, select, [tabindex]"
+      );
+
+      focusables.forEach((el) => {
+        el.setAttribute("tabindex", "-1");
+        el.setAttribute("aria-hidden", "true");
+        el.style.pointerEvents = "none";
+      });
+    });
+  }, []);
 
   return (
     <div className="slider-container">
