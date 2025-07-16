@@ -6,16 +6,29 @@ const AboutPage = () => {
   return (
     <>
       <Helmet>
-        <title>About Us | Jemzy.pk - Premium Jewelry in Pakistan</title>
+        <title>About Jemzy.pk | Pakistan’s Trusted Online Jewelry Brand</title>
         <meta
           name="description"
-          content="Discover the story behind Jemzy.pk — Pakistan's trusted online jewelry store for elegant and timeless designs."
+          content="Learn more about Jemzy.pk – Pakistan’s trusted online jewelry destination offering premium quality, craftsmanship, and customer-first service."
         />
         <meta
           name="keywords"
-          content="Jemzy, Jemzy.pk, Pakistani jewelry, premium jewelry, online jewelry store, fashion jewelry Pakistan"
+          content="Jemzy, Jemzy.pk, about Jemzy, online jewelry Pakistan, Pakistani jewelry brand, premium jewelry store, fashion jewelry"
         />
         <link rel="canonical" href="https://www.jemzy.pk/about" />
+
+        {/* Open Graph Meta Tags */}
+        <meta
+          property="og:title"
+          content="About Jemzy.pk | Pakistan’s Trusted Jewelry Brand"
+        />
+        <meta
+          property="og:description"
+          content="Discover Jemzy.pk's story, mission, and commitment to premium, elegant jewelry for every occasion."
+        />
+        <meta property="og:url" content="https://www.jemzy.pk/about" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://www.jemzy.pk/about-og.jpg" />
       </Helmet>
 
       <div className="text-xl text-center pt-6 sm:pt-8 border-t">

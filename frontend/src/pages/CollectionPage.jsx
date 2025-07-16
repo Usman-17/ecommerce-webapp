@@ -73,21 +73,21 @@ const CollectionPage = () => {
           name="keywords"
           content="Jemzy.pk jewelry, women’s jewelry, necklaces, earrings, rings, bracelets, Pakistani jewelry store, fashion accessories"
         />
-        <link rel="canonical" href="https://www.jemzy.pk/collections" />
+        <link rel="canonical" href="https://www.jemzy.pk/collection" />
         <meta
           property="og:title"
-          content="Explore Elegant Jewelry Collections | Jemzy.pk"
+          content="Explore Elegant Jewelry Collection | Jemzy.pk"
         />
         <meta
           property="og:description"
           content="Shop elegant and trendy jewelry pieces at Jemzy.pk. Find rings, necklaces, earrings, and more with premium quality."
         />
-        <meta property="og:url" content="https://www.jemzy.pk/collections" />
+        <meta property="og:url" content="https://www.jemzy.pk/collection" />
         <meta property="og:type" content="website" />
       </Helmet>
 
       <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-3 sm:pt-5 border-t sm:h-[calc(100vh)] overflow-hidden">
-        {/* Left Side Filter  */}
+        {/* Left Side Filter   */}
         <div className="min-w-60 md:min-w-40 lg:min-w-60 h-full overflow-y-auto sticky top-0">
           <p
             onClick={() => setShowFilter(!showFilter)}
