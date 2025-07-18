@@ -1,4 +1,4 @@
 User-agent: *
-Disallow:
+Disallow: /products?page=
 
 Sitemap: https://jemzy.pk/sitemap.xml

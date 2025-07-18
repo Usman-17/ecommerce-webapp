@@ -76,7 +76,7 @@ const SignupPage = () => {
               <CustomLabel label={"Full Name"} />
               <CustomInput
                 name="fullName"
-                placeholder="Muhammad Usman"
+                placeholder="Enter your full name"
                 onChange={handleInputChange}
                 value={formData.fullName}
               />

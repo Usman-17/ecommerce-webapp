@@ -25,7 +25,7 @@ const CustomInput = ({
       autoComplete={autoComplete}
       disabled={disabled}
       aria-label={placeholder}
-      className="mt-1 w-full p-2 border border-gray-300 rounded-md bg-[#fffaf5] text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed"
+      className="mt-1 w-full p-2 border border-gray-300 rounded-md bg-[#fffaf3] text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-800 focus:border-gray-800 disabled:bg-gray-200 disabled:cursor-not-allowed"
     />
   );
 };

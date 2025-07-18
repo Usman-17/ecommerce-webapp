@@ -16,8 +16,6 @@ const AboutPage = () => {
           content="Jemzy, Jemzy.pk, about Jemzy, online jewelry Pakistan, Pakistani jewelry brand, premium jewelry store, fashion jewelry"
         />
         <link rel="canonical" href="https://www.jemzy.pk/about" />
-
-        {/* Open Graph Meta Tags */}
         <meta
           property="og:title"
           content="About Jemzy.pk | Pakistan’s Trusted Jewelry Brand"
@@ -28,7 +26,11 @@ const AboutPage = () => {
         />
         <meta property="og:url" content="https://www.jemzy.pk/about" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://www.jemzy.pk/about-og.jpg" />
+        <meta property="og:site_name" content="Jemzy.pk" />
+        <meta
+          property="og:image"
+          content="https://www.jemzy.pk/about-og.webp"
+        />
       </Helmet>
 
       <div className="text-xl text-center pt-6 sm:pt-8 border-t">

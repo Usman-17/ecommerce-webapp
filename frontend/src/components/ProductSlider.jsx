@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import Slider from "react-slick";
@@ -73,47 +73,6 @@ const ProductSlider = ({ children, slidesToShow = 6 }) => {
       </button>
     );
   }
-
-  useEffect(() => {
-    const disableFocusableInHiddenSlides = () => {
-      const hiddenSlides = document.querySelectorAll(
-        '.slick-slide[aria-hidden="true"]'
-      );
-
-      hiddenSlides.forEach((slide) => {
-        const focusables = slide.querySelectorAll(
-          "a, button, input, textarea, select, iframe, [tabindex]"
-        );
-
-        focusables.forEach((el) => {
-          el.setAttribute("tabindex", "-1");
-          el.setAttribute("aria-hidden", "true");
-          el.style.pointerEvents = "none";
-
-          if (
-            el.tagName === "BUTTON" ||
-            el.tagName === "INPUT" ||
-            el.tagName === "SELECT"
-          ) {
-            el.disabled = true;
-          }
-        });
-      });
-    };
-
-    // Run once initially
-    disableFocusableInHiddenSlides();
-
-    // Set up a MutationObserver to handle DOM changes from Slick
-    const observer = new MutationObserver(disableFocusableInHiddenSlides);
-
-    observer.observe(document.querySelector(".slider-container"), {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div className="slider-container">
