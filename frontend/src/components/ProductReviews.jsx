@@ -1,28 +1,32 @@
-import { useState } from "react";
 import moment from "moment";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { PencilLine, Star, Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import LoadingSpinner from "./LoadingSpinner";
 import ReviewsSkeleton from "./Skeleton/ReviewsSkeleton";
+// Imports End
 
 const ProductReviews = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const queryClient = useQueryClient();
+  const reviewFormRef = useRef(null);
 
   const [showForm, setShowForm] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [selectedReview, setSelectedReview] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(3);
 
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 
   //   Get All Reviews Query
   const { data: reviews = [], isLoading: reviewsIsLoading } = useQuery({
-    queryKey: ["reviews", id],
+    queryKey: ["reviews", slug],
     queryFn: async () => {
-      const res = await fetch(`/api/review/${id}`);
+      const res = await fetch(`/api/review/${slug}`);
       if (!res.ok) throw new Error("Failed to fetch reviews");
       return res.json();
     },
@@ -49,7 +53,7 @@ const ProductReviews = () => {
       setRating(0);
       setComment("");
       setShowForm(false);
-      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+      queryClient.invalidateQueries({ queryKey: ["reviews", slug] });
     },
 
     onError: (err) => toast.error(err.message || "Error adding review"),
@@ -73,7 +77,7 @@ const ProductReviews = () => {
       setRating(0);
       setComment("");
       setShowForm(false);
-      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+      queryClient.invalidateQueries({ queryKey: ["reviews", slug] });
     },
 
     onError: () => toast.error("Failed to update review"),
@@ -91,7 +95,7 @@ const ProductReviews = () => {
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+      queryClient.invalidateQueries({ queryKey: ["reviews", slug] });
     },
 
     onError: () => toast.error("Error deleting review"),
@@ -104,6 +108,14 @@ const ProductReviews = () => {
     setRating(review.rating);
     setComment(review.comment);
     setShowForm(true);
+
+    // Scroll to the form smoothly after a tiny delay
+    setTimeout(() => {
+      reviewFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
   };
 
   const handleFormSubmit = (e) => {
@@ -116,7 +128,7 @@ const ProductReviews = () => {
     if (selectedReview) {
       updateReview({ reviewId: selectedReview._id, rating, comment });
     } else {
-      addReview({ productId: id, rating, comment });
+      addReview({ productId: slug, rating, comment });
     }
   };
 
@@ -173,7 +185,8 @@ const ProductReviews = () => {
       {authUser && showForm && (
         <form
           onSubmit={handleFormSubmit}
-          className="border rounded p-4 bg-white"
+          ref={reviewFormRef}
+          className="border rounded p-4 bg-[#fffaf1]"
         >
           <h3 className="text-lg font-semibold mb-2">
             {selectedReview ? "Edit Review" : "Write a Review"}
@@ -208,7 +221,7 @@ const ProductReviews = () => {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={3}
-              className="w-full border rounded px-3 py-2 text-sm"
+              className="w-full border rounded px-3 py-2 text-sm bg-[#fffaf1]"
               placeholder="Write your review..."
               required
             />
@@ -253,7 +266,7 @@ const ProductReviews = () => {
       {reviews.length === 0 ? (
         <p className="text-gray-500">No reviews yet.</p>
       ) : (
-        reviews.map((review) => (
+        reviews.slice(0, visibleCount).map((review) => (
           <div
             key={review._id}
             className="flex items-start gap-4 border-b pb-4"
@@ -270,7 +283,8 @@ const ProductReviews = () => {
                   {review?.user?.fullName || "Anonymous"}
                 </p>
 
-                {authUser?._id === review?.user?._id && (
+                {(authUser?._id === review?.user?._id ||
+                  authUser?.role === "admin") && (
                   <div className="flex gap-2">
                     <Trash2
                       size={18}
@@ -283,7 +297,7 @@ const ProductReviews = () => {
                     />
                     <PencilLine
                       size={18}
-                      className="text-gray-600 hover:text-blue-500 cursor-pointer"
+                      className="text-gray-600 hover:text-red-500 cursor-pointer"
                       onClick={() => handleEditClick(review)}
                       title="Edit Review"
                     />
@@ -296,7 +310,7 @@ const ProductReviews = () => {
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <Star
                       key={idx}
-                      size={16}
+                      size={14}
                       fill={idx < review.rating ? "currentColor" : "none"}
                       stroke="currentColor"
                     />
@@ -312,6 +326,15 @@ const ProductReviews = () => {
             </div>
           </div>
         ))
+      )}
+
+      {reviews.length > visibleCount && (
+        <button
+          onClick={() => setVisibleCount((prev) => prev + 5)}
+          className="mt-4 text-sm font-medium text-red-600 hover:text-red-700 underline underline-offset-4 transition-colors duration-200"
+        >
+          Show More Reviews
+        </button>
       )}
     </div>
   );

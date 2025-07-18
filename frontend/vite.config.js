@@ -9,6 +9,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "https://galaxydials-ecommerce-store.onrender.com",
+        // target: "http://localhost:8000/",
         changeOrigin: true,
       },
     },
