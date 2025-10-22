@@ -40,6 +40,10 @@ const ProductPage = () => {
     retry: false,
   });
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
+
   // Goggle Analytics
   useEffect(() => {
     if (product) {
