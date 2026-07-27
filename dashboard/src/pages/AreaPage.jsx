@@ -5,12 +5,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import CustomTable from "../components/CustomTable";
 import CustomModal from "../components/CustomModal";
+import CustomInput from "../components/CustomInput";
+import SuccessModal from "../components/SuccessModal";
 import ActionButtons from "../components/ActionButtons";
-import ModalActionButtons from "../components/ModalActionButtons";
 import SectionHeading from "../components/SectionHeading";
+import CustomDeleteModal from "../components/CustomDeleteModal";
+import ModalActionButtons from "../components/ModalActionButtons";
 
+import useGlobalFilter from "../hooks/useGlobalFilter";
 import { useGetAllAreas } from "../hooks/useGetAllAreas";
 // Imports End----
+
 const AreaPage = () => {
   const queryClient = useQueryClient();
 
@@ -18,10 +23,16 @@ const AreaPage = () => {
   const [addModal, setAddModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [areaName, setAreaName] = useState("");
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({
+    open: false,
+    name: "",
+    id: null,
+  });
 
   const { areas = [], isLoading } = useGetAllAreas();
 
-  const saveMutation = useMutation({
+  const { mutate: saveArea, isPending: isSaving } = useMutation({
     mutationFn: async () => {
       const method = editItem ? "PUT" : "POST";
       const url = editItem
@@ -46,17 +57,21 @@ const AreaPage = () => {
     onError: (err) => toast.error(err.message),
   });
 
-  const deleteMutation = useMutation({
+  const { mutate: deleteArea, isPending: isDeleting } = useMutation({
     mutationFn: async (id) => {
       const res = await fetch(`/api/area/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete area");
       return res.json();
     },
     onSuccess: () => {
-      toast.success("Area deleted successfully");
+      setConfirmModal({ open: false, name: "", id: null });
+      setSuccessModalOpen(true);
       queryClient.invalidateQueries(["areas"]);
     },
-    onError: () => toast.error("Failed to delete area"),
+    onError: () => {
+      toast.error("Failed to delete area");
+      setConfirmModal({ open: false, name: "", id: null });
+    },
   });
 
   const handleOpenAdd = () => {
@@ -82,24 +97,25 @@ const AreaPage = () => {
       toast.error("Area name is required");
       return;
     }
-    saveMutation.mutate();
+    saveArea();
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this area?")) {
-      deleteMutation.mutate(id);
-    }
+  const handleDelete = (record) => {
+    setConfirmModal({ open: true, name: record.name, id: record._id });
   };
 
-  const filteredData = areas
-    .filter((item) =>
-      item.name?.toLowerCase().includes(globalSearch.toLowerCase()),
-    )
-    .map((item, index) => ({
-      ...item,
-      key: item._id,
-      sr: index + 1,
-    }));
+  const handleConfirmDelete = () => {
+    deleteArea(confirmModal.id);
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmModal({ open: false, name: "", id: null });
+  };
+
+  const filteredData = useGlobalFilter(areas, globalSearch, [
+    "sr",
+    "productAreaName",
+  ]);
 
   const columns = [
     {
@@ -124,10 +140,10 @@ const AreaPage = () => {
       render: (_, record) => (
         <ActionButtons
           record={record}
-          isEditLoading={saveMutation.isPending && editItem?._id === record._id}
-          isDeleteLoading={deleteMutation.isLoading}
+          isEditLoading={isSaving && editItem?._id === record._id}
+          isDeleteLoading={isDeleting}
           onEdit={(rec) => handleOpenEdit(rec)}
-          onDelete={(rec) => handleDelete(rec._id)}
+          onDelete={(rec) => handleDelete(rec)}
         />
       ),
     },
@@ -176,29 +192,39 @@ const AreaPage = () => {
           </button>
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 font-medium text-sm text-gray-700">
-            Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={areaName}
-            onChange={(e) => setAreaName(e.target.value)}
-            placeholder="Enter Area Name"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
-            autoFocus
-            onKeyDown={(e) => e.key === "Enter" && handleSave()}
-          />
-        </div>
+        <CustomInput
+          id="areaName"
+          label="Name"
+          required
+          value={areaName}
+          onChange={(e) => setAreaName(e.target.value)}
+          placeholder="Enter Area Name"
+          autoFocus
+          onKeyDown={(e) => e.key === "Enter" && handleSave()}
+        />
 
         <ModalActionButtons
           onCancel={handleCloseModal}
           onSubmit={handleSave}
           isDisabled={!areaName.trim()}
-          isSubmitting={saveMutation.isPending}
+          isSubmitting={isSaving}
           submitText={editItem ? "Update" : "Add"}
         />
       </CustomModal>
+
+      <CustomDeleteModal
+        open={confirmModal.open}
+        title={confirmModal.name}
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
+
+      <SuccessModal
+        open={successModalOpen}
+        message="Area deleted successfully!"
+        onClose={() => setSuccessModalOpen(false)}
+      />
     </>
   );
 };
