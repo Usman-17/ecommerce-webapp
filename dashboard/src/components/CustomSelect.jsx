@@ -145,7 +145,7 @@ const CustomSelect = forwardRef(
               : options
           }
           autoComplete="no-autofill"
-          popupClassName="!z-[9999]"
+          popupClassName="!z-[9999999]"
           dropdownStyle={{ zIndex: 9999 }}
           styles={{ popup: { root: { borderRadius: "12px" } } }}
           onOpenChange={(visible) => setIsOpen(visible)}
@@ -158,9 +158,7 @@ const CustomSelect = forwardRef(
           }
         />
 
-        {helperText && (
-          <p className="text-xs text-gray-400">{helperText}</p>
-        )}
+        {helperText && <p className="text-xs text-gray-400">{helperText}</p>}
       </div>
     );
   },

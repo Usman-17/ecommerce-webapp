@@ -18,7 +18,7 @@ const navItems = [
     subItems: [
       { name: "Add Brand", path: "/brand/create" },
       { name: "Product Areas", path: "/area" },
-      { name: "Category", path: "/category/create" },
+      { name: "Category", path: "/category" },
       { name: "Sub Category", path: "/subcategory/manage" },
       { name: "Add Product", path: "/product/create" },
       { name: "Manage Products", path: "/product/manage" },

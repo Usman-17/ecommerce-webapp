@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-const useGetAllCategories = () => {
+export const useGetAllCategories = () => {
   const {
     data: categories,
     isLoading,
@@ -17,7 +17,17 @@ const useGetAllCategories = () => {
 
       return response.json();
     },
-    
+
+    select: (data) =>
+      data.map((item, index) => ({
+        ...item,
+        key: item._id,
+        sr: index + 1,
+        productCategoryName: item.name,
+        areaName: item.area?.name || "-",
+      })),
+
+    retry: false,
     staleTime: 0,
     refetchOnMount: true,
     refetchOnReconnect: true,
@@ -30,5 +40,3 @@ const useGetAllCategories = () => {
     error,
   };
 };
-
-export { useGetAllCategories };
