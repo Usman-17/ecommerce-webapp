@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+
 import Header from "./Header";
 import Backdrop from "./Backdrop";
 import Sidebar from "./Sidebar";
@@ -15,7 +16,7 @@ const LayoutContent = () => {
       </div>
       <div
         className={`flex-1 transition-all duration-300 ease-in-out ${
-          isExpanded || isHovered ? "lg:ml-[290px]" : "lg:ml-[90px]"
+          isExpanded || isHovered ? "lg:ml-[220px]" : "lg:ml-[56px]"
         } ${isMobileOpen ? "ml-0" : ""}`}
       >
         <Header />
