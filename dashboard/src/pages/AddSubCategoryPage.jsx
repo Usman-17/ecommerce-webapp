@@ -1,52 +1,52 @@
 import { useEffect, useState } from "react";
 import { Undo } from "lucide-react";
 import toast from "react-hot-toast";
+import { Select } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import SectionHeading from "../components/SectionHeading";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Button from "../components/Button";
-import CustomSelect from "../components/CustomSelect";
-import { useGetAllAreas } from "../hooks/useGetAllAreas";
 import { useGetAllCategories } from "../hooks/useGetAllCategories";
 
-const AddCategoryPage = () => {
-  const [formData, setFormData] = useState({ name: "", area: "" });
+const AddSubCategoryPage = () => {
+  const [formData, setFormData] = useState({ name: "", category: "" });
 
   const { id } = useParams();
   const navigate = useNavigate();
-  const { areas = [] } = useGetAllAreas();
   const { categories = [] } = useGetAllCategories();
 
   useEffect(() => {
     if (id) {
-      const fetchCategory = async () => {
+      const fetchSubCategory = async () => {
         try {
-          const res = await fetch(`/api/category/${id}`);
+          const res = await fetch(`/api/subcategory/${id}`);
           const data = await res.json();
           setFormData({
             name: data.name || "",
-            area: data.area?._id || "",
+            category: data.category?._id || "",
           });
         } catch (error) {
-          console.error("Error fetching category:", error);
-          toast.error("Failed to fetch category data");
+          console.error("Error fetching subcategory:", error);
+          toast.error("Failed to fetch subcategory data");
         }
       };
-      fetchCategory();
+      fetchSubCategory();
     }
   }, [id]);
 
   const {
-    mutate: saveCategory,
+    mutate: saveSubCategory,
     isPending,
     error,
     isError,
   } = useMutation({
     mutationFn: async (formData) => {
       const method = id ? "PUT" : "POST";
-      const url = id ? `/api/category/update/${id}` : "/api/category/create";
+      const url = id
+        ? `/api/subcategory/update/${id}`
+        : "/api/subcategory/create";
 
       const res = await fetch(url, {
         method,
@@ -55,7 +55,7 @@ const AddCategoryPage = () => {
 
       if (!res.ok) {
         const result = await res.json();
-        throw new Error(result.error || "Failed to save category");
+        throw new Error(result.error || "Failed to save subcategory");
       }
 
       return res.json();
@@ -63,13 +63,15 @@ const AddCategoryPage = () => {
 
     onSuccess: () => {
       toast.success(
-        `Category "${formData.name}" ${id ? "updated" : "created"} successfully`
+        `SubCategory "${formData.name}" ${
+          id ? "updated" : "created"
+        } successfully`
       );
-      navigate("/category/manage");
+      navigate("/subcategory/manage");
     },
 
     onError: () => {
-      toast.error(`Failed to ${id ? "update" : "create"} category`);
+      toast.error(`Failed to ${id ? "update" : "create"} subcategory`);
     },
   });
 
@@ -81,67 +83,71 @@ const AddCategoryPage = () => {
     e.preventDefault();
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
-    formDataToSend.append("area", formData.area);
-    saveCategory(formDataToSend);
+    formDataToSend.append("category", formData.category);
+    saveSubCategory(formDataToSend);
   };
-
-  const existingNames = [...new Set(categories.map((c) => c.name))];
-
-  const nameOptions = existingNames.map((name) => ({
-    label: name,
-    value: name,
-  }));
-
-  const areaOptions = areas.map((a) => ({
-    label: a.name,
-    value: a._id,
-  }));
 
   return (
     <>
       <div className="flex flex-col sm:flex-row justify-between mb-6 sm:mb-0">
         <SectionHeading
-          title={id ? "Edit Category" : "Add New Category"}
-          subtitle="Fill out the details below to add a category"
+          title={id ? "Edit SubCategory" : "Add New SubCategory"}
+          subtitle="Fill out the details below to add a subcategory"
         />
 
         <Button
-          title="Manage All Categories"
-          to="/category/manage"
+          title="Manage All SubCategories"
+          to="/subcategory/manage"
           Icon={Undo}
         />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <CustomSelect
-          label="Name"
-          placeholder="Select or type category name"
-          value={formData.name}
-          onChange={(val) => setFormData((prev) => ({ ...prev, name: val }))}
-          options={nameOptions}
-          mode="tags"
-          required
-        />
+        <div>
+          <label
+            htmlFor="name"
+            className="block mb-1 font-medium text-sm text-gray-700"
+          >
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="Enter SubCategory Name"
+            required
+            value={formData.name}
+            onChange={handleInputChange}
+            className="w-full px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none"
+          />
+        </div>
 
         <div>
           <div className="flex items-center justify-between">
             <label className="block mb-1 font-medium text-sm text-gray-700">
-              Area <span className="text-red-500 font-semibold">*</span>
+              Category*
             </label>
             <Link
-              to="/area/create"
+              to="/category/create"
               className="text-xs text-blue-600 hover:underline"
             >
-              Add New Area
+              Add New Category
             </Link>
           </div>
-          <CustomSelect
-            placeholder="Select Area"
-            value={formData.area}
-            onChange={(val) => setFormData((prev) => ({ ...prev, area: val }))}
-            options={areaOptions}
+          <Select
+            className="w-full"
+            value={formData.category || undefined}
+            onChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}
+            placeholder="Select Category"
             required
-          />
+            showSearch
+          >
+            {categories.map((cat) => (
+              <Select.Option key={cat._id} value={cat._id}>
+                {cat.name}
+              </Select.Option>
+            ))}
+          </Select>
         </div>
 
         {isError && <p className="text-sm text-red-600">{error?.message}</p>}
@@ -156,7 +162,7 @@ const AddCategoryPage = () => {
             {isPending ? (
               <LoadingSpinner content="Saving..." />
             ) : (
-              <>{id ? "Update Category" : "Add Category"}</>
+              <>{id ? "Update SubCategory" : "Add SubCategory"}</>
             )}
           </button>
         </div>
@@ -165,4 +171,4 @@ const AddCategoryPage = () => {
   );
 };
 
-export default AddCategoryPage;
+export default AddSubCategoryPage;

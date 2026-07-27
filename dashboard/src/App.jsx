@@ -20,6 +20,11 @@ const AddBrandPage = lazy(() => import("./pages/AddBrandPage"));
 const BrandListingPage = lazy(() => import("./pages/BrandListingPage"));
 const AddCategoryPage = lazy(() => import("./pages/AddCategoryPage"));
 const CategoryListingPage = lazy(() => import("./pages/CategoryListingPage"));
+const AreaPage = lazy(() => import("./pages/AreaPage"));
+const AddSubCategoryPage = lazy(() => import("./pages/AddSubCategoryPage"));
+const SubCategoryListingPage = lazy(
+  () => import("./pages/SubCategoryListingPage"),
+);
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const EnquiriesPage = lazy(() => import("./pages/EnquiriesPage"));
@@ -113,6 +118,32 @@ const App = () => {
               path="category/manage"
               element={
                 authUser ? <CategoryListingPage /> : <Navigate to="/login" />
+              }
+            />
+
+            {/* Area Routes */}
+            <Route
+              path="/area"
+              element={authUser ? <AreaPage /> : <Navigate to="/login" />}
+            />
+
+            {/* SubCategory Routes */}
+            <Route
+              path="/subcategory/create"
+              element={
+                authUser ? <AddSubCategoryPage /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="subcategory/edit/:id"
+              element={
+                authUser ? <AddSubCategoryPage /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="subcategory/manage"
+              element={
+                authUser ? <SubCategoryListingPage /> : <Navigate to="/login" />
               }
             />
 

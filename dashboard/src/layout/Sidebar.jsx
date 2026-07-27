@@ -28,7 +28,9 @@ const navItems = [
       { name: "Add Product", path: "/product/create" },
       { name: "Manage Products", path: "/product/manage" },
       { name: "Add Brand", path: "/brand/create" },
+      { name: "Product Areas", path: "/area" },
       { name: "Add Category", path: "/category/create" },
+      { name: "Manage SubCategories", path: "/subcategory/manage" },
     ],
   },
   {
@@ -58,7 +60,7 @@ const Sidebar = () => {
 
   const isActive = useCallback(
     (path) => location.pathname === path,
-    [location.pathname]
+    [location.pathname],
   );
 
   useEffect(() => {
@@ -173,8 +175,8 @@ const Sidebar = () => {
           isExpanded || isMobileOpen
             ? "w-[290px]"
             : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
+              ? "w-[290px]"
+              : "w-[90px]"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
