@@ -8,6 +8,11 @@ var categorySchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    area: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Area",
+      required: true,
+    },
   },
   { timestamps: true }
 );
