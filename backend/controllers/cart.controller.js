@@ -7,15 +7,13 @@ import Product from "../models/product.model.js";
 // DESC     : Add to Cart
 export const addToCart = async (req, res) => {
   try {
-    // Extract user ID from the authentication middleware
     const userId = req.user._id;
-    const { itemId, color, quantity = 1 } = req.body;
+    const { itemId, variantId, quantity = 1 } = req.body;
 
     if (!itemId) {
       return res.status(400).json({ error: "itemId is required" });
     }
 
-    // Find the user
     const userData = await User.findById(userId);
     if (!userData) return res.status(404).json({ error: "User not found" });
 
@@ -26,22 +24,29 @@ export const addToCart = async (req, res) => {
 
     let cartData = userData.cartData || {};
 
-    // Initialize the item in the cart if it doesn't exist
-    if (product.colors && product.colors.length > 0) {
-      // ✅ Product has color options
-      if (!color) {
+    if (product.variants && product.variants.length > 0) {
+      if (!variantId) {
         return res
           .status(400)
-          .json({ error: "Color is required for this product" });
+          .json({ error: "variantId is required for this product" });
+      }
+
+      const variant = product.variants.id(variantId);
+      if (!variant) {
+        return res.status(400).json({ error: "Invalid variant ID" });
       }
 
       if (!cartData[itemId]) {
         cartData[itemId] = {};
       }
 
-      cartData[itemId][color] = (cartData[itemId][color] || 0) + quantity;
+      cartData[itemId][variantId] =
+        (cartData[itemId][variantId] || 0) + quantity;
     } else {
-      // ✅ Product does not have color options
+      if (product.sold < quantity) {
+        return res.status(400).json({ error: "Insufficient stock" });
+      }
+
       cartData[itemId] = (cartData[itemId] || 0) + quantity;
     }
 
@@ -62,7 +67,7 @@ export const updateCart = async (req, res) => {
   const userId = req.user._id;
 
   try {
-    const { itemId, color, quantity } = req.body;
+    const { itemId, variantId, quantity } = req.body;
 
     if (!itemId || quantity === undefined) {
       return res.status(400).json({ error: "Missing itemId or quantity" });
@@ -75,29 +80,32 @@ export const updateCart = async (req, res) => {
 
     let updateQuery = {};
 
-    if (product.colors && product.colors.length > 0) {
-      // ✅ Product has colors
-      if (!color) {
+    if (product.variants && product.variants.length > 0) {
+      if (!variantId) {
         return res
           .status(400)
-          .json({ error: "Color is required for this product" });
+          .json({ error: "variantId is required for this product" });
+      }
+
+      const variant = product.variants.id(variantId);
+      if (!variant) {
+        return res.status(400).json({ error: "Invalid variant ID" });
       }
 
       if (quantity === 0) {
         updateQuery = {
           $unset: {
-            [`cartData.${itemId}.${color}`]: 1,
+            [`cartData.${itemId}.${variantId}`]: 1,
           },
         };
       } else {
         updateQuery = {
           $set: {
-            [`cartData.${itemId}.${color}`]: quantity,
+            [`cartData.${itemId}.${variantId}`]: quantity,
           },
         };
       }
     } else {
-      // ✅ Product has no colors
       if (quantity === 0) {
         updateQuery = {
           $unset: {
@@ -128,7 +136,7 @@ export const updateCart = async (req, res) => {
   }
 };
 
-// PATH     : /api/cart/upate
+// PATH     : /api/cart/get
 // METHOD   : GET
 // ACCESS   : Public
 // DESC     : Get User Cart
@@ -157,7 +165,7 @@ export const getUserCart = async (req, res) => {
 export const deleteCartItem = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { itemId, color } = req.body;
+    const { itemId, variantId } = req.body;
 
     if (!itemId) {
       return res.status(400).json({ error: "Missing itemId" });
@@ -175,26 +183,25 @@ export const deleteCartItem = async (req, res) => {
 
     const cartData = userData.cartData || {};
 
-    if (product.colors && product.colors.length > 0) {
-      // ✅ Product has colors
-      if (!color) {
+    if (product.variants && product.variants.length > 0) {
+      if (!variantId) {
         return res
           .status(400)
-          .json({ error: "Color is required for this product" });
+          .json({ error: "variantId is required for this product" });
       }
 
-      if (!cartData[itemId] || !cartData[itemId][color]) {
-        return res.status(404).json({ error: "Item/color not found in cart" });
+      if (!cartData[itemId] || !cartData[itemId][variantId]) {
+        return res
+          .status(404)
+          .json({ error: "Item/variant not found in cart" });
       }
 
-      delete cartData[itemId][color];
+      delete cartData[itemId][variantId];
 
-      // If no colors left for the item, delete the item
       if (Object.keys(cartData[itemId]).length === 0) {
         delete cartData[itemId];
       }
     } else {
-      // ✅ Product has no colors
       if (!cartData[itemId]) {
         return res.status(404).json({ error: "Item not found in cart" });
       }

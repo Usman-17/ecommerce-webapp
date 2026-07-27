@@ -35,22 +35,22 @@ export const placeOrder = async (req, res) => {
     const items = [];
 
     for (const productId in cart) {
-      const colorQuantities = cart[productId];
+      const variantQuantities = cart[productId];
 
-      if (typeof colorQuantities === "number") {
+      if (typeof variantQuantities === "number") {
         items.push({
           productId,
-          quantity: colorQuantities,
-          color: null,
+          quantity: variantQuantities,
+          variantId: null,
         });
-      } else if (typeof colorQuantities === "object") {
-        for (const color in colorQuantities) {
-          const quantity = colorQuantities[color];
+      } else if (typeof variantQuantities === "object") {
+        for (const variantId in variantQuantities) {
+          const quantity = variantQuantities[variantId];
 
           items.push({
             productId,
             quantity,
-            color: color || null,
+            variantId: variantId || null,
           });
         }
       }
@@ -65,15 +65,34 @@ export const placeOrder = async (req, res) => {
           throw new Error(`Product not found with ID: ${item.productId}`);
         }
 
+        let itemPrice = product.price;
+        let itemImages = product.productImages;
+        let variantName = null;
+        let variantAttributes = null;
+
+        if (item.variantId) {
+          const variant = product.variants.id(item.variantId);
+          if (!variant) {
+            throw new Error(`Variant not found with ID: ${item.variantId}`);
+          }
+
+          itemPrice = variant.price || product.price;
+          itemImages = variant.image ? [variant.image] : product.productImages;
+          variantName = variant.name;
+          variantAttributes = variant.attributes;
+        }
+
         return {
           productId: item.productId,
           title: product.title,
-          price: product.price,
+          price: itemPrice,
           quantity: item.quantity,
-          color: item.color,
-          productImages: product.productImages,
+          variantId: item.variantId,
+          variantName,
+          variantAttributes,
+          productImages: itemImages,
         };
-      })
+      }),
     );
 
     // Save order

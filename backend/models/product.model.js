@@ -1,5 +1,32 @@
 import mongoose from "mongoose";
 
+const variantSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    attributes: {
+      type: Map,
+      of: String,
+    },
+    price: {
+      type: Number,
+      min: 0,
+    },
+    sku: {
+      type: String,
+      trim: true,
+    },
+    image: {
+      public_id: { type: String },
+      url: { type: String },
+    },
+  },
+  { _id: true },
+);
+
 const productSchema = new mongoose.Schema(
   {
     title: {
@@ -50,10 +77,6 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
-    colors: {
-      type: [String],
-    },
-
     tags: {
       type: [String],
       required: true,
@@ -65,8 +88,10 @@ const productSchema = new mongoose.Schema(
         url: { type: String, required: true },
       },
     ],
+
+    variants: [variantSchema],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Product = mongoose.model("Product", productSchema);

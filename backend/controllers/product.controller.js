@@ -5,6 +5,31 @@ import { Category } from "../models/category.model.js";
 import slugify from "slugify";
 import { v2 as cloudinary } from "cloudinary";
 
+const uploadImages = async (files, folder) => {
+  const uploaded = [];
+  const images = Array.isArray(files) ? files : [files];
+  for (const image of images) {
+    const result = await cloudinary.uploader.upload(image.tempFilePath, {
+      folder,
+    });
+    uploaded.push({ url: result.secure_url, public_id: result.public_id });
+  }
+  return uploaded;
+};
+
+const uploadSingleImage = async (file, folder) => {
+  const result = await cloudinary.uploader.upload(file.tempFilePath, {
+    folder,
+  });
+  return { url: result.secure_url, public_id: result.public_id };
+};
+
+const deleteImage = async (image) => {
+  if (image && image.public_id) {
+    await cloudinary.uploader.destroy(image.public_id);
+  }
+};
+
 // PATH     : /api/product/create
 // METHOD   : POST
 // ACCESS   : Private Admin
@@ -17,15 +42,12 @@ export const createProduct = async (req, res) => {
       price,
       category,
       brand,
-      colors,
       tags,
       sold,
       secondaryPrice,
+      variants: variantsJson,
     } = req.body;
 
-    const { productImages } = req.files;
-
-    // Check for required fields
     if (!title || !description || !price || !category || !brand || !tags) {
       return res.status(400).json({ error: "All fields are required" });
     }
@@ -37,13 +59,10 @@ export const createProduct = async (req, res) => {
 
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
-      return res.status(400).json({ error: "Invalid Categort ID" });
+      return res.status(400).json({ error: "Invalid category ID" });
     }
 
-    // Generate a slug from the product title
     const slug = slugify(title, { lower: true });
-
-    // Check if the slug already exists to ensure uniqueness
     const existingProduct = await Product.findOne({ slug });
     if (existingProduct) {
       return res
@@ -51,43 +70,40 @@ export const createProduct = async (req, res) => {
         .json({ error: "Product with this title already exists" });
     }
 
-    // Upload projectImg to Cloudinary
-    if (!productImages || productImages.length === 0) {
+    if (!req.files || !req.files.productImages) {
       return res
         .status(400)
         .json({ error: "At least one product image is required" });
     }
 
-    let uploadedImages = [];
+    const uploadedProductImages = await uploadImages(
+      req.files.productImages,
+      "PRODUCT_IMAGES",
+    );
 
-    if (!Array.isArray(productImages)) {
-      const singleUpload = await cloudinary.uploader.upload(
-        productImages.tempFilePath,
-        {
-          folder: "PRODUCT_IMAGES",
-        }
-      );
-
-      uploadedImages.push({
-        url: singleUpload.secure_url,
-        public_id: singleUpload.public_id,
-      });
-    } else {
-      // Handle multiple file uploads
-      for (let image of productImages) {
-        const uploadResponse = await cloudinary.uploader.upload(
-          image.tempFilePath,
-          {
-            folder: "PRODUCT_IMAGES",
-          }
-        );
-
-        uploadedImages.push({
-          url: uploadResponse.secure_url,
-          public_id: uploadResponse.public_id,
-        });
+    let parsedVariants = [];
+    if (variantsJson) {
+      try {
+        parsedVariants = JSON.parse(variantsJson);
+      } catch {
+        return res.status(400).json({ error: "Invalid variants JSON format" });
       }
     }
+
+    for (let i = 0; i < parsedVariants.length; i++) {
+      const variant = parsedVariants[i];
+      const imageKey = `variant_${i}_image`;
+
+      if (req.files && req.files[imageKey]) {
+        variant.image = await uploadSingleImage(
+          req.files[imageKey],
+          "VARIANT_IMAGES",
+        );
+      } else {
+        variant.image = null;
+      }
+    }
+
     const newProduct = new Product({
       title,
       slug,
@@ -96,10 +112,10 @@ export const createProduct = async (req, res) => {
       secondaryPrice,
       category,
       brand,
-      colors,
       sold,
       tags,
-      productImages: uploadedImages,
+      productImages: uploadedProductImages,
+      variants: parsedVariants,
     });
 
     await newProduct.save();
@@ -110,8 +126,8 @@ export const createProduct = async (req, res) => {
   }
 };
 
-// PATH     : /api/product/update/id
-// METHOD   : POST
+// PATH     : /api/product/update/:id
+// METHOD   : PUT
 // ACCESS   : Private Admin
 // DESC     : Update product
 export const updateProduct = async (req, res) => {
@@ -125,15 +141,14 @@ export const updateProduct = async (req, res) => {
       category,
       brand,
       quantity,
-      colors,
       tags,
       sold,
+      variants: variantsJson,
     } = req.body;
 
     const product = await Product.findById(id);
     if (!product) return res.status(404).json({ error: "Product not found" });
 
-    // --- Validate Category (name or ID) ---
     let foundCategory = null;
     if (category) {
       foundCategory = await Category.findById(category).catch(() => null);
@@ -145,7 +160,6 @@ export const updateProduct = async (req, res) => {
       }
     }
 
-    // --- Validate Brand (name or ID) ---
     let foundBrand = null;
     if (brand) {
       foundBrand = await Brand.findById(brand).catch(() => null);
@@ -169,44 +183,71 @@ export const updateProduct = async (req, res) => {
       product.slug = newSlug;
     }
 
-    // --- Update other fields only if provided ---
     if (description) product.description = description;
     if (tags) product.tags = tags;
     if (price) product.price = price;
     if (secondaryPrice) product.secondaryPrice = secondaryPrice;
     if (quantity) product.quantity = quantity;
     if (sold) product.sold = sold;
-    if (colors) product.colors = colors;
     if (foundCategory) product.category = foundCategory._id;
     if (foundBrand) product.brand = foundBrand._id;
 
-    // Handle product image upload
     if (req.files && req.files.productImages) {
-      // Delete old images from Cloudinary
-      if (product.productImages && product.productImages.length > 0) {
-        for (const image of product.productImages) {
-          await cloudinary.uploader.destroy(image.public_id);
+      await deleteImages(product.productImages);
+      product.productImages = await uploadImages(
+        req.files.productImages,
+        "PRODUCT_IMAGES",
+      );
+    }
+
+    if (variantsJson) {
+      let parsedVariants;
+      try {
+        parsedVariants = JSON.parse(variantsJson);
+      } catch {
+        return res.status(400).json({ error: "Invalid variants JSON format" });
+      }
+
+      for (let i = 0; i < parsedVariants.length; i++) {
+        const variant = parsedVariants[i];
+        const imageKey = `variant_${i}_image`;
+
+        if (variant._id) {
+          const existingVariant = product.variants.id(variant._id);
+          if (existingVariant) {
+            if (req.files && req.files[imageKey]) {
+              await deleteImage(existingVariant.image);
+              variant.image = await uploadSingleImage(
+                req.files[imageKey],
+                "VARIANT_IMAGES",
+              );
+            } else {
+              variant.image = existingVariant.image;
+            }
+          }
+        } else {
+          if (req.files && req.files[imageKey]) {
+            variant.image = await uploadSingleImage(
+              req.files[imageKey],
+              "VARIANT_IMAGES",
+            );
+          } else {
+            variant.image = null;
+          }
         }
       }
 
-      // Upload new images to Cloudinary
-      const uploadedImages = [];
-      const images = Array.isArray(req.files.productImages)
-        ? req.files.productImages
-        : [req.files.productImages];
+      const incomingIds = parsedVariants
+        .filter((v) => v._id)
+        .map((v) => v._id.toString());
 
-      for (const image of images) {
-        const { secure_url, public_id } = await cloudinary.uploader.upload(
-          image.tempFilePath,
-          {
-            folder: "PRODUCT_IMAGES",
-          }
-        );
-        uploadedImages.push({ url: secure_url, public_id });
+      for (const oldVariant of product.variants) {
+        if (!incomingIds.includes(oldVariant._id.toString())) {
+          await deleteImage(oldVariant.image);
+        }
       }
 
-      // Update product with new images
-      product.productImages = uploadedImages;
+      product.variants = parsedVariants;
     }
 
     await product.save();
@@ -220,7 +261,7 @@ export const updateProduct = async (req, res) => {
 // PATH     : /api/product/all
 // METHOD   : GET
 // ACCESS   : PUBLIC
-// DESC     : Get all product
+// DESC     : Get all products
 export const getAllproducts = async (req, res) => {
   try {
     const product = await Product.find()
@@ -237,7 +278,7 @@ export const getAllproducts = async (req, res) => {
   }
 };
 
-// PATH     : /api/product/id"
+// PATH     : /api/product/:id
 // METHOD   : GET
 // ACCESS   : Public
 // DESC     : Get Single Product
@@ -276,7 +317,7 @@ export const getProductBySlug = async (req, res) => {
   }
 };
 
-// PATH     : /api/product/:id"
+// PATH     : /api/product/:id
 // METHOD   : DELETE
 // ACCESS   : PRIVATE
 // DESC     : Delete product
@@ -290,12 +331,13 @@ export const deleteProduct = async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    // Delete all product images from Cloudinary if they exist
     if (product.productImages && product.productImages.length > 0) {
-      for (const image of product.productImages) {
-        if (image.public_id) {
-          await cloudinary.uploader.destroy(image.public_id);
-        }
+      await deleteImages(product.productImages);
+    }
+
+    if (product.variants && product.variants.length > 0) {
+      for (const variant of product.variants) {
+        await deleteImage(variant.image);
       }
     }
 
