@@ -96,7 +96,7 @@ const SubCategoryPage = () => {
     setEditItem(record);
     setFormData({
       name: record.name,
-      category: record.category?._id || "",
+      category: record.categoryId || "",
     });
     setAddModal(true);
   };
@@ -146,6 +146,12 @@ const SubCategoryPage = () => {
       width: 70,
       align: "center",
       sorter: (a, b) => a.sr - b.sr,
+    },
+    {
+      title: "Area",
+      dataIndex: "areaName",
+      key: "areaName",
+      sorter: (a, b) => a.areaName.localeCompare(b.areaName),
     },
     {
       title: "Category",

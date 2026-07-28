@@ -92,7 +92,7 @@ const CategoryPage = () => {
     setEditItem(record);
     setFormData({
       name: record.name,
-      area: record.area?._id || "",
+      area: record.areaId || "",
     });
     setAddModal(true);
   };
