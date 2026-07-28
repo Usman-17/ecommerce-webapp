@@ -1,6 +1,7 @@
 import { Loader } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
+import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import "tippy.js/dist/tippy.css";
@@ -13,9 +14,9 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import PageViewTracker from "./components/PageViewTracker";
 
-import HomePage from "./pages/HomePage";
 import useGetAuth from "./hooks/useGetAuth";
-import { HelmetProvider } from "react-helmet-async";
+
+import HomePage from "./pages/HomePage/HomePage";
 const CollectionPage = lazy(() => import("./pages/CollectionPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage/ProductPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
