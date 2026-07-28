@@ -30,6 +30,32 @@ const deleteImage = async (image) => {
   }
 };
 
+const formatProduct = (prod) => {
+  const obj = prod.toObject ? prod.toObject() : prod;
+  return {
+    _id: obj._id,
+    title: obj.title,
+    slug: obj.slug,
+    description: obj.description,
+    price: obj.price,
+    secondaryPrice: obj.secondaryPrice,
+    sold: obj.sold,
+    tags: obj.tags,
+    productImages: obj.productImages,
+    variants: obj.variants,
+    categoryId: obj.category?._id || obj.category || null,
+    categoryName: obj.category?.name || null,
+    brandId: obj.brand?._id || obj.brand || null,
+    brandName: obj.brand?.name || null,
+    areaId: obj.area?._id || obj.area || null,
+    areaName: obj.area?.name || null,
+    subCategoryId: obj.subCategory?._id || obj.subCategory || null,
+    subCategoryName: obj.subCategory?.name || null,
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt,
+  };
+};
+
 // PATH     : /api/product/create
 // METHOD   : POST
 // ACCESS   : Private Admin
@@ -41,6 +67,8 @@ export const createProduct = async (req, res) => {
       description,
       price,
       category,
+      subCategory,
+      area,
       brand,
       tags,
       sold,
@@ -48,13 +76,15 @@ export const createProduct = async (req, res) => {
       variants: variantsJson,
     } = req.body;
 
-    if (!title || !description || !price || !category || !brand || !tags) {
+    if (!title || !description || !price || !category || !tags) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const brandExists = await Brand.findById(brand);
-    if (!brandExists) {
-      return res.status(400).json({ error: "Invalid brand ID" });
+    if (brand && brand !== "undefined" && brand !== "null" && brand !== "") {
+      const brandExists = await Brand.findById(brand);
+      if (!brandExists) {
+        return res.status(400).json({ error: "Invalid brand ID" });
+      }
     }
 
     const categoryExists = await Category.findById(category);
@@ -111,6 +141,8 @@ export const createProduct = async (req, res) => {
       price,
       secondaryPrice,
       category,
+      subCategory: subCategory || undefined,
+      area: area || undefined,
       brand,
       sold,
       tags,
@@ -119,7 +151,10 @@ export const createProduct = async (req, res) => {
     });
 
     await newProduct.save();
-    return res.status(201).json(newProduct);
+    const populated = await newProduct.populate(
+      "brand category subCategory area",
+    );
+    return res.status(201).json(formatProduct(populated));
   } catch (error) {
     console.error("Error in createProduct controller:", error.message);
     res.status(500).json({ error: error.message });
@@ -139,6 +174,8 @@ export const updateProduct = async (req, res) => {
       price,
       secondaryPrice,
       category,
+      subCategory,
+      area,
       brand,
       quantity,
       tags,
@@ -161,7 +198,7 @@ export const updateProduct = async (req, res) => {
     }
 
     let foundBrand = null;
-    if (brand) {
+    if (brand && brand !== "undefined" && brand !== "null" && brand !== "") {
       foundBrand = await Brand.findById(brand).catch(() => null);
       if (!foundBrand) {
         foundBrand = await Brand.findOne({ name: brand.trim() });
@@ -169,6 +206,10 @@ export const updateProduct = async (req, res) => {
       if (!foundBrand) {
         return res.status(400).json({ error: "Invalid brand" });
       }
+    }
+
+    if (brand === "" || brand === "null" || brand === "undefined") {
+      product.brand = null;
     }
 
     if (title) {
@@ -190,7 +231,25 @@ export const updateProduct = async (req, res) => {
     if (quantity) product.quantity = quantity;
     if (sold) product.sold = sold;
     if (foundCategory) product.category = foundCategory._id;
-    if (foundBrand) product.brand = foundBrand._id;
+    if (brand === "" || brand === "null" || brand === "undefined") {
+      product.brand = null;
+    } else if (foundBrand) {
+      product.brand = foundBrand._id;
+    }
+    if (
+      subCategory === "" ||
+      subCategory === "null" ||
+      subCategory === "undefined"
+    ) {
+      product.subCategory = null;
+    } else if (subCategory) {
+      product.subCategory = subCategory;
+    }
+    if (area === "" || area === "null" || area === "undefined") {
+      product.area = null;
+    } else if (area) {
+      product.area = area;
+    }
 
     if (req.files && req.files.productImages) {
       await deleteImages(product.productImages);
@@ -251,7 +310,8 @@ export const updateProduct = async (req, res) => {
     }
 
     await product.save();
-    res.status(200).json(product);
+    const populated = await product.populate("brand category subCategory area");
+    res.status(200).json(formatProduct(populated));
   } catch (error) {
     console.log("Update Product Error:", error);
     res.status(500).json({ error: "Something went wrong" });
@@ -267,11 +327,13 @@ export const getAllproducts = async (req, res) => {
     const product = await Product.find()
       .populate("brand")
       .populate("category")
+      .populate("subCategory")
+      .populate("area")
       .sort({ createdAt: -1 });
 
     if (!product.length === 0) return res.status(200).json([]);
 
-    return res.status(200).json(product);
+    return res.status(200).json(product.map(formatProduct));
   } catch (error) {
     console.log("Error in getAllProduct Controller:", error.message);
     return res.status(500).json({ error: error.message });
@@ -287,8 +349,10 @@ export const getProduct = async (req, res) => {
   try {
     const product = await Product.findById(id)
       .populate("brand")
-      .populate("category");
-    res.status(200).json(product);
+      .populate("category")
+      .populate("subCategory")
+      .populate("area");
+    res.status(200).json(formatProduct(product));
   } catch (error) {
     console.log("Error in getProduct Controller", error.message);
     res.status(500).json({ error: error.message });
@@ -304,13 +368,15 @@ export const getProductBySlug = async (req, res) => {
   try {
     const product = await Product.findOne({ slug })
       .populate("brand")
-      .populate("category");
+      .populate("category")
+      .populate("subCategory")
+      .populate("area");
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    res.status(200).json(product);
+    res.status(200).json(formatProduct(product));
   } catch (error) {
     console.log("Error in getProductBySlug Controller", error.message);
     res.status(500).json({ error: error.message });

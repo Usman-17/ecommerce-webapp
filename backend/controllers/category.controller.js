@@ -1,5 +1,16 @@
-import { Area } from "../models/area.model.js";
 import { Category } from "../models/category.model.js";
+import { Area } from "../models/area.model.js";
+
+const formatCategory = (cat) => {
+  return {
+    _id: cat._id,
+    name: cat.name,
+    areaId: cat.area?._id || cat.area || null,
+    areaName: cat.area?.name || null,
+    createdAt: cat.createdAt,
+    updatedAt: cat.updatedAt,
+  };
+};
 
 // PATH     : /api/category/create
 // METHOD   : POST
@@ -9,13 +20,15 @@ export const createCategory = async (req, res) => {
   try {
     const { name, area } = req.body;
 
-    if (!name || !area) {
-      return res.status(400).json({ error: "Name and Area are required" });
+    if (!name) {
+      return res.status(400).json({ error: "Name is required" });
     }
 
-    const areaExists = await Area.findById(area);
-    if (!areaExists) {
-      return res.status(400).json({ error: "Invalid Area ID" });
+    if (area) {
+      const areaExists = await Area.findById(area);
+      if (!areaExists) {
+        return res.status(400).json({ error: "Invalid Area ID" });
+      }
     }
 
     const existingCategory = await Category.findOne({ name });
@@ -27,7 +40,7 @@ export const createCategory = async (req, res) => {
 
     const category = await new Category({ name, area }).save();
     const populated = await category.populate("area");
-    return res.status(201).json(populated);
+    return res.status(201).json(formatCategory(populated));
   } catch (error) {
     console.error("Error in createCategory controller:", error.message);
     res.status(500).json({ error: error.message });
@@ -58,7 +71,7 @@ export const updateCategory = async (req, res) => {
 
     await category.save();
     const populated = await category.populate("area");
-    res.status(200).json(populated);
+    res.status(200).json(formatCategory(populated));
   } catch (error) {
     console.error("Error in updateCategory:", error.message);
     res.status(500).json({ error: error.message });
@@ -74,7 +87,9 @@ export const getAllCategories = async (req, res) => {
     const categories = await Category.find()
       .populate("area")
       .sort({ createdAt: -1 });
-    return res.status(200).json(categories);
+
+    const formatted = categories.map(formatCategory);
+    return res.status(200).json(formatted);
   } catch (error) {
     console.error("Error in getAllCategories:", error.message);
     res.status(500).json({ error: error.message });
@@ -90,7 +105,7 @@ export const getCategory = async (req, res) => {
   try {
     const category = await Category.findById(id).populate("area");
     if (!category) return res.status(404).json({ error: "Category not found" });
-    res.status(200).json(category);
+    res.status(200).json(formatCategory(category));
   } catch (error) {
     console.error("Error in getCategory:", error.message);
     res.status(500).json({ error: error.message });

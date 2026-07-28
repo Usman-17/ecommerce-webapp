@@ -7,11 +7,13 @@ import {
   deleteSubCategory,
   getAllSubCategories,
   getSubCategory,
+  getSubCategoriesByCategory,
   updateSubCategory,
 } from "../controllers/subCategory.controller.js";
 import { isAdmin, protectRoute } from "../middlewares/authMiddleware.js";
 
 router.get("/all", getAllSubCategories);
+router.get("/category/:categoryId", getSubCategoriesByCategory);
 router.get("/:id", getSubCategory);
 
 // Admin Routes
