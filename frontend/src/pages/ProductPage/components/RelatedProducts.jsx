@@ -13,13 +13,10 @@ const RelatedProducts = ({ category, currentProductId, allProducts }) => {
     const currentId = String(currentProductId);
     return allProducts
       .filter((item) => {
-        const itemId = String(item.productId);
-        const itemWebLinkId = String(item.productWebLinkId);
-        const isSameProduct =
-          itemId === currentId || itemWebLinkId === currentId;
-        return item.productCategoryName === category && !isSameProduct;
+        const itemId = String(item._id || "");
+        const isSameProduct = itemId === currentId;
+        return item.categoryName === category && !isSameProduct;
       })
-
       .slice(0, 6);
   }, [allProducts, category, currentProductId]);
 
@@ -33,7 +30,7 @@ const RelatedProducts = ({ category, currentProductId, allProducts }) => {
     <div className="my-5 mb-5 sm:mb-8">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 2xl:grid-cols-6 gap-y-6 gap-2 sm:gap-2">
         {related.map((product) => (
-          <ProductCard key={product.productSlug} product={product} />
+          <ProductCard key={product.slug || product._id} product={product} />
         ))}
       </div>
     </div>

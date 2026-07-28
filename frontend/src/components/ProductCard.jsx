@@ -2,26 +2,27 @@ import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
   return (
-    <Link to={`/product/${product.slug}`}>
+    <Link to={`/product/${product?.slug}`}>
       <div className="rounded-lg transition-shadow duration-300 ease-in-out max-w-sm mx-auto sm:max-w-none group py-2 hover:shadow-sm mb-2">
         <div className="relative overflow-hidden">
           <div className="relative w-full h-0 pb-[100%] rounded-t-md overflow-hidden">
             {/* Badge for Sale */}
-            {product?.secondaryPrice && (
-              <div className="absolute top-2 left-2 bg-rose-600 text-white text-[10px] sm:text-[11px] font-medium px-3 py-0.5 rounded-full shadow-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                (
-                {Math.round(
-                  ((product.secondaryPrice - product.price) /
-                    product.secondaryPrice) *
-                    100
-                ).toFixed(0)}
-                % OFF)
-              </div>
-            )}
+            {product?.secondaryPrice &&
+              product.secondaryPrice > product?.price && (
+                <div className="absolute top-2 left-2 bg-rose-600 text-white text-[10px] sm:text-[11px] font-medium px-3 py-0.5 rounded-full shadow-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  (
+                  {Math.round(
+                    ((product.secondaryPrice - product.price) /
+                      product.secondaryPrice) *
+                      100,
+                  ).toFixed(0)}
+                  % OFF)
+                </div>
+              )}
 
             {/* First Image */}
             <img
-              src={product?.productImages[0]?.url}
+              src={product?.productImages?.[0]?.url || product?.image}
               alt={product?.title}
               className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ease-in-out group-hover:opacity-0"
               loading="lazy"
@@ -29,9 +30,9 @@ const ProductCard = ({ product }) => {
             />
 
             {/* Second Image */}
-            {product?.productImages[1]?.url && (
+            {product?.productImages?.[1]?.url && (
               <img
-                src={product?.productImages[1].url}
+                src={product.productImages[1].url}
                 alt={`${product?.title} - Alt`}
                 className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out"
               />
@@ -41,9 +42,11 @@ const ProductCard = ({ product }) => {
 
         {/* Product Info */}
         <div className="py-2 px-0.5 sm:px-2">
-          <p className="text-xs sm:text-sm text-gray-500">
-            {product?.brand?.name || ""}
-          </p>
+          {product?.brandName && (
+            <p className="text-xs sm:text-sm text-gray-500">
+              {product.brandName}
+            </p>
+          )}
 
           <h2
             className="font-medium text-xs sm:text-sm md:text-sm tracking-tight text-gray-800"
@@ -61,7 +64,7 @@ const ProductCard = ({ product }) => {
           {/* Price */}
           <div className="flex items-center gap-1 text-nowrap">
             <p className="text-lg font-semibold text-gray-900">
-              Rs. {product?.price.toLocaleString()}
+              Rs. {(product?.price ?? 0).toLocaleString()}
             </p>
 
             {product?.secondaryPrice && (

@@ -49,7 +49,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
     if (activeVariantImage) {
       const idx = images.findIndex(
         (img) =>
-          (img.productImageURL || img.imageURL || img) === activeVariantImage,
+          (img.url || img) === activeVariantImage,
       );
       setSelectedImageIndex(idx !== -1 ? idx : -1);
       setIsAutoPlay(false);
@@ -203,7 +203,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
                   >
                     <img
                       ref={(el) => (thumbnailRefs.current[i] = el)}
-                      src={img.productImageURL || img.imageURL || img}
+                      src={img.url || img}
                       alt={`Thumbnail ${i}`}
                       onClick={() => {
                         setSelectedImageIndex(i);
@@ -255,7 +255,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
           >
             <div className="relative w-full h-84 sm:h-80 lg:h-96 xl:h-122 mt-1.5">
               {images.map((img, idx) => {
-                const src = img.productImageURL || img.imageURL || img;
+                const src = img.url || img;
                 const isActive =
                   selectedImageIndex === idx ||
                   (selectedImageIndex === -1 && src === activeVariantImage);
@@ -276,7 +276,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
                 activeVariantImage &&
                 !images.some(
                   (img) =>
-                    (img.productImageURL || img.imageURL || img) ===
+                    (img.url || img) ===
                     activeVariantImage,
                 ) && (
                   <img
@@ -355,7 +355,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
         close={() => setLightboxOpen(false)}
         index={selectedImageIndex}
         slides={images.map((img) => ({
-          src: img.productImageURL || img.imageURL || img,
+          src: img.url || img,
         }))}
         plugins={[Fullscreen, Zoom, Thumbnails]}
         zoom={{ maxZoomPixelRatio: 3, zoomInMultiplier: 1.2 }}

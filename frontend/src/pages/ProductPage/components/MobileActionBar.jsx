@@ -36,7 +36,6 @@ const MobileActionBar = ({
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Show if scrolling up, hide if scrolling down
       if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
         setIsVisible(false);
       } else {
@@ -50,65 +49,35 @@ const MobileActionBar = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const options = product?.data?.productOptionResponses || [];
-  const hasOptions = options.some(
-    (opt) => opt.productOptionDetailResponses?.length > 0,
-  );
+  const hasVariants = (product?.variants?.length || 0) > 0;
 
   const addToCartInternal = (qty, opts, pk) => {
-    if (!pk) {
-      toast.error("Please select a pack.", { id: "pack-error" });
-      return false;
-    }
     if (currentPrice <= 0) {
       toast.error("Product price is not available.", { id: "price-error" });
       return false;
     }
-    const missingOptions = options.filter(
-      (option) =>
-        option.productOptionDetailResponses?.length > 0 &&
-        !opts[option.productOptionId],
-    );
-    if (missingOptions.length > 0) {
-      const labels = missingOptions.map(
-        (o) => o.productOptionTypeName || o.productOptionPrefix || "Option",
-      );
+    if (hasVariants && !opts["variant"]) {
       setShakeOptions(true);
       setTimeout(() => setShakeOptions(false), 500);
-      toast.error(`Please select ${labels.join(" and ")}`, {
-        id: "selection-error",
-      });
+      toast.error("Please select a variant", { id: "variant-error" });
       return false;
     }
 
     const cartItem = {
-      productId: product.data.productId,
-      productSlug: product.data.productSlug,
-      name: product.data.productName,
+      productId: product._id,
+      productSlug: product.slug,
+      name: product.title,
       image: mainImage,
       variantImage: activeVariantImage,
-      category: product.data.productCategoryName,
-      subCategory: product.data.productSubCategoryName,
-      packId: pk.productPackId,
-      packDescription: pk.productPackDescription,
+      category: product.categoryName,
+      subCategory: product.subCategoryName,
+      packId: pk?.productPackId || null,
+      packDescription: pk?.productPackDescription || null,
       price: currentPrice,
       quantity: qty,
       total: currentPrice * qty,
       selectedOptions: opts,
-      selectedVariants: product.data.productOptionResponses
-        .filter((option) => opts[option.productOptionId])
-        .map((option) => {
-          const detail = option.productOptionDetailResponses.find(
-            (d) => d.productOptionDetailId === opts[option.productOptionId],
-          );
-          return {
-            optionName:
-              option.productOptionTypeName ||
-              option.productOptionPrefix ||
-              "Option",
-            detailName: detail ? detail.optionDetailName : "",
-          };
-        }),
+      selectedVariants: [],
     };
 
     const existingCart = getCart();
@@ -161,56 +130,28 @@ const MobileActionBar = ({
   };
 
   const handleBuyNowInternal = (qty) => {
-    if (hasOptions) {
-      const missingOptions = options.filter(
-        (option) =>
-          option.productOptionDetailResponses?.length > 0 &&
-          !selectedOptions[option.productOptionId],
-      );
-      if (missingOptions.length > 0) {
-        const labels = missingOptions.map(
-          (o) => o.productOptionTypeName || o.productOptionPrefix || "Option",
-        );
-        setShakeOptions(true);
-        setTimeout(() => setShakeOptions(false), 500);
-        toast.error(`Please select ${labels.join(" and ")}`, {
-          id: "selection-error",
-        });
-        return false;
-      }
-    }
-    if (!selectedPack) {
-      toast.error("Please select a pack.", { id: "pack-error" });
+    if (hasVariants && !selectedOptions["variant"]) {
+      setShakeOptions(true);
+      setTimeout(() => setShakeOptions(false), 500);
+      toast.error("Please select a variant", { id: "variant-error" });
       return false;
     }
 
     const buyNowItem = {
-      productId: product.data.productId,
-      productSlug: product.data.productSlug,
-      name: product.data.productName,
+      productId: product._id,
+      productSlug: product.slug,
+      name: product.title,
       image: mainImage,
       variantImage: activeVariantImage,
-      category: product.data.productCategoryName,
-      subCategory: product.data.productSubCategoryName,
-      packId: selectedPack?.productPackId,
-      packDescription: selectedPack?.productPackDescription,
+      category: product.categoryName,
+      subCategory: product.subCategoryName,
+      packId: selectedPack?.productPackId || null,
+      packDescription: selectedPack?.productPackDescription || null,
       price: currentPrice,
       quantity: qty,
       total: currentPrice * qty,
       selectedOptions,
-      selectedVariants: product.data.productOptionResponses
-        .filter((option) => selectedOptions[option.productOptionId])
-        .map((option) => {
-          const detail = option.productOptionDetailResponses.find(
-            (d) =>
-              d.productOptionDetailId ===
-              selectedOptions[option.productOptionId],
-          );
-          return {
-            optionName: option.productOptionTypeName,
-            detailName: detail ? detail.optionDetailName : "",
-          };
-        }),
+      selectedVariants: [],
     };
     setInMemoryData("buyNowItem", buyNowItem);
     return true;

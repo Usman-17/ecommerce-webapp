@@ -29,71 +29,37 @@ const ProductActions = ({
 
   const total = currentPrice * quantity;
 
-  const handleAddToCart = () => {
-    if (!selectedPack) {
-      toast.error("Please select a pack before adding to cart.", {
-        id: "pack-error",
-      });
-      return;
-    }
+  const hasVariants = (product?.variants?.length || 0) > 0;
 
+  const handleAddToCart = () => {
     if (currentPrice <= 0) {
       toast.error("Product price is not available.", { id: "price-error" });
       return;
     }
 
-    // Check if all required options are selected (only if product has options)
-    const options = product.data.productOptionResponses || [];
-    const hasOptions = options.some(
-      (option) => option.productOptionDetailResponses?.length > 0,
-    );
-    const missingOptions = options.filter(
-      (option) =>
-        option.productOptionDetailResponses?.length > 0 &&
-        !selectedOptions[option.productOptionId],
-    );
-
-    if (hasOptions && missingOptions.length > 0) {
-      const labels = missingOptions.map((o) => o.productOptionTypeName);
+    if (hasVariants && !selectedOptions["variant"]) {
       onShakeOptions?.();
-      toast.error(`Please select ${labels.join(" and ")}`, {
-        id: "selection-error",
-      });
+      toast.error("Please select a variant", { id: "variant-error" });
       return;
     }
 
     setIsAdding(true);
 
     const cartItem = {
-      productId: product.data.productId,
-      productSlug: product.data.productSlug,
-      name: product.data.productName,
+      productId: product._id,
+      productSlug: product.slug,
+      name: product.title,
       image: mainImage,
       variantImage: activeVariantImage,
-      category: product.data.productCategoryName,
-      subCategory: product.data.productSubCategoryName,
-      packId: selectedPack?.productPackId,
-      packDescription: selectedPack?.productPackDescription,
+      category: product.categoryName,
+      subCategory: product.subCategoryName,
+      packId: selectedPack?.productPackId || null,
+      packDescription: selectedPack?.productPackDescription || null,
       price: currentPrice,
       quantity: quantity,
       total: total,
       selectedOptions,
-      selectedVariants: product.data.productOptionResponses
-        .filter((option) => selectedOptions[option.productOptionId])
-        .map((option) => {
-          const detail = option.productOptionDetailResponses.find(
-            (d) =>
-              d.productOptionDetailId ===
-              selectedOptions[option.productOptionId],
-          );
-          return {
-            optionName:
-              option.productOptionTypeName ||
-              option.productOptionPrefix ||
-              "Option",
-            detailName: detail ? detail.optionDetailName : "",
-          };
-        }),
+      selectedVariants: [],
     };
 
     const existingCart = getCart();
@@ -118,7 +84,7 @@ const ProductActions = ({
     setCart(existingCart);
     window.dispatchEvent(new Event("cartUpdated"));
 
-    trackAddToCart(product.data, quantity, { item_list_name: "product_page" });
+    trackAddToCart(product, quantity, { item_list_name: "product_page" });
 
     setTimeout(() => {
       setIsAdding(false);
@@ -127,70 +93,32 @@ const ProductActions = ({
   };
 
   const handleBuyNow = () => {
-    if (!selectedPack) {
-      toast.error("Please select a pack before proceeding.", {
-        id: "pack-error",
-      });
-      return;
-    }
-
     if (currentPrice <= 0) {
       toast.error("Product price is not available.", { id: "price-error" });
       return;
     }
 
-    // Check if all required options are selected (only if product has options)
-    const options = product.data.productOptionResponses || [];
-    const hasOptions = options.some(
-      (option) => option.productOptionDetailResponses?.length > 0,
-    );
-    const missingOptions = options.filter(
-      (option) =>
-        option.productOptionDetailResponses?.length > 0 &&
-        !selectedOptions[option.productOptionId],
-    );
-
-    if (hasOptions && missingOptions.length > 0) {
-      const labels = missingOptions.map(
-        (o) => o.productOptionTypeName || o.productOptionPrefix || "Option",
-      );
+    if (hasVariants && !selectedOptions["variant"]) {
       onShakeOptions?.();
-      toast.error(`Please select ${labels.join(" and ")}`, {
-        id: "selection-error",
-      });
+      toast.error("Please select a variant", { id: "variant-error" });
       return;
     }
 
     const buyNowItem = {
-      productId: product.data.productId,
-      productSlug: product.data.productSlug,
-      name: product.data.productName,
+      productId: product._id,
+      productSlug: product.slug,
+      name: product.title,
       image: mainImage,
       variantImage: activeVariantImage,
-      category: product.data.productCategoryName,
-      subCategory: product.data.productSubCategoryName,
-      packId: selectedPack?.productPackId,
-      packDescription: selectedPack?.productPackDescription,
+      category: product.categoryName,
+      subCategory: product.subCategoryName,
+      packId: selectedPack?.productPackId || null,
+      packDescription: selectedPack?.productPackDescription || null,
       price: currentPrice,
       quantity: quantity,
       total: total,
       selectedOptions,
-      selectedVariants: product.data.productOptionResponses
-        .filter((option) => selectedOptions[option.productOptionId])
-        .map((option) => {
-          const detail = option.productOptionDetailResponses.find(
-            (d) =>
-              d.productOptionDetailId ===
-              selectedOptions[option.productOptionId],
-          );
-          return {
-            optionName:
-              option.productOptionTypeName ||
-              option.productOptionPrefix ||
-              "Option",
-            detailName: detail ? detail.optionDetailName : "",
-          };
-        }),
+      selectedVariants: [],
     };
 
     setInMemoryData("buyNowItem", buyNowItem);
@@ -218,7 +146,7 @@ const ProductActions = ({
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-              className="w-12 text-center bg-transparent focus:outline-none font-bold text-primary select-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&]:moz-appearance:textfield"
+              className="w-12 text-center bg-transparent focus:outline-none font-bold text-primary select-none [&::-webkit-outer-spin-button]:appearance-none [&]:moz-appearance:textfield"
             />
 
             <button
