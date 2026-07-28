@@ -11,7 +11,7 @@ import PageViewTracker from "./components/PageViewTracker";
 import HomePage from "./pages/HomePage";
 import useGetAuth from "./hooks/useGetAuth";
 const CollectionPage = lazy(() => import("./pages/CollectionPage"));
-const ProductPage = lazy(() => import("./pages/ProductPage"));
+const ProductPage = lazy(() => import("./pages/ProductPage/ProductPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const PlaceOrderPage = lazy(() => import("./pages/PlaceOrderPage"));
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage"));

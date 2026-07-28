@@ -8,6 +8,7 @@ import { AppContextProvider } from "./context/AppContext.jsx";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { initGA } from "./lib/ga/index.js";
+import { WishlistProvider } from "./context/WishlistContext.jsx";
 
 initGA();
 
@@ -35,8 +36,10 @@ createRoot(document.getElementById("root")).render(
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AppContextProvider>
-        <App />
+        <WishlistProvider>
+          <App />
+        </WishlistProvider>
       </AppContextProvider>
     </QueryClientProvider>
-  </HelmetProvider>
+  </HelmetProvider>,
 );

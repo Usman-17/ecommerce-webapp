@@ -1,12 +1,25 @@
-const CustomButton = ({ disabled, type = "submit", content, className }) => {
+import { Link } from "react-router-dom";
+
+const CustomButton = ({
+  to = "/shop",
+  text = "Start Shopping",
+  className = "",
+  icon: Icon,
+}) => {
   return (
-    <button
-      type={type}
-      disabled={disabled}
-      className={`text-white bg-gray-950 hover:bg-black focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 transition ${className} `}
+    <Link
+      to={to}
+      className={`group flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-full font-semibold transition-all duration-150 hover:opacity-90 active:scale-[0.97] active:opacity-80 active:ring-2 active:ring-white/20 select-none ${className}`}
     >
-      {content}
-    </button>
+      {text}
+
+      {Icon && (
+        <Icon
+          size={14}
+          className="mt-1 transition-transform duration-150 group-hover:translate-x-1 group-active:translate-x-0.5"
+        />
+      )}
+    </Link>
   );
 };
 
