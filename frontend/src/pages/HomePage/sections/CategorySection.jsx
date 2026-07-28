@@ -117,7 +117,7 @@ const CategorySection = () => {
                     >
                       <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-warm border border-[#f0e4da] shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-[#CC0D39]/30 group-hover:scale-105 mt-2">
                         <img
-                          src={"/category.png"}
+                          src={cat.imageUrl || "/category.png"}
                           alt={cat.name || "Category"}
                           loading="lazy"
                           width={112}

@@ -4,8 +4,6 @@ import { Link, useParams } from "react-router-dom";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronRight, Star, Share2 } from "lucide-react";
 
-import { apiRequest } from "../../utils/authFetch";
-
 import { useWishlist } from "../../hooks/useWishlist";
 import { useGetAllProducts } from "../../hooks/useGetAllProducts";
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
@@ -55,13 +53,17 @@ const ProductPage = () => {
 
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
     queryKey: ["productReviews", product?._id],
+    enabled: !!product?._id,
+
     queryFn: async () => {
-      const result = await apiRequest(
+      const res = await fetch(
         `/api/WAP/ProductReview/GetByProductId?Id=${product._id}`,
       );
-      return Array.isArray(result?.data) ? result.data : [];
+      if (!res.ok) return [];
+      const json = await res.json();
+      return Array.isArray(json?.data) ? json.data : [];
     },
-    enabled: !!product?._id,
+
     retry: false,
     staleTime: 0,
     refetchOnMount: true,

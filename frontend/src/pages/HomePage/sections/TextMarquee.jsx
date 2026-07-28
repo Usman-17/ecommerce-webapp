@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "../../../utils/authFetch";
 
 const StarIcon = () => (
   <svg
@@ -19,8 +18,10 @@ const TextMarquee = () => {
   const { data: announcements = [] } = useQuery({
     queryKey: ["announcements"],
     queryFn: async () => {
-      const result = await apiRequest("/api/WAP/Announcement/GetAll");
-      return (result.data || []).filter((a) => a.isActive);
+      const res = await fetch("/api/WAP/Announcement/GetAll");
+      if (!res.ok) return [];
+      const json = await res.json();
+      return (json.data || []).filter((a) => a.isActive);
     },
 
     retry: false,
