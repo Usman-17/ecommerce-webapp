@@ -12,6 +12,10 @@ const categorySchema = new mongoose.Schema(
       ref: "Area",
       default: null,
     },
+    image: {
+      public_id: { type: String },
+      url: { type: String },
+    },
   },
   { timestamps: true },
 );

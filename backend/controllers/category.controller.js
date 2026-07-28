@@ -1,16 +1,30 @@
 import { Category } from "../models/category.model.js";
 import { Area } from "../models/area.model.js";
+import { v2 as cloudinary } from "cloudinary";
 
-const formatCategory = (cat) => {
-  return {
-    _id: cat._id,
-    name: cat.name,
-    areaId: cat.area?._id || cat.area || null,
-    areaName: cat.area?.name || null,
-    createdAt: cat.createdAt,
-    updatedAt: cat.updatedAt,
-  };
+const uploadImage = async (file) => {
+  const result = await cloudinary.uploader.upload(file.tempFilePath, {
+    folder: "CATEGORY_IMAGES",
+  });
+  return { url: result.secure_url, public_id: result.public_id };
 };
+
+const deleteImage = async (image) => {
+  if (image && image.public_id) {
+    await cloudinary.uploader.destroy(image.public_id);
+  }
+};
+
+const formatCategory = (cat) => ({
+  _id: cat._id,
+  name: cat.name,
+  areaId: cat.area?._id || cat.area || null,
+  areaName: cat.area?.name || null,
+  imagePublicId: cat.image?.public_id || null,
+  imageUrl: cat.image?.url || null,
+  createdAt: cat.createdAt,
+  updatedAt: cat.updatedAt,
+});
 
 // PATH     : /api/category/create
 // METHOD   : POST
@@ -20,8 +34,8 @@ export const createCategory = async (req, res) => {
   try {
     const { name, area } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ error: "Name is required" });
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: "Category name is required" });
     }
 
     if (area) {
@@ -31,15 +45,25 @@ export const createCategory = async (req, res) => {
       }
     }
 
-    const existingCategory = await Category.findOne({ name });
+    const existingCategory = await Category.findOne({ name: name.trim() });
     if (existingCategory) {
       return res
         .status(400)
         .json({ error: "Category with this name already exists" });
     }
 
-    const category = await new Category({ name, area }).save();
-    const populated = await category.populate("area");
+    let image = null;
+    if (req.files && req.files.image) {
+      image = await uploadImage(req.files.image);
+    }
+
+    const category = await Category.create({
+      name: name.trim(),
+      area: area || null,
+      image,
+    });
+
+    const populated = await Category.findById(category._id).populate("area");
     return res.status(201).json(formatCategory(populated));
   } catch (error) {
     console.error("Error in createCategory controller:", error.message);
@@ -59,19 +83,40 @@ export const updateCategory = async (req, res) => {
     const category = await Category.findById(id);
     if (!category) return res.status(404).json({ error: "Category not found" });
 
-    if (area) {
-      const areaExists = await Area.findById(area);
-      if (!areaExists) {
-        return res.status(400).json({ error: "Invalid Area ID" });
+    if (area !== undefined) {
+      if (area === "" || area === "null" || area === "undefined") {
+        category.area = null;
+      } else if (area) {
+        const areaExists = await Area.findById(area);
+        if (!areaExists) {
+          return res.status(400).json({ error: "Invalid Area ID" });
+        }
+        category.area = area;
       }
-      category.area = area;
     }
 
-    if (name) category.name = name;
+    if (name && name.trim()) {
+      const existing = await Category.findOne({
+        name: name.trim(),
+        _id: { $ne: id },
+      });
+      if (existing) {
+        return res
+          .status(400)
+          .json({ error: "Category with this name already exists" });
+      }
+      category.name = name.trim();
+    }
+
+    // Handle image upload
+    if (req.files && req.files.image) {
+      await deleteImage(category.image);
+      category.image = await uploadImage(req.files.image);
+    }
 
     await category.save();
-    const populated = await category.populate("area");
-    res.status(200).json(formatCategory(populated));
+    const populated = await Category.findById(category._id).populate("area");
+    return res.status(200).json(formatCategory(populated));
   } catch (error) {
     console.error("Error in updateCategory:", error.message);
     res.status(500).json({ error: error.message });
@@ -105,10 +150,10 @@ export const getCategory = async (req, res) => {
   try {
     const category = await Category.findById(id).populate("area");
     if (!category) return res.status(404).json({ error: "Category not found" });
-    res.status(200).json(formatCategory(category));
+    return res.status(200).json(formatCategory(category));
   } catch (error) {
     console.error("Error in getCategory:", error.message);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: "Failed to fetch category" });
   }
 };
 
@@ -122,10 +167,11 @@ export const deleteCategory = async (req, res) => {
     const category = await Category.findById(id);
     if (!category) return res.status(404).json({ error: "Category not found" });
 
+    await deleteImage(category.image);
     await Category.findByIdAndDelete(id);
-    res.status(200).json({ message: "Category deleted successfully" });
+    return res.status(200).json({ message: "Category deleted successfully" });
   } catch (error) {
     console.error("Error in deleteCategory:", error.message);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: "Failed to delete category" });
   }
 };
