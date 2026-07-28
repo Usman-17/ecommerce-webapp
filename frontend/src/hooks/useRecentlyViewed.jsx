@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const STORAGE_KEY = "recentlyViewed";
 const MAX_ITEMS = 20;
@@ -13,24 +13,24 @@ export const useRecentlyViewed = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(recentlyViewed));
   }, [recentlyViewed]);
 
-  const addRecentlyViewed = (product) => {
+  const addRecentlyViewed = useCallback((product) => {
     setRecentlyViewed((prev) => {
       const filtered = prev.filter(
         (item) => item.productId !== product.productId,
       );
       return [product, ...filtered].slice(0, MAX_ITEMS);
     });
-  };
+  }, []);
 
-  const removeRecentlyViewed = (productId) => {
+  const removeRecentlyViewed = useCallback((productId) => {
     setRecentlyViewed((prev) =>
       prev.filter((item) => item.productId !== productId),
     );
-  };
+  }, []);
 
-  const clearRecentlyViewed = () => {
+  const clearRecentlyViewed = useCallback(() => {
     setRecentlyViewed([]);
-  };
+  }, []);
 
   return {
     recentlyViewed,

@@ -188,14 +188,12 @@ const ProductPage = () => {
     product,
   });
 
-  useEffect(() => {
-    recentlyViewedRef.current = {
-      mainImage,
-      currentPrice,
-      originalPrice,
-      product,
-    };
-  });
+  recentlyViewedRef.current = {
+    mainImage,
+    currentPrice,
+    originalPrice,
+    product,
+  };
 
   useEffect(() => {
     const {

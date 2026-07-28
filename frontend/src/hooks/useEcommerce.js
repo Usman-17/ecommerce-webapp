@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useMemo } from "react";
 import {
   trackViewItem as _trackViewItem,
   trackViewItemList as _trackViewItemList,
@@ -17,26 +17,30 @@ import {
 import { IS_ANALYTICS_ENABLED } from "../analytics/constants";
 
 const useEcommerce = () => {
-  const guard = useCallback((fn) => (...args) => {
-    if (!IS_ANALYTICS_ENABLED) return;
-    return fn(...args);
-  }, []);
+  return useMemo(() => {
+    const guard =
+      (fn) =>
+      (...args) => {
+        if (!IS_ANALYTICS_ENABLED) return;
+        return fn(...args);
+      };
 
-  return {
-    trackViewItem: guard(_trackViewItem),
-    trackViewItemList: guard(_trackViewItemList),
-    trackSelectItem: guard(_trackSelectItem),
-    trackAddToCart: guard(_trackAddToCart),
-    trackRemoveFromCart: guard(_trackRemoveFromCart),
-    trackViewCart: guard(_trackViewCart),
-    trackBeginCheckout: guard(_trackBeginCheckout),
-    trackAddShippingInfo: guard(_trackAddShippingInfo),
-    trackAddPaymentInfo: guard(_trackAddPaymentInfo),
-    trackPurchase: guard(_trackPurchase),
-    trackRefund: guard(_trackRefund),
-    trackAddToWishlist: guard(_trackAddToWishlist),
-    trackRemoveFromWishlist: guard(_trackRemoveFromWishlist),
-  };
+    return {
+      trackViewItem: guard(_trackViewItem),
+      trackViewItemList: guard(_trackViewItemList),
+      trackSelectItem: guard(_trackSelectItem),
+      trackAddToCart: guard(_trackAddToCart),
+      trackRemoveFromCart: guard(_trackRemoveFromCart),
+      trackViewCart: guard(_trackViewCart),
+      trackBeginCheckout: guard(_trackBeginCheckout),
+      trackAddShippingInfo: guard(_trackAddShippingInfo),
+      trackAddPaymentInfo: guard(_trackAddPaymentInfo),
+      trackPurchase: guard(_trackPurchase),
+      trackRefund: guard(_trackRefund),
+      trackAddToWishlist: guard(_trackAddToWishlist),
+      trackRemoveFromWishlist: guard(_trackRemoveFromWishlist),
+    };
+  }, []);
 };
 
 export default useEcommerce;

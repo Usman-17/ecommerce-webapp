@@ -64,9 +64,8 @@ const WishlistButton = ({ isLiked, onToggle, className = "" }) => {
                 scale: [1, 1.4, 0.9, 1.1, 1],
                 transition: {
                   duration: 0.4,
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 15,
+                  type: "tween",
+                  ease: "easeInOut",
                 },
               }
             : { scale: 1 }
