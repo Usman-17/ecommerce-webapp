@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from "react";
 import { X } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 
 import ProductCard from "./ProductCard";
 import ProductCardSkeleton from "../components/Skeleton/ProductCardSkeleton";
@@ -38,13 +38,13 @@ const SearchModal = ({ onClose }) => {
   useEffect(() => {
     if (debouncedSearch && Array.isArray(products)) {
       const filtered = products.filter((product) =>
-        product.title.toLowerCase().includes(debouncedSearch.toLowerCase())
+        product.title.toLowerCase().includes(debouncedSearch.toLowerCase()),
       );
       setSearchData(filtered);
     } else {
       // No search input: show popular products
       const popularProducts = products.filter((product) =>
-        product.tags?.includes("Popular")
+        product.tags?.includes("Popular"),
       );
       setSearchData(popularProducts);
     }
@@ -102,7 +102,7 @@ const SearchModal = ({ onClose }) => {
             ref={inputRef}
             type="text"
             placeholder="I'm Looking for..."
-            className="border border-gray-300 rounded-full w-full p-3 px-5 text-base focus:outline-none focus:border-gray-800 placeholder:text-sm placeholder:font-normal"
+            className="border border-gray-300 rounded-full w-full p-3 px-5 text-base focus:outline-none placeholder:font-normal"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

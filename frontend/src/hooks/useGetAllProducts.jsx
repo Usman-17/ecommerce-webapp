@@ -23,7 +23,7 @@ const useGetAllProducts = () => {
   });
 
   return {
-    products,
+    products: products || [],
     productIsLoading: isLoading,
     productError: isError,
     productRefetch: refetch,

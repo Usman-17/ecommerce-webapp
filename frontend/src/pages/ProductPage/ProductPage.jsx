@@ -51,7 +51,7 @@ const ProductPage = () => {
     retry: false,
   });
 
-  const { allProducts } = useGetAllProducts();
+  const { products: allProducts = [] } = useGetAllProducts();
 
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
     queryKey: ["productReviews", product?._id],

@@ -1,3 +1,4 @@
+import { Loader } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -9,7 +10,6 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import PreLoader from "./components/PreLoader";
 import ScrollToTop from "./components/ScrollToTop";
 import PageViewTracker from "./components/PageViewTracker";
 
@@ -37,22 +37,22 @@ const App = () => {
 
   return (
     <HelmetProvider>
-      <div className="px-4 sm:px-[5vw] md:px-[3vw] lg:px-[3vw]">
-        <BrowserRouter>
-          <PageViewTracker />
-          <Header />
+      <BrowserRouter>
+        <ScrollToTop />
+        <PageViewTracker />
 
+        <div className="px-3">
+          <Header />
           <Suspense
             fallback={
-              <div className="min-h-[100vh] flex items-center justify-center">
-                <PreLoader />
+              <div className="flex items-center justify-center h-screen bg-[#fffaf5]">
+                <Loader className="size-10 animate-spin text-primary" />
               </div>
             }
           >
-            <ScrollToTop />
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/collection" element={<CollectionPage />} />
+              <Route path="/shop" element={<CollectionPage />} />
               <Route path="/product/:slug" element={<ProductPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
@@ -104,22 +104,22 @@ const App = () => {
               />
             </Routes>
           </Suspense>
+        </div>
 
-          <Toaster
-            position="bottom-center"
-            toastOptions={{
-              style: {
-                background: "#363636",
-                color: "#fffbfb",
-                fontFamily: "outfit",
-                fontSize: "13px",
-                padding: "8px 16px",
-              },
-            }}
-          />
-          <Footer />
-        </BrowserRouter>
-      </div>
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            style: {
+              background: "#363636",
+              color: "#fffbfb",
+              fontFamily: "outfit",
+              fontSize: "13px",
+              padding: "8px 16px",
+            },
+          }}
+        />
+        <Footer />
+      </BrowserRouter>
     </HelmetProvider>
   );
 };
