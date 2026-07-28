@@ -7,6 +7,7 @@ import CustomTable from "../components/CustomTable";
 import CustomModal from "../components/CustomModal";
 import CustomInput from "../components/CustomInput";
 import CustomSelect from "../components/CustomSelect";
+import CustomUpload from "../components/CustomUpload";
 import SuccessModal from "../components/SuccessModal";
 import ActionButtons from "../components/ActionButtons";
 import SectionHeading from "../components/SectionHeading";
@@ -22,7 +23,12 @@ import { useGetAllCategories } from "../hooks/useGetAllCategories";
 const CategoryPage = () => {
   const queryClient = useQueryClient();
 
-  const [formData, setFormData] = useState({ name: "", area: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    area: "",
+    imageFile: null,
+    imagePreview: "",
+  });
   const [globalSearch, setGlobalSearch] = useState("");
   const [addModal, setAddModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -38,17 +44,13 @@ const CategoryPage = () => {
   const { categories = [], isLoading } = useGetAllCategories();
 
   const { mutate: saveCategory, isPending: isSaving } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (formDataToSend) => {
       const method = editItem ? "PUT" : "POST";
       const url = editItem
         ? `/api/category/update/${editItem._id}`
         : "/api/category/create";
 
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: formData.name, area: formData.area }),
-      });
+      const res = await fetch(url, { method, body: formDataToSend });
       if (!res.ok) {
         const result = await res.json();
         throw new Error(result.error || "Failed to save category");
@@ -84,7 +86,7 @@ const CategoryPage = () => {
 
   const handleOpenAdd = () => {
     setEditItem(null);
-    setFormData({ name: "", area: "" });
+    setFormData({ name: "", area: "", imageFile: null, imagePreview: "" });
     setAddModal(true);
   };
 
@@ -93,6 +95,8 @@ const CategoryPage = () => {
     setFormData({
       name: record.name,
       area: record.areaId || "",
+      imageFile: null,
+      imagePreview: record.imageUrl || record.image?.url || "",
     });
     setAddModal(true);
   };
@@ -100,7 +104,7 @@ const CategoryPage = () => {
   const handleCloseModal = () => {
     setAddModal(false);
     setEditItem(null);
-    setFormData({ name: "", area: "" });
+    setFormData({ name: "", area: "", imageFile: null, imagePreview: "" });
   };
 
   const handleSave = () => {
@@ -112,7 +116,13 @@ const CategoryPage = () => {
       toast.error("Please select an area");
       return;
     }
-    saveCategory();
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("area", formData.area);
+    if (formData.imageFile) {
+      formDataToSend.append("image", formData.imageFile);
+    }
+    saveCategory(formDataToSend);
   };
 
   const handleDelete = (record) => {
@@ -141,6 +151,27 @@ const CategoryPage = () => {
       width: 70,
       align: "center",
       sorter: (a, b) => a.sr - b.sr,
+    },
+    {
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
+      width: 70,
+      align: "center",
+      render: (_, record) => {
+        const img = record.imageUrl || record.image?.url;
+        return img ? (
+          <img
+            src={img}
+            alt={record.name}
+            className="w-full h-10 rounded-lg object-contain mx-auto"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center mx-auto text-xs text-gray-400">
+            N/A
+          </div>
+        );
+      },
     },
     {
       title: "Area",
@@ -193,7 +224,7 @@ const CategoryPage = () => {
       />
 
       {/* Add / Edit Modal */}
-      <CustomModal isOpen={addModal} className="w-[90%] max-w-md">
+      <CustomModal isOpen={addModal} className="w-[90%] max-w-xl">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
@@ -235,6 +266,20 @@ const CategoryPage = () => {
             }
             placeholder="Enter Category Name"
             onKeyDown={(e) => e.key === "Enter" && handleSave()}
+          />
+
+          <CustomUpload
+            label=""
+            title="Choose Image or Drag & Drop"
+            description="Upload category image"
+            value={formData.imagePreview}
+            onChange={(file) =>
+              setFormData((prev) => ({
+                ...prev,
+                imageFile: file,
+                imagePreview: URL.createObjectURL(file),
+              }))
+            }
           />
         </div>
 
