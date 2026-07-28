@@ -16,7 +16,7 @@ const RecommendedProducts = ({
   const allProducts =
     propAllProducts !== undefined
       ? propAllProducts
-      : hookProducts.allProducts || [];
+      : hookProducts.products || [];
   const productIsLoading =
     propProductIsLoading !== undefined
       ? propProductIsLoading
@@ -46,7 +46,7 @@ const RecommendedProducts = ({
             ))
           : products.map((product, idx) => (
               <Motion.div
-                key={product.productSlug}
+                key={product.slug}
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -67,7 +67,7 @@ const RecommendedProducts = ({
             ))
           : products.map((product, idx) => (
               <Motion.div
-                key={product.productSlug}
+                key={product.slug}
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

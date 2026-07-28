@@ -17,8 +17,8 @@ const JewelrySection = () => {
 
   const jewelryProducts = products.filter(
     (p) =>
-      p.productAreaName?.toLowerCase() === "jewelry" ||
-      p.productAreaName?.toLowerCase().includes("jewel"),
+      p.areaName?.toLowerCase() === "jewelry" ||
+      p.areaName?.toLowerCase().includes("jewel"),
   );
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const JewelrySection = () => {
         >
           {jewelryProducts.map((product, idx) => (
             <InViewAnimation
-              key={product.productSlug}
+              key={product.slug}
               delay={0.04 * idx}
               className="shrink-0"
             >

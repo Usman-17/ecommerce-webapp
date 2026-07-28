@@ -22,13 +22,13 @@ const PurchasePopup = ({ products = [] }) => {
   const safeProducts = useMemo(() => {
     const rawProducts = Array.isArray(products) ? products : [];
     return rawProducts.flatMap((product) =>
-      product?.productName && product?.productImageURL
+      product?.title && product?.productImages?.[0]?.url
         ? [
             {
-              id: product.productSlug,
-              href: `/product/${product.productSlug}`,
-              name: product.productName,
-              image: product.productImageURL,
+              id: product.slug,
+              href: `/product/${product.slug}`,
+              name: product.title,
+              image: product.productImages[0].url,
             },
           ]
         : [],

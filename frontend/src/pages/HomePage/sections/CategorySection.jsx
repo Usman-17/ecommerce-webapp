@@ -16,13 +16,14 @@ const CategorySection = () => {
   const touchStartX = useRef(0);
   const hasScrolled = useRef(false);
 
-  const { data: categories = [], isLoading } = useGetAllCategories();
-  const { data: productAreas = [] } = useGetAllProductAreas();
+  const { categories = [], categoryIsLoading: isLoading } =
+    useGetAllCategories();
+  const { areas = [] } = useGetAllProductAreas();
 
   // Precompute area lookup map for O(1) access
   const areaMap = {};
-  productAreas.forEach((a) => {
-    areaMap[a.productAreaId] = a.productAreaName;
+  areas.forEach((a) => {
+    areaMap[a._id] = a.name;
   });
 
   useEffect(() => {
@@ -99,30 +100,25 @@ const CategorySection = () => {
               className="flex overflow-x-auto overflow-y-hidden no-scrollbar gap-3 sm:gap-6 snap-x snap-mandatory px-4 sm:px-0"
             >
               {categories.map((cat, idx) => {
-                const areaName = areaMap[cat.productAreaId];
+                const areaName = areaMap[cat.areaId];
                 const areaParam = areaName
                   ? `&area=${encodeURIComponent(areaName)}`
                   : "";
                 return (
                   <InViewAnimation
-                    key={cat.key}
+                    key={cat._id}
                     delay={0.04 * idx}
                     className="shrink-0 snap-center"
                   >
                     <Link
-                      to={`/shop?category=${encodeURIComponent(cat.productCategoryName || "")}${areaParam}`}
+                      to={`/shop?category=${encodeURIComponent(cat.name || "")}${areaParam}`}
                       onClick={handleCategoryClick}
                       className="flex flex-col items-center gap-3 group shrink-0"
                     >
                       <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-warm border border-[#f0e4da] shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-[#CC0D39]/30 group-hover:scale-105 mt-2">
                         <img
-                          src={
-                            cat.categoryImageURL &&
-                            cat.categoryImageURL !== "https://cdn.htagsol.com/"
-                              ? cat.categoryImageURL
-                              : "/category.png"
-                          }
-                          alt={cat.productCategoryName || "Category"}
+                          src={"/category.png"}
+                          alt={cat.name || "Category"}
                           loading="lazy"
                           width={112}
                           height={112}
@@ -133,7 +129,7 @@ const CategorySection = () => {
                         />
                       </div>
                       <span className="max-w-20 sm:max-w-xs text-[11px] sm:text-xs font-bold text-gray-600 text-center leading-tight line-clamp-1 group-hover:text-[#CC0D39] transition-colors">
-                        {cat.productCategoryName}
+                        {cat.name}
                       </span>
                     </Link>
                   </InViewAnimation>

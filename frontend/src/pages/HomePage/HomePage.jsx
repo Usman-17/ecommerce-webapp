@@ -15,7 +15,7 @@ import { useGetAllProducts } from "../../hooks/useGetAllProducts";
 // Imports End-----
 
 const HomePage = () => {
-  const { products, allProducts, productIsLoading } = useGetAllProducts();
+  const { products, productIsLoading } = useGetAllProducts();
 
   return (
     <main>
@@ -48,7 +48,7 @@ const HomePage = () => {
       <PromoBanner />
       <div className="lg:px-32">
         <RecommendedProducts
-          allProducts={allProducts}
+          allProducts={products}
           productIsLoading={productIsLoading}
         />
       </div>

@@ -17,8 +17,8 @@ const HairAccessoriesSection = () => {
 
   const hairProducts = products.filter(
     (p) =>
-      p.productAreaName?.toLowerCase() === "hair accessories" ||
-      p.productAreaName?.toLowerCase().includes("hair"),
+      p.areaName?.toLowerCase() === "hair accessories" ||
+      p.areaName?.toLowerCase().includes("hair"),
   );
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const HairAccessoriesSection = () => {
         >
           {hairProducts.map((product, idx) => (
             <InViewAnimation
-              key={product.productSlug}
+              key={product.slug}
               delay={0.04 * idx}
               className="shrink-0"
             >

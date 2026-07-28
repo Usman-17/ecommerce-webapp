@@ -17,8 +17,8 @@ const MakeupSection = () => {
 
   const makeupProducts = products.filter(
     (p) =>
-      p.productAreaName?.toLowerCase() === "makeup & beauty" ||
-      p.productAreaName?.toLowerCase().includes("makeup"),
+      p.areaName?.toLowerCase() === "makeup & beauty" ||
+      p.areaName?.toLowerCase().includes("makeup"),
   );
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const MakeupSection = () => {
         >
           {makeupProducts.map((product, idx) => (
             <InViewAnimation
-              key={product.productSlug}
+              key={product.slug}
               delay={0.04 * idx}
               className="shrink-0"
             >

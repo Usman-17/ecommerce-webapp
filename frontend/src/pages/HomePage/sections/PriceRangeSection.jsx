@@ -27,13 +27,7 @@ const PriceRangeSection = () => {
   const { products } = useGetAllProducts();
 
   const getPrice = (p) => {
-    const detail = p.productPriceDetailResponse || {};
-    const salePrice =
-      detail.salePrice || p.salePrice || p.productSalePrice || 0;
-    const netSalePrice = detail.netSalePrice || p.netSalePrice || 0;
-    return netSalePrice > 0 && netSalePrice < salePrice
-      ? netSalePrice
-      : salePrice;
+    return p.price ?? 0;
   };
 
   // Filter products based on active price range
@@ -93,7 +87,7 @@ const PriceRangeSection = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.productSlug} product={product} />
+            <ProductCard key={product.slug} product={product} />
           ))}
         </div>
 
