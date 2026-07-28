@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 
-const useGetAllProducts = () => {
+export const useGetAllProducts = () => {
   const {
     data: products,
     isLoading,
     isError,
+    error,
     refetch,
     isRefetching,
   } = useQuery({
@@ -17,6 +18,19 @@ const useGetAllProducts = () => {
       return response.json();
     },
 
+    select: (data) =>
+      data.map((item, index) => ({
+        ...item,
+        key: item._id,
+        sr: index + 1,
+        categoryName: item.categoryName || "-",
+        areaName: item.areaName || "-",
+        subCategoryName: item.subCategoryName || "-",
+        brandName: item.brandName || "-",
+        productImage: item.productImages?.[0]?.url || "",
+      })),
+
+    retry: false,
     staleTime: 0,
     refetchOnMount: true,
     refetchOnReconnect: true,
@@ -24,11 +38,10 @@ const useGetAllProducts = () => {
 
   return {
     products,
-    productIsLoading: isLoading,
-    productError: isError,
-    productRefetch: refetch,
-    productIsRefetching: isRefetching,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isRefetching,
   };
 };
-
-export { useGetAllProducts };

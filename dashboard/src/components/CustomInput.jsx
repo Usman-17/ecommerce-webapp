@@ -63,16 +63,16 @@ const CustomInput = ({
             name={id}
             rows={rows || 4}
             spellCheck={spellCheck}
-            className={`${inputClassName} w-full rounded-md border ${
+            className={`${inputClassName} w-full rounded-lg border ${
               Icon ? "pl-10" : "pl-3"
-            } pr-2 py-2 transition-all duration-300 shadow-sm
-          focus:outline-none focus:ring-2 placeholder:text-sm text-sm sm:text-[15px]
+            } pr-2 py-2 transition-all duration-200 shadow-sm
+          focus:outline-none placeholder:text-sm text-sm sm:text-[15px]
           ${
             error
-              ? "border-red-500 focus:ring-red-200"
-              : "bg-gray-100/50 border-gray-300 focus:border-(--secondary-color) focus:ring-[color-mix(in_srgb,var(--secondary-color)_15%,transparent)]"
+              ? "border-red-500 focus:ring-2 focus:ring-red-200"
+              : "bg-white border-gray-200 hover:border-gray-400 focus:border-(--secondary-color) focus:ring-2 focus:ring-[color-mix(in_srgb,var(--secondary-color)_15%,transparent)]"
           }
-          text-gray-900 placeholder-gray-600
+          text-gray-900 placeholder-gray-400
           ${disabled ? "cursor-not-allowed opacity-60" : ""}
         `}
           />
@@ -91,16 +91,16 @@ const CustomInput = ({
             maxLength={maxLength}
             name={id}
             spellCheck={spellCheck}
-            className={`${inputClassName} w-full rounded-md border ${
+            className={`${inputClassName} w-full rounded-lg border ${
               Icon ? "pl-10" : "pl-3"
-            } pr-2 py-2 transition-all duration-300 shadow-sm
-          focus:outline-none focus:ring-2 placeholder:text-sm text-sm sm:text-[15px]
+            } pr-2 py-2 transition-all duration-200 shadow-sm
+          focus:outline-none placeholder:text-sm text-sm sm:text-[15px]
           ${
             error
-              ? "border-red-500 focus:ring-red-200"
-              : "bg-gray-100/50 border-gray-300 focus:border-(--secondary-color) focus:ring-[color-mix(in_srgb,var(--secondary-color)_15%,transparent)]"
+              ? "border-red-500 focus:ring-2 focus:ring-red-200"
+              : "bg-white border-gray-200 hover:border-gray-400 focus:border-(--secondary-color) focus:ring-2 focus:ring-[color-mix(in_srgb,var(--secondary-color)_15%,transparent)]"
           }
-          text-gray-900 placeholder-gray-600
+          text-gray-900 placeholder-gray-400
           ${disabled ? "cursor-not-allowed opacity-60" : ""}
         `}
           />

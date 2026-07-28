@@ -14,12 +14,11 @@ import { lazy, Suspense, useEffect } from "react";
 // Lazy load pages
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
-const AddProductPage = lazy(() => import("./pages/AddProductPage"));
-const ProductListingPage = lazy(() => import("./pages/ProductListingPage"));
+const ProductPage = lazy(() => import("./pages/ProductPage"));
 const AddBrandPage = lazy(() => import("./pages/AddBrandPage"));
 const BrandListingPage = lazy(() => import("./pages/BrandListingPage"));
-const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const AreaPage = lazy(() => import("./pages/AreaPage"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const SubCategoryPage = lazy(() => import("./pages/SubCategoryPage"));
 
 const UsersPage = lazy(() => import("./pages/UsersPage"));
@@ -66,20 +65,9 @@ const App = () => {
               element={authUser ? <DashboardPage /> : <LoginPage />}
             />
 
-            {/* Product Routes */}
             <Route
-              path="/product/create"
-              element={authUser ? <AddProductPage /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="product/edit/:id"
-              element={authUser ? <AddProductPage /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="product/manage"
-              element={
-                authUser ? <ProductListingPage /> : <Navigate to="/login" />
-              }
+              path="product"
+              element={authUser ? <ProductPage /> : <Navigate to="/login" />}
             />
 
             {/* Brand Routes */}
@@ -151,6 +139,7 @@ const App = () => {
 
       <Toaster
         position="bottom-center"
+        containerStyle={{ zIndex: 9999999 }}
         toastOptions={{
           style: {
             background: "#363636",

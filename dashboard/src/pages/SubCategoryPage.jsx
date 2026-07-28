@@ -135,6 +135,7 @@ const SubCategoryPage = () => {
     "sr",
     "productSubCategoryName",
     "categoryName",
+    "areaName",
   ]);
 
   const columns = [

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-const useGetSubCategoriesByCategory = (categoryId) => {
+export const useGetSubCategoriesByCategory = (categoryId) => {
   const {
     data: subCategories,
     isLoading,
@@ -22,11 +22,9 @@ const useGetSubCategoriesByCategory = (categoryId) => {
   });
 
   return {
-    subCategories,
+    subCategories: subCategories || [],
     isLoading,
     isError,
     error,
   };
 };
-
-export { useGetSubCategoriesByCategory };
