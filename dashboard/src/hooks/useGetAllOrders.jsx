@@ -30,7 +30,15 @@ const useGetAllOrders = () => {
         customerPhone: item.address?.phone || "",
         amountStr: `Rs. ${item.amount.toLocaleString()} ${item.amount}`,
         itemsCount: item.items?.length || 0,
-        dateFormatted: new Date(item.date).toLocaleDateString(),
+        dateFormatted: new Date(item.date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+        timeFormatted: new Date(item.date).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       })),
 
     retry: false,

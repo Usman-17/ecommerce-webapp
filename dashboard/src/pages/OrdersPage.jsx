@@ -210,7 +210,10 @@ const OrdersPage = () => {
       key: "dateFormatted",
       sorter: (a, b) => a.date - b.date,
       render: (_, record) => (
-        <span className="block text-right">{record.dateFormatted}</span>
+        <div className="text-right">
+          <p className="text-sm text-gray-900">{record.dateFormatted}</p>
+          <p className="text-xs text-gray-400">{record.timeFormatted}</p>
+        </div>
       ),
     },
     {
@@ -363,6 +366,11 @@ const OrdersPage = () => {
                   month: "long",
                   day: "numeric",
                   year: "numeric",
+                })}
+                {" at "}
+                {new Date(viewOrder.date).toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </span>
               <div className="flex-1" />
