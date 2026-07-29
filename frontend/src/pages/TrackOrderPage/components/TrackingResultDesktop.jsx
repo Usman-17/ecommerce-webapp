@@ -21,17 +21,17 @@ const TrackingResultDesktop = ({
     <Motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl p-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-50"
+      className="bg-white rounded-xl p-6 sm:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-50"
     >
       {/* Result Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-5">
           <div>
-            <h3 className="text-3xl font-black text-primary">
+            <h3 className="text-lg sm:text-xl font-black text-primary">
               Track Your Order
             </h3>
 
-            <p className="text-sm text-gray-400 font-bold mt-1">
+            <p className="text-xs text-gray-400 font-bold mt-0.5">
               Real-time updates on your order journey
             </p>
           </div>
@@ -54,7 +54,7 @@ const TrackingResultDesktop = ({
       </div>
 
       {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         {[
           {
             label: "Tracking Number",
@@ -82,10 +82,10 @@ const TrackingResultDesktop = ({
         ].map((info, idx) => (
           <div
             key={idx}
-            className="bg-gray-50/30 border border-gray-100 rounded-2xl p-6 flex items-center gap-5"
+            className="bg-gray-50/30 border border-gray-100 rounded-2xl p-4 flex items-center gap-4"
           >
-            <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-accent">
-              <info.icon size={22} />
+            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-accent">
+              <info.icon size={18} />
             </div>
 
             <div>
@@ -93,7 +93,7 @@ const TrackingResultDesktop = ({
                 {info.label}
               </p>
 
-              <p className="text-base text-primary font-black mt-0.5">
+              <p className="text-sm text-primary font-black mt-0.5">
                 {info.value}
               </p>
             </div>
@@ -101,9 +101,9 @@ const TrackingResultDesktop = ({
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_400px] gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_350px] gap-8">
         {/* Status Timeline */}
-        <div className="space-y-12 relative pt-4">
+        <div className="space-y-8 relative pt-4">
           {stepsToDisplay.map((vStep, idx) => {
             const isCompleted = vStep.isCompleted;
 
@@ -114,18 +114,18 @@ const TrackingResultDesktop = ({
             const isCurrent = isCompleted && !nextStepIsCompleted;
 
             return (
-              <div key={idx} className="flex items-start gap-8 relative z-10">
+              <div key={idx} className="flex items-start gap-6 relative z-10">
                 {/* Connector Line */}
                 {idx < stepsToDisplay.length - 1 && (
                   <div
-                    className={`absolute left-7 top-14 -bottom-12 w-0.5 -translate-x-1/2 transition-colors duration-500 ${
+                    className={`absolute left-6 top-12 -bottom-8 w-0.5 -translate-x-1/2 transition-colors duration-500 ${
                       nextStepIsCompleted ? "bg-accent" : "bg-gray-100"
                     } ${vStep.isCancelled ? "bg-red-500" : ""}`}
                   />
                 )}
 
                 <div
-                  className={`w-14 h-14 rounded-full flex items-center justify-center border-4 border-white shadow-sm shrink-0 transition-all duration-500 ${
+                  className={`w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-sm shrink-0 transition-all duration-500 ${
                     vStep.isCancelled
                       ? "bg-red-500 text-white"
                       : isCompleted
@@ -134,7 +134,7 @@ const TrackingResultDesktop = ({
                   }`}
                 >
                   <vStep.icon
-                    size={24}
+                    size={20}
                     className={
                       isCurrent &&
                       vStep.label !== "Delivered" &&
@@ -149,7 +149,7 @@ const TrackingResultDesktop = ({
                   <div className="flex items-start justify-between gap-6">
                     <div className="flex-1 min-w-0">
                       <h4
-                        className={`text-lg font-black transition-colors ${
+                        className={`text-sm font-black transition-colors ${
                           vStep.isCancelled
                             ? "text-red-500"
                             : isCompleted
@@ -161,7 +161,7 @@ const TrackingResultDesktop = ({
                       </h4>
 
                       <p
-                        className={`text-sm font-bold mt-1.5 ${isCompleted ? "text-gray-500" : "text-gray-300"}`}
+                        className={`text-xs font-bold mt-1 ${isCompleted ? "text-gray-500" : "text-gray-300"}`}
                       >
                         {vStep.desc}
                       </p>
@@ -216,16 +216,16 @@ const TrackingResultDesktop = ({
 
         {/* Summary Sidebar */}
         <div className="space-y-8">
-          <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
-            <h4 className="font-black text-primary mb-6 flex items-center gap-3 whitespace-nowrap">
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+            <h4 className="font-black text-primary mb-6 flex items-center gap-3 whitespace-nowrap text-sm">
               <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center text-accent shrink-0">
                 <MapPinHouse size={20} />
               </div>
               Delivery Address
             </h4>
 
-            <div className="text-sm text-gray-500 font-bold leading-relaxed mb-8">
-              <p className="text-primary font-black text-base mb-1.5">
+            <div className="text-xs text-gray-500 font-bold leading-relaxed mb-8">
+              <p className="text-primary font-black text-sm mb-1.5">
                 {address.firstName} {address.lastName}
               </p>
               <p>{address.address}</p>
@@ -238,7 +238,7 @@ const TrackingResultDesktop = ({
                 <span className="text-gray-400 font-black text-xs uppercase tracking-widest">
                   Total Amount
                 </span>
-                <span className="text-accent font-black text-xl">
+                <span className="text-accent font-black text-lg">
                   Rs. {order.amount?.toLocaleString()}
                 </span>
               </div>
@@ -258,9 +258,9 @@ const TrackingResultDesktop = ({
               </button>
             )}
 
-            <div className="mt-10 bg-gray-50/50 rounded-xl p-5 flex items-center gap-4">
-              <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-emerald-500">
-                <ShieldCheck size={24} />
+            <div className="mt-6 bg-gray-50/50 rounded-xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-emerald-500">
+                <ShieldCheck size={20} />
               </div>
               <div>
                 <p className="text-xs text-primary font-black">

@@ -25,26 +25,6 @@ const CancelOrderModal = ({
     };
   }, [isOpen]);
 
-  // Intercept mobile hardware back button — close modal instead of navigating away
-  useEffect(() => {
-    if (!isOpen) return;
-
-    history.pushState({ modal: "cancel-order" }, "");
-
-    const handlePopState = () => {
-      onClose();
-    };
-
-    window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-      if (history.state?.modal === "cancel-order") {
-        history.back();
-      }
-    };
-  }, [isOpen, onClose]);
-
   if (!isOpen) return null;
 
   return (
