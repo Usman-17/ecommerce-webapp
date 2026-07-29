@@ -13,7 +13,7 @@ const SuggestedProducts = ({ currentItems = [] }) => {
     currentItems.map((item) => item.productId || item.id),
   );
 
-  const suggestions = allProducts
+  const suggestions = (allProducts || [])
     .filter((p) => !currentIds.has(p.productId))
     .slice(0, 4);
 

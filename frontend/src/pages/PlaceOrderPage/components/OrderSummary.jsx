@@ -1,5 +1,15 @@
 import { Link } from "react-router-dom";
-import { Loader, ArrowRight, Ticket, Tag, BadgeInfo, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  Loader,
+  ArrowRight,
+  Ticket,
+  Tag,
+  BadgeInfo,
+  AlertCircle,
+  CheckCircle2,
+  Sparkles,
+  ShoppingBag,
+} from "lucide-react";
 
 import { vibrate } from "../../../utils/vibrate";
 // Imports End-----
@@ -19,6 +29,8 @@ const OrderSummary = ({
   couponError,
   couponSuccess,
   onApplyCoupon,
+  orderType,
+  scoopType,
 }) => {
   return (
     <div className="hidden sm:block bg-[#fff8f8] rounded-xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden relative">
@@ -26,9 +38,22 @@ const OrderSummary = ({
 
       {/* Header & Items - Hidden on Mobile */}
       <div className="hidden sm:block p-6 sm:p-8 pb-6">
-        <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-8">
-          Order Summary
-        </h3>
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">
+            Order Summary
+          </h3>
+          {orderType === "scoop" ? (
+            <span className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-xs font-bold px-3 py-1.5 rounded-full">
+              <Sparkles size={12} />
+              {scoopType || "Scoop Deal"}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-full">
+              <ShoppingBag size={12} />
+              Normal Order
+            </span>
+          )}
+        </div>
 
         <div className="space-y-6">
           {/* Item List */}
@@ -67,13 +92,25 @@ const OrderSummary = ({
                     </div>
 
                     <div className="mt-2 flex items-center justify-between">
-                      <p className="text-xs text-gray-400 font-medium">
-                        {item.quantity} × Rs{" "}
-                        {Math.floor(item.price || 0).toLocaleString("en-US")}
-                      </p>
-                      <p className="text-sm font-bold text-gray-900">
-                        Rs {Math.floor(item.total || 0).toLocaleString("en-US")}
-                      </p>
+                      {item.price > 0 && (
+                        <p className="text-xs text-gray-400 font-medium">
+                          {item.quantity} × Rs{" "}
+                          {Math.floor(item.price || 0).toLocaleString("en-US")}
+                        </p>
+                      )}
+
+                      {item.price > 0 && (
+                        <p className="text-sm font-bold text-gray-900">
+                          Rs{" "}
+                          {Math.floor(item.total || 0).toLocaleString("en-US")}
+                        </p>
+                      )}
+
+                      {item.price === 0 && (
+                        <p className="text-xs text-gray-400 font-medium">
+                          Included in bundle
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

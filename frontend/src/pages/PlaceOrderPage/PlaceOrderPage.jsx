@@ -2,9 +2,9 @@
 import moment from "moment";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion as Motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -33,6 +33,7 @@ import DeliveryTypeSelector from "./components/DeliveryTypeSelector";
 
 const PlaceOrderPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { trackBeginCheckout, trackPurchase } = useEcommerce();
 
@@ -175,6 +176,15 @@ const PlaceOrderPage = () => {
         },
       };
 
+      if (scoopData) {
+        payload.scoop = {
+          type: scoopData.scoopType,
+          quantity: scoopData.quantity,
+          fixedPrice: scoopData.totalAmount,
+          selections: scoopData.selections,
+        };
+      }
+
       saveOrder(payload);
     },
   });
@@ -219,10 +229,26 @@ const PlaceOrderPage = () => {
 
   // Load product/cart items
   const [buyNowItem] = useState(() => getInMemoryData("buyNowItem"));
-
   const [cartItems] = useState(() => getCart());
 
-  const itemsToShow = buyNowItem ? [buyNowItem] : cartItems;
+  // Scoop data from ScoopPage (passed via navigate state)
+  const scoopData = location.state?.scoopProducts ? location.state : null;
+
+  const itemsToShow = scoopData
+    ? scoopData.scoopProducts.map((p) => ({
+        productId: p._id,
+        variantId: null,
+        name: p.title,
+        price: 0,
+        quantity: 1,
+        total: 0,
+        image: p.productImages?.[0]?.url || "",
+        selectedVariants: [],
+        _scoopInstanceId: p._instanceId,
+      }))
+    : buyNowItem
+      ? [buyNowItem]
+      : cartItems;
 
   const estimatedArrival =
     moment().add(2, "days").format("DD MMM") +
@@ -232,8 +258,8 @@ const PlaceOrderPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
 
-    // Clear coupon for Buy Now orders
-    if (buyNowItem) {
+    // Clear coupon for Buy Now or Scoop orders
+    if (buyNowItem || scoopData) {
       setAppliedCoupon(null);
       setCouponCode("");
       setCouponSuccess("");
@@ -343,10 +369,9 @@ const PlaceOrderPage = () => {
   }, [isSuccess]);
 
   // Calculate totals
-  const subtotal = itemsToShow.reduce(
-    (sum, item) => sum + (item.total || 0),
-    0,
-  );
+  const subtotal = scoopData
+    ? scoopData.totalAmount
+    : itemsToShow.reduce((sum, item) => sum + (item.total || 0), 0);
 
   const FREE_SHIPPING_THRESHOLD = 5000;
   const MIN_ORDER_AMOUNT = 500;
@@ -443,6 +468,8 @@ const PlaceOrderPage = () => {
               couponError={couponError}
               couponSuccess={couponSuccess}
               onApplyCoupon={handleApplyCoupon}
+              orderType={scoopData ? "scoop" : "normal"}
+              scoopType={scoopData?.scoopType}
             />
           </div>
 
@@ -464,6 +491,8 @@ const PlaceOrderPage = () => {
               couponError={couponError}
               couponSuccess={couponSuccess}
               onApplyCoupon={handleApplyCoupon}
+              orderType={scoopData ? "scoop" : "normal"}
+              scoopType={scoopData?.scoopType}
             />
 
             {isBelowMinimum && <SuggestedProducts currentItems={itemsToShow} />}

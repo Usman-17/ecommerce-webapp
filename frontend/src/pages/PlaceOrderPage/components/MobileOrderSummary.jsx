@@ -5,6 +5,8 @@ import {
   BadgeInfo,
   AlertCircle,
   CheckCircle2,
+  Sparkles,
+  ShoppingBag,
 } from "lucide-react";
 
 import { vibrate } from "../../../utils/vibrate";
@@ -21,6 +23,8 @@ const MobileOrderSummary = ({
   couponError,
   couponSuccess,
   onApplyCoupon,
+  orderType,
+  scoopType,
 }) => {
   const inputClass = useMemo(
     () =>
@@ -42,11 +46,20 @@ const MobileOrderSummary = ({
       <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden relative">
         {/* Header */}
         <div className="w-full flex items-center justify-between px-4 py-3 border-b border-gray-50">
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800">
-              Order Summary
-            </h2>
-          </div>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800">
+            Order Summary
+          </h2>
+          {orderType === "scoop" ? (
+            <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-[10px] font-bold px-2 py-1 rounded-full">
+              <Sparkles size={10} />
+              {scoopType || "Scoop Deal"}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-full">
+              <ShoppingBag size={10} />
+              Normal Order
+            </span>
+          )}
         </div>
 
         <div className="px-4 pb-4">
@@ -87,12 +100,20 @@ const MobileOrderSummary = ({
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
-                        Rs {Math.floor(item.price || 0).toLocaleString()}
-                      </p>
-                      <p className="text-xs font-black text-gray-900">
-                        Rs {Math.floor(item.total || 0).toLocaleString()}
-                      </p>
+                      {item.price > 0 ? (
+                        <>
+                          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
+                            Rs {Math.floor(item.price || 0).toLocaleString()}
+                          </p>
+                          <p className="text-xs font-black text-gray-900">
+                            Rs {Math.floor(item.total || 0).toLocaleString()}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
+                          Included in bundle
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
