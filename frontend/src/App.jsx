@@ -27,6 +27,7 @@ const BestSellerPage = lazy(
 );
 const DealsPage = lazy(() => import("./pages/DealsPage/DealsPage"));
 const ScoopPage = lazy(() => import("./pages/ScoopPage/ScoopPage"));
+const WishlistPage = lazy(() => import("./pages/WishlistPage/WishlistPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const PlaceOrderPage = lazy(() => import("./pages/PlaceOrderPage"));
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage"));
@@ -67,6 +68,7 @@ const App = () => {
               <Route path="/best-sellers" element={<BestSellerPage />} />
               <Route path="/deals" element={<DealsPage />} />
               <Route path="/scoop" element={<ScoopPage />} />
+              <Route path="/wishlist" element={<WishlistPage />} />
 
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
