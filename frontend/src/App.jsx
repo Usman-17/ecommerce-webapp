@@ -19,6 +19,9 @@ import useGetAuth from "./hooks/useGetAuth";
 import HomePage from "./pages/HomePage/HomePage";
 const ShopPage = lazy(() => import("./pages/ShopPage/ShopPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage/ProductPage"));
+const NewArrivalPage = lazy(
+  () => import("./pages/NewArrivalPage/NewArrivalPage"),
+);
 const CartPage = lazy(() => import("./pages/CartPage"));
 const PlaceOrderPage = lazy(() => import("./pages/PlaceOrderPage"));
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage"));
@@ -55,6 +58,8 @@ const App = () => {
               <Route path="/" element={<HomePage />} />
               <Route path="/shop" element={<ShopPage />} />
               <Route path="/product/:slug" element={<ProductPage />} />
+              <Route path="/new-arrivals" element={<NewArrivalPage />} />
+
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
 
