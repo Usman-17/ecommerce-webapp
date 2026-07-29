@@ -71,31 +71,23 @@ const ShopPage = () => {
     subcategoryParam,
   });
 
-  const { data: productAreas = [] } = useGetAllProductAreas();
-  const { data: subCategories = [] } = useGetAllSubCategories();
+  const { areas: productAreas = [] } = useGetAllProductAreas();
+  const { subCategories } = useGetAllSubCategories();
 
   // Filter categories for current area
   const areaCategories = (() => {
     if (!areaParam) return [];
-    const currentArea = productAreas.find(
-      (a) => a.productAreaName === areaParam,
-    );
+    const currentArea = productAreas.find((a) => a.name === areaParam);
     if (!currentArea) return [];
-    return categories.filter(
-      (c) => c.productAreaId === currentArea.productAreaId,
-    );
+    return categories.filter((c) => c.areaId === currentArea._id);
   })();
 
   // Filter subcategories for current category
   const categorySubCategories = (() => {
     if (!categoryParam) return [];
-    const currentCat = categories.find(
-      (c) => c.productCategoryName === categoryParam,
-    );
+    const currentCat = categories.find((c) => c.name === categoryParam);
     if (!currentCat) return [];
-    return subCategories.filter(
-      (sc) => sc.productCategoryId === currentCat.productCategoryId,
-    );
+    return subCategories.filter((sc) => sc.categoryId === currentCat._id);
   })();
 
   const toggleMobileFilter = () => setIsMobileFilterOpen((v) => !v);
@@ -241,8 +233,8 @@ const ShopPage = () => {
                     className="w-80 h-80"
                   />
                   <p className="max-w-xs sm:max-w-sm mt-4 text-center text-gray-500 text-sm">
-                    We couldn't find any products for your selected filters. Try
-                    different options.
+                    We couldn&apos;t find any products for your selected
+                    filters. Try different options.
                   </p>
                 </div>
               ) : (
@@ -251,7 +243,7 @@ const ShopPage = () => {
                 >
                   {sortedProducts.map((product) => (
                     <div
-                      key={product.productSlug}
+                      key={product._id}
                       className="break-inside-avoid mb-2 sm:mb-0"
                     >
                       <ProductCard product={product} />

@@ -23,8 +23,6 @@ export const useGetAllCategories = () => {
         ...item,
         key: item._id,
         sr: index + 1,
-        productCategoryName: item.name,
-        areaName: item.areaName || "-",
       })),
 
     retry: false,

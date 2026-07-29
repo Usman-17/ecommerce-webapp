@@ -5,11 +5,9 @@ import { useGetAllProducts } from "./useGetAllProducts";
 import { useGetAllCategories } from "./useGetAllCategories";
 
 const isSale = (product) => {
-  const priceDetail = product?.productPriceDetailResponse || {};
-  const salePrice =
-    priceDetail.salePrice || product.salePrice || product.productSalePrice || 0;
-  const netSalePrice = priceDetail.netSalePrice || product.netSalePrice || 0;
-  return netSalePrice > 0 && netSalePrice < salePrice;
+  const secondaryPrice = product?.secondaryPrice || 0;
+  const price = product?.price || 0;
+  return secondaryPrice > 0 && secondaryPrice > price;
 };
 
 const isColorLight = (colorStr) => {
@@ -69,8 +67,7 @@ const useShopFilters = ({
   const { products: allProducts, productIsLoading: isLoading } =
     useGetAllProducts();
   const { colors, sizes, variantOptionsLoading } = useGetVariantOptions();
-  const { data: categories = [], isLoading: categoriesLoading } =
-    useGetAllCategories();
+  const { categories, isLoading: categoriesLoading } = useGetAllCategories();
 
   const products = initialProducts || allProducts;
 
@@ -87,13 +84,7 @@ const useShopFilters = ({
   const getPriceRange = useCallback(() => {
     if (products.length === 0) return [0, 10000];
     const prices = products
-      .map((p) => {
-        const priceDetail = p?.productPriceDetailResponse || {};
-        const salePrice =
-          priceDetail.salePrice || p.salePrice || p.productSalePrice || 0;
-        const netSalePrice = priceDetail.netSalePrice || p.netSalePrice || 0;
-        return isSale(p) ? netSalePrice : salePrice;
-      })
+      .map((p) => p?.price || 0)
       .filter((price) => price > 0);
 
     if (prices.length === 0) return [0, 10000];
@@ -102,7 +93,7 @@ const useShopFilters = ({
     return [minPrice, maxPrice];
   }, [products]);
 
-  // Sync price range when products load
+  // Sync price range when products first load
   const priceRangeInited = useRef(false);
   useEffect(() => {
     if (products.length > 0 && !priceRangeInited.current) {
@@ -113,19 +104,18 @@ const useShopFilters = ({
     }
   }, [products, getPriceRange]);
 
+  // Reset init flag when products change (e.g., after refetch with different data)
+  useEffect(() => {
+    if (products.length === 0) {
+      priceRangeInited.current = false;
+    }
+  }, [products]);
+
   // Filter products based on selected filters
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       // Price filter
-      const priceDetail = product?.productPriceDetailResponse || {};
-      const salePrice =
-        priceDetail.salePrice ||
-        product.salePrice ||
-        product.productSalePrice ||
-        0;
-      const netSalePrice =
-        priceDetail.netSalePrice || product.netSalePrice || 0;
-      const finalPrice = isSale(product) ? netSalePrice : salePrice;
+      const finalPrice = product?.price || 0;
 
       const priceMatch =
         finalPrice === 0 ||
@@ -162,15 +152,15 @@ const useShopFilters = ({
       // Subcategory filter
       const subCategoryMatch =
         !subcategoryParam ||
-        subcategoryParam === (product.productCategoryName || "") ||
-        subcategoryParam === (product.productSubCategoryName || "");
+        subcategoryParam === (product.categoryName || "") ||
+        subcategoryParam === (product.subCategoryName || "");
 
       // Category filter
       const categoryMatch =
-        !categoryParam || product.productCategoryName === categoryParam;
+        !categoryParam || product.categoryName === categoryParam;
 
       // Area filter
-      const areaMatch = !areaParam || product.productAreaName === areaParam;
+      const areaMatch = !areaParam || product.areaName === areaParam;
 
       return (
         priceMatch &&
@@ -194,17 +184,7 @@ const useShopFilters = ({
   // Sort filtered products
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((a, b) => {
-      const getPrice = (product) => {
-        const priceDetail = product?.productPriceDetailResponse || {};
-        const salePrice =
-          priceDetail.salePrice ||
-          product.salePrice ||
-          product.productSalePrice ||
-          0;
-        const netSalePrice =
-          priceDetail.netSalePrice || product.netSalePrice || 0;
-        return isSale(product) ? netSalePrice : salePrice;
-      };
+      const getPrice = (product) => product?.price || 0;
 
       switch (sortBy) {
         case "price-asc":
@@ -212,12 +192,12 @@ const useShopFilters = ({
         case "price-desc":
           return getPrice(b) - getPrice(a);
         case "name-asc":
-          return (a.productName || "").localeCompare(b.productName || "");
+          return (a.title || "").localeCompare(b.title || "");
         case "name-desc":
-          return (b.productName || "").localeCompare(a.productName || "");
+          return (b.title || "").localeCompare(a.title || "");
         case "newest":
         default:
-          return (b.productId || 0) - (a.productId || 0);
+          return (b._id || "").localeCompare(a._id || "");
       }
     });
   }, [filteredProducts, sortBy]);
@@ -259,9 +239,8 @@ const useShopFilters = ({
   // Count products per category
   const getCategoryProductCount = useCallback(
     (categoryName) => {
-      return products.filter(
-        (product) => product.productCategoryName === categoryName,
-      ).length;
+      return products.filter((product) => product.categoryName === categoryName)
+        .length;
     },
     [products],
   );

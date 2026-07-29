@@ -23,9 +23,6 @@ export const useGetAllSubCategories = () => {
         ...item,
         key: item._id,
         sr: index + 1,
-        productSubCategoryName: item.name,
-        categoryName: item.categoryName || "-",
-        areaName: item.areaName || "-",
       })),
 
     retry: false,

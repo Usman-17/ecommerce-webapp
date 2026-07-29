@@ -21,7 +21,6 @@ export const useGetAllProductAreas = () => {
         ...item,
         key: item._id,
         sr: index + 1,
-        productAreaName: item.name,
       })),
 
     retry: false,

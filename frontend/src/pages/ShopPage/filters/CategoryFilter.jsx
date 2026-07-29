@@ -39,13 +39,11 @@ const CategoryFilter = ({
 
   const filteredCategories = categories.filter((cat) => {
     const count = getCategoryProductCount
-      ? getCategoryProductCount(cat.productCategoryName)
+      ? getCategoryProductCount(cat.name)
       : 0;
     return (
       count > 0 &&
-      (cat.productCategoryName || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
+      (cat.name || "").toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
 
@@ -69,7 +67,7 @@ const CategoryFilter = ({
           placeholder="Find a Category"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-4 pr-10 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-full focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 placeholder:text-gray-400"
+          className="w-full pl-4 pr-10 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-1 focus:ring-accent/20"
         />
         <Search
           size={18}
@@ -83,28 +81,24 @@ const CategoryFilter = ({
           <p className="text-sm text-gray-500">No categories found</p>
         ) : (
           displayItems.map((cat) => {
-            const isSelected = selectedCategories.includes(
-              cat.productCategoryName || "",
-            );
+            const isSelected = selectedCategories.includes(cat.name || "");
             const productCount = getCategoryProductCount
-              ? getCategoryProductCount(cat.productCategoryName)
+              ? getCategoryProductCount(cat.name)
               : 0;
 
             return (
               <div
-                key={cat.productCategoryId || cat.key}
+                key={cat._id || cat.key}
                 className="flex items-center justify-between group cursor-pointer"
                 onClick={() => {
                   if (isSelected) {
                     setSelectedCategories(
-                      selectedCategories.filter(
-                        (c) => c !== (cat.productCategoryName || ""),
-                      ),
+                      selectedCategories.filter((c) => c !== (cat.name || "")),
                     );
                   } else {
                     setSelectedCategories([
                       ...selectedCategories,
-                      cat.productCategoryName || "",
+                      cat.name || "",
                     ]);
                   }
                 }}
@@ -125,7 +119,7 @@ const CategoryFilter = ({
                         : "text-gray-600 group-hover:text-primary"
                     }`}
                   >
-                    {cat.productCategoryName}
+                    {cat.name}
                   </label>
                 </div>
 
