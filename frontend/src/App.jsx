@@ -10,7 +10,7 @@ import "tippy.js/animations/shift-away.css";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import Header from "./components/Header";
-import Footer from "./components/Footer";
+import Footer from "./components/common/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import PageViewTracker from "./components/PageViewTracker";
 
@@ -106,6 +106,7 @@ const App = () => {
             </Routes>
           </Suspense>
         </div>
+        <Footer />
 
         <Toaster
           position="bottom-center"
@@ -119,7 +120,6 @@ const App = () => {
             },
           }}
         />
-        <Footer />
       </BrowserRouter>
     </HelmetProvider>
   );
