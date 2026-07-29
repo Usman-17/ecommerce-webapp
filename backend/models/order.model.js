@@ -8,6 +8,12 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+    trackingNo: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
     items: [
       {
         productId: {
@@ -63,9 +69,10 @@ const orderSchema = new mongoose.Schema(
     },
 
     cancelledAt: { type: Date },
+    cancelRemarks: { type: String, default: "" },
     deliveredAt: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Order = mongoose.model("Order", orderSchema);

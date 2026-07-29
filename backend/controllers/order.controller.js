@@ -2,6 +2,13 @@ import User from "../models/user.model.js";
 import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
 
+const generateTrackingNo = () => {
+  const prefix = "JMZ";
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `${prefix}-${timestamp}-${random}`;
+};
+
 // PATH     : /api/order/place
 // METHOD   : POST
 // ACCESS   : Public
@@ -98,6 +105,7 @@ export const placeOrder = async (req, res) => {
     // Save order
     const orderData = {
       userId,
+      trackingNo: generateTrackingNo(),
       items: orderItems,
       amount: totalAmount,
       address: {
@@ -191,5 +199,64 @@ export const updateOrderStatus = async (req, res) => {
     res.status(200).json({ message: "Order status updated" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+// PATH     : /api/order/track
+// METHOD   : GET
+// ACCESS   : Public
+// DESC     : Track order by tracking number
+export const trackOrder = async (req, res) => {
+  const { trackingNo } = req.query;
+  try {
+    if (!trackingNo) {
+      return res.status(400).json({ error: "Tracking number is required" });
+    }
+
+    const order = await Order.findOne({ trackingNo })
+      .select("-userId -__v")
+      .lean();
+
+    if (!order) {
+      return res.status(404).json({ error: "No record found." });
+    }
+
+    return res.status(200).json({ data: order });
+  } catch (error) {
+    console.log("Error in trackOrder controller:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// PATH     : /api/order/cancel
+// METHOD   : POST
+// ACCESS   : Public
+// DESC     : Cancel order by tracking number with remarks
+export const cancelWebOrder = async (req, res) => {
+  const { id, remarks } = req.query;
+  try {
+    if (!id) {
+      return res.status(400).json({ error: "Order ID is required" });
+    }
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    if (order.status === "Cancelled") {
+      return res.status(400).json({ error: "Order is already cancelled" });
+    }
+
+    order.status = "Cancelled";
+    order.cancelledAt = new Date();
+    order.cancelRemarks = remarks || "";
+    await order.save();
+
+    return res.status(200).json({ message: "Order cancelled successfully" });
+  } catch (error) {
+    console.log("Error in cancelWebOrder controller:", error.message);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
