@@ -14,6 +14,7 @@ import Footer from "./components/common/Footer";
 import CartDrawer from "./components/CartDrawer";
 import ScrollToTop from "./components/ScrollToTop";
 import PageViewTracker from "./components/PageViewTracker";
+import ScrollToTopButton from "./components/common/ScrollToTopButton";
 
 import useGetAuth from "./hooks/useGetAuth";
 
@@ -69,6 +70,7 @@ const App = () => {
       <BrowserRouter>
         <ScrollToTop />
         <PageViewTracker />
+        <ScrollToTopButton />
 
         <div className="px-3">
           <Header />
