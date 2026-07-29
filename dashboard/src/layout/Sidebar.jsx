@@ -18,8 +18,13 @@ const Sidebar = () => {
   const subMenuRefs = useRef({});
 
   const isActive = useCallback(
-    (path) => location.pathname === path,
-    [location.pathname],
+    (path) => {
+      if (path.includes("?")) {
+        return location.pathname + location.search === path;
+      }
+      return location.pathname === path && !location.search;
+    },
+    [location.pathname, location.search],
   );
 
   useEffect(() => {

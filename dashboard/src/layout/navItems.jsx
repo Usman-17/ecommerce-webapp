@@ -31,7 +31,12 @@ const navItems = [
   {
     name: "Orders",
     icon: <ShoppingBag size={18} />,
-    path: "/orders",
+    subItems: [
+      { name: "All Orders", path: "/orders" },
+      { name: "Pending", path: "/orders?status=pending" },
+      { name: "Delivered", path: "/orders?status=delivered" },
+      { name: "Cancelled", path: "/orders?status=cancelled" },
+    ],
   },
   {
     name: "Enquiries",

@@ -20,6 +20,20 @@ const useGetAllOrders = () => {
       return response.json();
     },
 
+    select: (data) =>
+      data.map((item, index) => ({
+        ...item,
+        key: item._id,
+        sr: index + 1,
+        customerName:
+          `${item.address?.firstName || ""} ${item.address?.lastName || ""}`.trim(),
+        customerPhone: item.address?.phone || "",
+        amountStr: `Rs. ${item.amount.toLocaleString()} ${item.amount}`,
+        itemsCount: item.items?.length || 0,
+        dateFormatted: new Date(item.date).toLocaleDateString(),
+      })),
+
+    retry: false,
     staleTime: 0,
     refetchOnMount: true,
     refetchOnReconnect: true,
