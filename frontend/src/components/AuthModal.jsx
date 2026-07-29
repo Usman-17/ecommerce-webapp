@@ -2,7 +2,6 @@ import toast from "react-hot-toast";
 import { useState, useRef, useEffect } from "react";
 import {
   Loader,
-  Camera,
   Mail,
   CheckCircle,
   ArrowRight,
@@ -12,7 +11,6 @@ import {
 import CustomInput from "./CustomInput";
 import GoogleButton from "./GoogleButton";
 
-import { apiRequest, uploadFile } from "../utils/authFetch";
 
 import logo from "../assets/logo.webp";
 import { useAnalytics } from "../hooks/useAnalytics";
@@ -30,9 +28,6 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
-  const [profilePreview, setProfilePreview] = useState(null);
-  const fileInputRef = useRef(null);
   const modalRef = useRef(null);
   const prevIsOpen = useRef(isOpen);
 
@@ -41,13 +36,16 @@ const AuthModal = ({ isOpen, onClose }) => {
   const handleGoogleSuccess = async (credentialResponse) => {
     setIsLoading(true);
     try {
-      const res = await apiRequest("/api/CRM/CustomerWeb/GoogleSignUp", {
+      const res = await fetch("/api/auth/google", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken: credentialResponse.credential }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Google sign-in failed");
       localStorage.setItem(
         "user",
-        JSON.stringify({ ...res.data, loginProvider: "google" }),
+        JSON.stringify({ ...data, loginProvider: "google" }),
       );
       window.dispatchEvent(new Event("userUpdated"));
       trackLogin("google");
@@ -128,20 +126,6 @@ const AuthModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Image size must be less than 2MB");
-        return;
-      }
-      setProfileImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setProfilePreview(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
   const switchView = (newView) => {
     setView(newView);
     resetForm();
@@ -206,58 +190,50 @@ const AuthModal = ({ isOpen, onClose }) => {
     setIsLoading(true);
     try {
       if (view === "login") {
-        const res = await apiRequest("/api/CRM/CustomerWeb/SignIn", {
+        const res = await fetch("/api/auth/login", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            loginId: formData.email,
-            loginPassword: formData.password,
+            email: formData.email,
+            password: formData.password,
           }),
         });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Login failed");
         localStorage.setItem(
           "user",
-          JSON.stringify({ ...res.data, loginProvider: "email" }),
+          JSON.stringify({ ...data, loginProvider: "email" }),
         );
         trackLogin("email");
         toast.success("Signed in successfully!", { id: "auth" });
         onClose();
         window.dispatchEvent(new Event("userUpdated"));
       } else if (view === "signup") {
-        let logoImageURL = "";
-        let logoThumbImageURL = "";
-        if (profileImage) {
-          const imageForm = new FormData();
-          imageForm.append("File", profileImage);
-          imageForm.append("UploadRequestFrom", "signup");
-          const imgRes = await uploadFile(
-            "/api/DBO/File/UploadFileWithThumb",
-            imageForm,
-          );
-          logoImageURL = imgRes.data.webPURL || "";
-          logoThumbImageURL = imgRes.data.thumbnailURL || "";
-        }
-        await apiRequest("/api/CRM/CustomerWeb/SignUp", {
+        const res = await fetch("/api/auth/signup", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            partyName: formData.name,
-            phoneNo1: formData.phone,
+            fullName: formData.name,
             email: formData.email,
-            logoImageURL,
-            logoThumbImageURL,
-            loginId: formData.email,
-            loginPassword: formData.password,
-            rowVersionLong: 0,
+            password: formData.password,
+            mobile: formData.phone,
           }),
         });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Signup failed");
         trackSignUp("email");
         toast.success("Account created successfully! Please sign in.", {
           id: "auth",
         });
         switchView("login");
       } else if (view === "forgot") {
-        await apiRequest(
-          `/api/CRM/CustomerWeb/ForgetPassword?LoginId=${encodeURIComponent(formData.email)}`,
-          { method: "GET" },
-        );
+        const res = await fetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: formData.email }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Request failed");
         setForgotSent(true);
       }
     } catch (error) {
@@ -400,46 +376,6 @@ const AuthModal = ({ isOpen, onClose }) => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-3">
-                {/* Profile Image Upload */}
-                <div className="flex justify-center mb-1">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current.click()}
-                    aria-label={
-                      profilePreview
-                        ? "Change profile photo"
-                        : "Upload profile photo"
-                    }
-                    className="relative w-18 h-18 rounded-full bg-linear-to-br from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 hover:border-accent hover:bg-accent/5 transition-all duration-300 overflow-hidden group"
-                  >
-                    {profilePreview ? (
-                      <img
-                        src={profilePreview}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full">
-                        <Camera
-                          size={20}
-                          className="text-gray-400 group-hover:text-accent transition-colors duration-300"
-                        />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-full">
-                      <Camera size={18} className="text-white" />
-                    </div>
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    aria-label="Upload profile photo"
-                    className="sr-only"
-                  />
-                </div>
-
                 <CustomInput
                   label="Full Name"
                   name="name"

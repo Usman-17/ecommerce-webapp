@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "../utils/authFetch";
 
 const useGetVariantOptions = () => {
   const { data, isLoading, isError, refetch, isRefetching } = useQuery({
     queryKey: ["variantOptions"],
-    queryFn: () => apiRequest("/api/ISPM/VariantOption/GetForWeb"),
-
+    queryFn: async () => {
+      const res = await fetch("/api/ISPM/VariantOption/GetForWeb");
+      if (!res.ok) return { data: [] };
+      return res.json();
+    },
     retry: false,
   });
 

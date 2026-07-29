@@ -38,6 +38,8 @@
     "web-vitals": "^5.3.0",
     "slick-carousel": "^1.8.1",
     "tailwindcss": "^4.3.0",
+    "formik": "^2.4.9",
+    "yup": "^1.7.1",
     "yet-another-react-lightbox": "^3.32.1"
   },
   "devDependencies": {

@@ -37,7 +37,9 @@ const DealsPage = lazy(() => import("./pages/DealsPage/DealsPage"));
 const ScoopPage = lazy(() => import("./pages/ScoopPage/ScoopPage"));
 const WishlistPage = lazy(() => import("./pages/WishlistPage/WishlistPage"));
 const CartPage = lazy(() => import("./pages/CartPage/CartPage"));
-const PlaceOrderPage = lazy(() => import("./pages/PlaceOrderPage"));
+const PlaceOrderPage = lazy(
+  () => import("./pages/PlaceOrderPage/PlaceOrderPage"),
+);
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage"));
 const AboutUsPage = lazy(() => import("./pages/AboutUsPage/AboutUsPage"));
 const ContactUsPage = lazy(() => import("./pages/ContactUsPage/ContactUsPage"));
@@ -119,18 +121,12 @@ const App = () => {
                 <Route path="/scoop" element={<ScoopPage />} />
                 <Route path="/wishlist" element={<WishlistPage />} />
                 <Route path="/cart" element={<CartPage />} />
+                <Route path="/place-order" element={<PlaceOrderPage />} />
 
                 <Route path="/about-us" element={<AboutUsPage />} />
                 <Route path="/contact-us" element={<ContactUsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 <Route path="/track-order" element={<TrackOrderPage />} />
-
-                <Route
-                  path="/place-order"
-                  element={
-                    authUser ? <PlaceOrderPage /> : <Navigate to="/login" />
-                  }
-                />
 
                 <Route
                   path="/order"
