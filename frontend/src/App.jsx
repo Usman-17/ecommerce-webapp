@@ -25,6 +25,7 @@ const NewArrivalPage = lazy(
 const BestSellerPage = lazy(
   () => import("./pages/BestSellerPage/BestSellerPage"),
 );
+const DealsPage = lazy(() => import("./pages/DealsPage/DealsPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const PlaceOrderPage = lazy(() => import("./pages/PlaceOrderPage"));
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage"));
@@ -63,6 +64,7 @@ const App = () => {
               <Route path="/product/:slug" element={<ProductPage />} />
               <Route path="/new-arrivals" element={<NewArrivalPage />} />
               <Route path="/best-sellers" element={<BestSellerPage />} />
+              <Route path="/deals" element={<DealsPage />} />
 
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
