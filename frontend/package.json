@@ -21,7 +21,7 @@
     "framer-motion": "^12.12.1",
     "fuse.js": "^7.5.0",
     "lottie-react": "^2.4.1",
-    "lucide-react": "^0.417.0",
+    "lucide-react": "^1.17.0",
     "moment": "^2.30.1",
     "rc-slider": "^11.1.9",
     "react": "^18.3.1",

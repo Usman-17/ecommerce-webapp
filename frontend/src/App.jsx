@@ -28,7 +28,7 @@ const BestSellerPage = lazy(
 const DealsPage = lazy(() => import("./pages/DealsPage/DealsPage"));
 const ScoopPage = lazy(() => import("./pages/ScoopPage/ScoopPage"));
 const WishlistPage = lazy(() => import("./pages/WishlistPage/WishlistPage"));
-const CartPage = lazy(() => import("./pages/CartPage"));
+const CartPage = lazy(() => import("./pages/CartPage/CartPage"));
 const PlaceOrderPage = lazy(() => import("./pages/PlaceOrderPage"));
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
@@ -69,14 +69,10 @@ const App = () => {
               <Route path="/deals" element={<DealsPage />} />
               <Route path="/scoop" element={<ScoopPage />} />
               <Route path="/wishlist" element={<WishlistPage />} />
+              <Route path="/cart" element={<CartPage />} />
 
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
-
-              <Route
-                path="/cart"
-                element={authUser ? <CartPage /> : <Navigate to="/login" />}
-              />
 
               <Route
                 path="/place-order"
