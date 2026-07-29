@@ -16,7 +16,7 @@ const generateTrackingNo = () => {
 export const placeOrder = async (req, res) => {
   try {
     const userId = req.user?._id || null;
-    const { cart, totalAmount, deliveryInfo } = req.body;
+    const { cart, totalAmount, deliveryInfo, scoop } = req.body;
 
     if (!cart || Object.keys(cart).length === 0) {
       return res
@@ -119,7 +119,17 @@ export const placeOrder = async (req, res) => {
       paymentMethod: "COD",
       payment: false,
       date: Date.now(),
+      orderType: scoop ? "scoop" : "normal",
     };
+
+    if (scoop) {
+      orderData.scoopDetails = {
+        scoopType: scoop.type,
+        quantity: scoop.quantity,
+        fixedPrice: scoop.fixedPrice,
+        selections: scoop.selections ? new Map(Object.entries(scoop.selections)) : undefined,
+      };
+    }
 
     const newOrder = new Order(orderData);
     await newOrder.save();

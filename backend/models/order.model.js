@@ -71,6 +71,19 @@ const orderSchema = new mongoose.Schema(
     cancelledAt: { type: Date },
     cancelRemarks: { type: String, default: "" },
     deliveredAt: { type: Date },
+
+    orderType: {
+      type: String,
+      enum: ["normal", "scoop"],
+      default: "normal",
+    },
+
+    scoopDetails: {
+      scoopType: { type: String },
+      quantity: { type: Number },
+      fixedPrice: { type: Number },
+      selections: { type: Map, of: String },
+    },
   },
   { timestamps: true },
 );
