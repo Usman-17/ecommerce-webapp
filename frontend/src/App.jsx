@@ -40,6 +40,11 @@ const CartPage = lazy(() => import("./pages/CartPage/CartPage"));
 const PlaceOrderPage = lazy(
   () => import("./pages/PlaceOrderPage/PlaceOrderPage"),
 );
+
+const ShippingPolicyPage = lazy(
+  () => import("./pages/ShippingPolicyPage/ShippingPolicyPage"),
+);
+
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage"));
 const AboutUsPage = lazy(() => import("./pages/AboutUsPage/AboutUsPage"));
 const ContactUsPage = lazy(() => import("./pages/ContactUsPage/ContactUsPage"));
@@ -127,6 +132,11 @@ const App = () => {
                 <Route path="/contact-us" element={<ContactUsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 <Route path="/track-order" element={<TrackOrderPage />} />
+
+                <Route
+                  path="/shipping-policy"
+                  element={<ShippingPolicyPage />}
+                />
 
                 <Route
                   path="/order"
