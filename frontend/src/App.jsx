@@ -51,6 +51,8 @@ const ContactUsPage = lazy(() => import("./pages/ContactUsPage/ContactUsPage"));
 const PrivacyPolicyPage = lazy(
   () => import("./pages/PrivacyPolicyPage/PrivacyPolicyPage"),
 );
+const FAQsPage = lazy(() => import("./pages/FAQsPage/FAQsPage"));
+
 const TrackOrderPage = lazy(
   () => import("./pages/TrackOrderPage/TrackOrderPage"),
 );
@@ -137,6 +139,7 @@ const App = () => {
                   path="/shipping-policy"
                   element={<ShippingPolicyPage />}
                 />
+                <Route path="/faqs" element={<FAQsPage />} />
 
                 <Route
                   path="/order"
