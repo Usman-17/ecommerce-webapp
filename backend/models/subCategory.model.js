@@ -12,6 +12,10 @@ const subCategorySchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
+    image: {
+      public_id: { type: String },
+      url: { type: String },
+    },
   },
   { timestamps: true }
 );
