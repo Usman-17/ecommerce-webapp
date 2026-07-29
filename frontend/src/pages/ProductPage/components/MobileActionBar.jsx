@@ -14,6 +14,7 @@ const MobileActionBar = ({
   product,
   selectedPack,
   selectedOptions,
+  matchedVariant,
   currentPrice,
   mainImage,
   activeVariantImage,
@@ -77,7 +78,10 @@ const MobileActionBar = ({
       quantity: qty,
       total: currentPrice * qty,
       selectedOptions: opts,
-      selectedVariants: [],
+      variantId: matchedVariant?._id || null,
+      selectedVariants: matchedVariant
+        ? [{ detailName: matchedVariant.name }]
+        : [],
     };
 
     const existingCart = getCart();
@@ -151,7 +155,10 @@ const MobileActionBar = ({
       quantity: qty,
       total: currentPrice * qty,
       selectedOptions,
-      selectedVariants: [],
+      variantId: matchedVariant?._id || null,
+      selectedVariants: matchedVariant
+        ? [{ detailName: matchedVariant.name }]
+        : [],
     };
     setInMemoryData("buyNowItem", buyNowItem);
     return true;

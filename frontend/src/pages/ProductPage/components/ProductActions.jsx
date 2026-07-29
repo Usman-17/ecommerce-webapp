@@ -18,6 +18,7 @@ const ProductActions = ({
   mainImage,
   activeVariantImage,
   selectedOptions,
+  matchedVariant,
   currentPrice,
   onShakeOptions,
 }) => {
@@ -59,7 +60,10 @@ const ProductActions = ({
       quantity: quantity,
       total: total,
       selectedOptions,
-      selectedVariants: [],
+      variantId: matchedVariant?._id || null,
+      selectedVariants: matchedVariant
+        ? [{ detailName: matchedVariant.name }]
+        : [],
     };
 
     const existingCart = getCart();
@@ -118,7 +122,10 @@ const ProductActions = ({
       quantity: quantity,
       total: total,
       selectedOptions,
-      selectedVariants: [],
+      variantId: matchedVariant?._id || null,
+      selectedVariants: matchedVariant
+        ? [{ detailName: matchedVariant.name }]
+        : [],
     };
 
     setInMemoryData("buyNowItem", buyNowItem);

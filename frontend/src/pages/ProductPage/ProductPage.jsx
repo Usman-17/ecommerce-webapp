@@ -421,6 +421,7 @@ const ProductPage = () => {
                 mainImage={mainImage}
                 activeVariantImage={activeVariantImage}
                 selectedOptions={selectedOptions}
+                matchedVariant={matchedVariant}
                 currentPrice={currentPrice}
                 onShakeOptions={() => {
                   setShakeOptions(true);
@@ -474,6 +475,7 @@ const ProductPage = () => {
         product={product}
         selectedPack={null}
         selectedOptions={selectedOptions}
+        matchedVariant={matchedVariant}
         currentPrice={currentPrice}
         mainImage={mainImage}
         activeVariantImage={activeVariantImage}
