@@ -1,8 +1,14 @@
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { HelmetProvider } from "react-helmet-async";
-import { lazy, Suspense, useState, useEffect } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
@@ -12,7 +18,6 @@ import "react-loading-skeleton/dist/skeleton.css";
 import Header from "./components/Header";
 import Footer from "./components/common/Footer";
 import CartDrawer from "./components/CartDrawer";
-import ScrollToTop from "./components/ScrollToTop";
 import PageViewTracker from "./components/PageViewTracker";
 import ScrollToTopButton from "./components/common/ScrollToTopButton";
 
@@ -42,7 +47,17 @@ const ForgotPasswordPage = lazy(
 );
 const ResetPasswordPage = lazy(() => import("./pages/Auth/ResetPasswordPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
-// imports End
+// imports End----
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 const App = () => {
   const { data: authUser } = useGetAuth();
