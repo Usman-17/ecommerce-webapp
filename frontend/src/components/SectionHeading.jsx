@@ -1,12 +1,16 @@
-const SectionHeading = ({ text1, text2, className }) => {
+const SectionHeading = ({ title, subtitle }) => {
   return (
-    <div className="inline-flex gap-2 items-center mb-3">
-      <p className={`text-gray-500 text-lg sm:text-2xl ${className}`}>
-        {text1} <span className="text-gray-700 font-medium">{text2}</span>
-      </p>
+    <>
+      <h2 className="text-lg md:text-2xl font-bold text-heading capitalize">
+        {title}
+      </h2>
 
-      <p className="w-8 sm:w-12 h-[1px] sm:h-[2px] bg-gray-700"></p>
-    </div>
+      {subtitle && (
+        <p className="text-gray-500 text-sm md:text-base font-medium">
+          {subtitle}
+        </p>
+      )}
+    </>
   );
 };
 

@@ -18,10 +18,11 @@ import "react-loading-skeleton/dist/skeleton.css";
 import Header from "./components/Header";
 import Footer from "./components/common/Footer";
 import CartDrawer from "./components/CartDrawer";
-import PageViewTracker from "./components/PageViewTracker";
+import AnalyticsProvider from "./components/AnalyticsProvider";
 import ScrollToTopButton from "./components/common/ScrollToTopButton";
 
 import useGetAuth from "./hooks/useGetAuth";
+import useTrackPage from "./hooks/useTrackPage";
 
 import HomePage from "./pages/HomePage/HomePage";
 const ShopPage = lazy(() => import("./pages/ShopPage/ShopPage"));
@@ -80,98 +81,113 @@ const App = () => {
     return () => document.removeEventListener("contextmenu", handleContextMenu);
   }, []);
 
+  const PageViewTracker = () => {
+    useTrackPage();
+    return null;
+  };
+
   return (
     <HelmetProvider>
       <BrowserRouter>
-        <ScrollToTop />
-        <PageViewTracker />
-        <ScrollToTopButton />
+        <AnalyticsProvider>
+          <PageViewTracker />
+          <ScrollToTop />
+          <ScrollToTopButton />
 
-        <div className="px-3">
-          <Header />
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center h-screen bg-[#fffaf5]">
-                <Loader className="size-10 animate-spin text-primary" />
-              </div>
-            }
-          >
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/product/:slug" element={<ProductPage />} />
-              <Route path="/new-arrivals" element={<NewArrivalPage />} />
-              <Route path="/best-sellers" element={<BestSellerPage />} />
-              <Route path="/deals" element={<DealsPage />} />
-              <Route path="/scoop" element={<ScoopPage />} />
-              <Route path="/wishlist" element={<WishlistPage />} />
-              <Route path="/cart" element={<CartPage />} />
+          <div className="px-3">
+            <Header />
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center h-screen bg-[#fffaf5]">
+                  <Loader className="size-10 animate-spin text-primary" />
+                </div>
+              }
+            >
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/shop" element={<ShopPage />} />
+                <Route path="/product/:slug" element={<ProductPage />} />
+                <Route path="/new-arrivals" element={<NewArrivalPage />} />
+                <Route path="/best-sellers" element={<BestSellerPage />} />
+                <Route path="/deals" element={<DealsPage />} />
+                <Route path="/scoop" element={<ScoopPage />} />
+                <Route path="/wishlist" element={<WishlistPage />} />
+                <Route path="/cart" element={<CartPage />} />
 
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
 
-              <Route
-                path="/place-order"
-                element={
-                  authUser ? <PlaceOrderPage /> : <Navigate to="/login" />
-                }
-              />
+                <Route
+                  path="/place-order"
+                  element={
+                    authUser ? <PlaceOrderPage /> : <Navigate to="/login" />
+                  }
+                />
 
-              <Route
-                path="/order"
-                element={authUser ? <MyOrdersPage /> : <Navigate to="/login" />}
-              />
+                <Route
+                  path="/order"
+                  element={
+                    authUser ? <MyOrdersPage /> : <Navigate to="/login" />
+                  }
+                />
 
-              <Route
-                path="/profile"
-                element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
-              />
+                <Route
+                  path="/profile"
+                  element={
+                    authUser ? <ProfilePage /> : <Navigate to="/login" />
+                  }
+                />
 
-              {/* Auth */}
-              <Route
-                path="/login"
-                element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/signup"
-                element={!authUser ? <SignupPage /> : <Navigate to="/" />}
-              />
+                {/* Auth */}
+                <Route
+                  path="/login"
+                  element={!authUser ? <LoginPage /> : <Navigate to="/" />}
+                />
+                <Route
+                  path="/signup"
+                  element={!authUser ? <SignupPage /> : <Navigate to="/" />}
+                />
 
-              <Route
-                path="/forgot-password"
-                element={
-                  !authUser ? <ForgotPasswordPage /> : <Navigate to="/login" />
-                }
-              />
+                <Route
+                  path="/forgot-password"
+                  element={
+                    !authUser ? (
+                      <ForgotPasswordPage />
+                    ) : (
+                      <Navigate to="/login" />
+                    )
+                  }
+                />
 
-              <Route
-                path="/reset-password/:token"
-                element={
-                  !authUser ? <ResetPasswordPage /> : <Navigate to="/login" />
-                }
-              />
-            </Routes>
-          </Suspense>
-        </div>
-        <Footer />
+                <Route
+                  path="/reset-password/:token"
+                  element={
+                    !authUser ? <ResetPasswordPage /> : <Navigate to="/login" />
+                  }
+                />
+              </Routes>
+            </Suspense>
+          </div>
+          <Footer />
 
-        <CartDrawer
-          isOpen={cartDrawerOpen}
-          onClose={() => setCartDrawerOpen(false)}
-        />
+          <CartDrawer
+            isOpen={cartDrawerOpen}
+            onClose={() => setCartDrawerOpen(false)}
+          />
 
-        <Toaster
-          position="bottom-center"
-          toastOptions={{
-            style: {
-              background: "#363636",
-              color: "#fffbfb",
-              fontFamily: "outfit",
-              fontSize: "13px",
-              padding: "8px 16px",
-            },
-          }}
-        />
+          <Toaster
+            position="bottom-center"
+            toastOptions={{
+              style: {
+                background: "#363636",
+                color: "#fffbfb",
+                fontFamily: "outfit",
+                fontSize: "13px",
+                padding: "8px 16px",
+              },
+            }}
+          />
+        </AnalyticsProvider>
       </BrowserRouter>
     </HelmetProvider>
   );
