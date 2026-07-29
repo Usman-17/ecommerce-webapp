@@ -48,6 +48,18 @@ const OrdersPage = () => {
   const [viewOrder, setViewOrder] = useState(null);
   const [statusDropdown, setStatusDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const [dateFrom, setDateFrom] = useState(() => {
+    const now = new Date();
+    const year =
+      now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+    return `${year}-07-01`;
+  });
+  const [dateTo, setDateTo] = useState(() => {
+    const now = new Date();
+    const year =
+      now.getMonth() >= 6 ? now.getFullYear() + 1 : now.getFullYear();
+    return `${year}-06-30`;
+  });
   const [statusFilter, setStatusFilter] = useState(() => {
     const param = searchParams.get("status");
     if (param === "pending") return "Pending";
@@ -76,18 +88,39 @@ const OrdersPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const totalOrders = orders.length;
-  const deliveredOrders = orders.filter((o) => o.status === "Delivered").length;
-  const cancelledOrders = orders.filter((o) => o.status === "Cancelled").length;
-  const pendingOrders = orders.filter(
+  const dateFilteredOrders = orders.filter((o) => {
+    const orderDate = new Date(o.date);
+    if (dateFrom) {
+      const from = new Date(dateFrom);
+      from.setHours(0, 0, 0, 0);
+      if (orderDate < from) return false;
+    }
+    if (dateTo) {
+      const to = new Date(dateTo);
+      to.setHours(23, 59, 59, 999);
+      if (orderDate > to) return false;
+    }
+    return true;
+  });
+
+  const totalOrders = dateFilteredOrders.length;
+  const deliveredOrders = dateFilteredOrders.filter(
+    (o) => o.status === "Delivered",
+  ).length;
+  const cancelledOrders = dateFilteredOrders.filter(
+    (o) => o.status === "Cancelled",
+  ).length;
+  const pendingOrders = dateFilteredOrders.filter(
     (o) => !["Delivered", "Cancelled"].includes(o.status),
   ).length;
 
   const statusFilteredOrders = statusFilter
     ? statusFilter === "Pending"
-      ? orders.filter((o) => !["Delivered", "Cancelled"].includes(o.status))
-      : orders.filter((o) => o.status === statusFilter)
-    : orders;
+      ? dateFilteredOrders.filter(
+          (o) => !["Delivered", "Cancelled"].includes(o.status),
+        )
+      : dateFilteredOrders.filter((o) => o.status === statusFilter)
+    : dateFilteredOrders;
 
   const { mutate: updateStatus } = useMutation({
     mutationFn: async ({ orderId, status }) => {
@@ -268,6 +301,37 @@ const OrdersPage = () => {
             setSearchParams({ status: "cancelled" });
           }}
         />
+      </div>
+
+      {/* Date Filter */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <span className="text-sm text-gray-500 font-medium">
+          Filter by date:
+        </span>
+        <input
+          type="date"
+          value={dateFrom}
+          onChange={(e) => setDateFrom(e.target.value)}
+          className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-(--secondary-color) cursor-pointer"
+        />
+        <span className="text-gray-400">to</span>
+        <input
+          type="date"
+          value={dateTo}
+          onChange={(e) => setDateTo(e.target.value)}
+          className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-(--secondary-color) cursor-pointer"
+        />
+        {(dateFrom || dateTo) && (
+          <button
+            onClick={() => {
+              setDateFrom("");
+              setDateTo("");
+            }}
+            className="text-xs text-red-500 hover:text-red-600 font-medium cursor-pointer"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       <CustomTable
