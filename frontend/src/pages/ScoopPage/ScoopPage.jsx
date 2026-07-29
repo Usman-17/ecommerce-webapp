@@ -269,8 +269,6 @@ const ScoopPage = () => {
           product={quickViewProduct}
           isOpen={!!quickViewProduct}
           onClose={handleCloseQuickView}
-          selections={selections}
-          onVariantSelect={handleVariantSelect}
         />
       </div>
     </div>

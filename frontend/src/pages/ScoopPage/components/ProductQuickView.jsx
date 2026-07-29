@@ -5,8 +5,6 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 const QuickViewContent = ({
   displayProduct,
-  selections,
-  onVariantSelect,
   isSale,
   discountPercentage,
   displayPrice,
@@ -16,7 +14,10 @@ const QuickViewContent = ({
   const thumbStripRef = useRef(null);
 
   const allImages = useMemo(
-    () => (displayProduct.productImages || []).map((img) => img.url).filter(Boolean),
+    () =>
+      (displayProduct.productImages || [])
+        .map((img) => img.url)
+        .filter(Boolean),
     [displayProduct.productImages],
   );
 
@@ -208,7 +209,9 @@ const QuickViewContent = ({
                   className="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-700 bg-gray-50"
                 >
                   {variant.name}
-                  {variant.price ? ` — Rs ${variant.price.toLocaleString()}` : ""}
+                  {variant.price
+                    ? ` — Rs ${variant.price.toLocaleString()}`
+                    : ""}
                 </div>
               ))}
             </div>
@@ -219,13 +222,7 @@ const QuickViewContent = ({
   );
 };
 
-const ProductQuickView = ({
-  product,
-  isOpen,
-  onClose,
-  selections = {},
-  onVariantSelect,
-}) => {
+const ProductQuickView = ({ product, isOpen, onClose }) => {
   const modalRef = useRef(null);
 
   // Use the product data directly (flat backend fields)
@@ -296,10 +293,10 @@ const ProductQuickView = ({
           {/* Modal */}
           <Motion.div
             ref={modalRef}
-            initial={{ opacity: 0, y: "100%" }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="relative bg-white w-full sm:max-w-3xl min-h-[80vh] sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col sm:flex-row sm:rounded-2xl rounded-t-2xl"
           >
             {/* Close button */}
@@ -312,62 +309,18 @@ const ProductQuickView = ({
             </button>
 
             <QuickViewContent
-                key={displayProduct._id || displayProduct._instanceId}
-                displayProduct={displayProduct}
-                selections={selections}
-                onVariantSelect={onVariantSelect}
-                isSale={isSale}
-                discountPercentage={discountPercentage}
-                displayPrice={displayPrice}
-                oldPrice={oldPrice}
-              />
+              key={displayProduct._id || displayProduct._instanceId}
+              displayProduct={displayProduct}
+              isSale={isSale}
+              discountPercentage={discountPercentage}
+              displayPrice={displayPrice}
+              oldPrice={oldPrice}
+            />
           </Motion.div>
         </div>
       )}
     </AnimatePresence>
   );
 };
-
-// Skeleton loading component
-const QuickViewSkeleton = () => (
-  <div className="flex flex-col sm:flex-row w-full">
-    {/* Image skeleton */}
-    <div className="relative w-full sm:w-1/2 bg-gray-100 shrink-0 flex flex-col">
-      <div className="w-full aspect-4/3 sm:aspect-square bg-gray-200 animate-pulse" />
-      <div className="hidden sm:flex gap-1.5 p-2">
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="shrink-0 w-[calc(25%-4.5px)] aspect-square rounded-lg bg-gray-200 animate-pulse"
-          />
-        ))}
-      </div>
-    </div>
-
-    {/* Content skeleton */}
-    <div className="p-5 space-y-4 flex-1 overflow-y-auto sm:overflow-hidden">
-      <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
-      <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse" />
-      <div className="h-5 w-1/2 bg-gray-200 rounded animate-pulse" />
-      <div className="flex gap-1">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
-        ))}
-      </div>
-      <div className="h-7 w-24 bg-gray-200 rounded animate-pulse" />
-      <div className="space-y-2">
-        <div className="h-3 w-12 bg-gray-200 rounded animate-pulse" />
-        <div className="flex gap-1.5">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="h-6 w-6 rounded-full bg-gray-200 animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-);
 
 export default ProductQuickView;

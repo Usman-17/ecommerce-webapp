@@ -18,9 +18,13 @@ const ScoopSizeCard = ({
 
   return (
     <InViewAnimation>
-      <Motion.button
-        type="button"
+      <Motion.div
+        role="button"
+        tabIndex={0}
         onClick={() => onSelect(config.id)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") onSelect(config.id);
+        }}
         whileTap={{ scale: 0.97 }}
         className={`relative w-full h-full text-left p-6 sm:p-8 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col ${
           config.popular ? "sm:-mt-2" : ""
@@ -81,7 +85,8 @@ const ScoopSizeCard = ({
               <div className="inline-flex items-center gap-3 border border-gray-200 rounded-full px-1 py-1.5">
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     if (quantity > 1) onSelectQuantity(quantity - 1);
                   }}
                   disabled={quantity <= 1}
@@ -94,7 +99,8 @@ const ScoopSizeCard = ({
                 </span>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     if (quantity < 3) onSelectQuantity(quantity + 1);
                   }}
                   disabled={quantity >= 3}
@@ -125,7 +131,7 @@ const ScoopSizeCard = ({
             {quantity === 3 && (
               <p className="mt-2 flex items-center justify-center gap-1 text-xs text-gray-500">
                 <Tag size={12} className="text-accent" />
-                You're saving{" "}
+                You&apos;re saving{" "}
                 <span className="font-semibold text-green-600">
                   Rs{" "}
                   {(config.pricing[1] * 3 - config.pricing[3]).toLocaleString()}
@@ -135,7 +141,7 @@ const ScoopSizeCard = ({
             )}
           </div>
         </div>
-      </Motion.button>
+      </Motion.div>
     </InViewAnimation>
   );
 };
