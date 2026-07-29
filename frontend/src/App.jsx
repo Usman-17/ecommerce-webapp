@@ -1,7 +1,7 @@
 import { Loader } from "lucide-react";
-import { lazy, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import { HelmetProvider } from "react-helmet-async";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import "tippy.js/dist/tippy.css";
@@ -11,6 +11,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 import Header from "./components/Header";
 import Footer from "./components/common/Footer";
+import CartDrawer from "./components/CartDrawer";
 import ScrollToTop from "./components/ScrollToTop";
 import PageViewTracker from "./components/PageViewTracker";
 
@@ -44,6 +45,24 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 
 const App = () => {
   const { data: authUser } = useGetAuth();
+
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpenDrawer = () => setCartDrawerOpen(true);
+    window.addEventListener("openCartDrawer", handleOpenDrawer);
+    return () => window.removeEventListener("openCartDrawer", handleOpenDrawer);
+  }, []);
+
+  useEffect(() => {
+    const handleContextMenu = (e) => {
+      if (window.innerWidth <= 640 && e.target.tagName === "IMG") {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener("contextmenu", handleContextMenu);
+    return () => document.removeEventListener("contextmenu", handleContextMenu);
+  }, []);
 
   return (
     <HelmetProvider>
@@ -118,6 +137,11 @@ const App = () => {
           </Suspense>
         </div>
         <Footer />
+
+        <CartDrawer
+          isOpen={cartDrawerOpen}
+          onClose={() => setCartDrawerOpen(false)}
+        />
 
         <Toaster
           position="bottom-center"
