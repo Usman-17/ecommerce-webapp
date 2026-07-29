@@ -11,7 +11,7 @@ import {
 
 const router = express.Router();
 
-router.post("/place", protectRoute, placeOrder);
+router.post("/place", placeOrder);
 router.get("/userorders", protectRoute, userOrders);
 router.put("/status/:id", protectRoute, updateOrderStatus);
 router.get("/track", trackOrder);

@@ -15,7 +15,7 @@ const generateTrackingNo = () => {
 // DESC     : Placing order using COD Method
 export const placeOrder = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id || null;
     const { cart, totalAmount, deliveryInfo } = req.body;
 
     if (!cart || Object.keys(cart).length === 0) {
@@ -124,10 +124,17 @@ export const placeOrder = async (req, res) => {
     const newOrder = new Order(orderData);
     await newOrder.save();
 
-    // Clear cart
-    await User.findByIdAndUpdate(userId, { cartData: {} });
+    // Clear cart (only for logged-in users)
+    if (userId) {
+      await User.findByIdAndUpdate(userId, { cartData: {} });
+    }
 
-    res.json({ success: true, message: "Order Placed", id: newOrder._id });
+    res.json({
+      success: true,
+      message: "Order Placed",
+      id: newOrder._id,
+      trackingNo: newOrder.trackingNo,
+    });
   } catch (error) {
     console.log("Error in placeOrder Controller:", error.message);
     return res.status(500).json({ error: error.message });
