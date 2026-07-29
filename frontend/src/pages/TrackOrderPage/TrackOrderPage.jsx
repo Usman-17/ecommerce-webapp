@@ -3,7 +3,6 @@ import { toast } from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { apiRequest } from "../../utils/authFetch";
 import useTrackOrder from "../../hooks/useTrackOrder";
 
 import QuickLinks from "../../components/QuickLinks";
@@ -47,10 +46,18 @@ const TrackOrderPage = () => {
   // Cancel order mutation
   const { mutate: cancelOrder, isPending: isCancelling } = useMutation({
     mutationFn: async ({ id, remarks }) => {
-      return await apiRequest(
-        `/api/SALE/WebOrder/CancelWeb?Id=${id}&StatusRemarks=${encodeURIComponent(remarks)}`,
+      const res = await fetch(
+        `/api/order/cancel?id=${id}&remarks=${encodeURIComponent(remarks)}`,
         { method: "POST" },
       );
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to cancel order");
+      }
+
+      return json;
     },
     onSuccess: () => {
       toast.success("Order cancelled successfully");
@@ -64,8 +71,8 @@ const TrackOrderPage = () => {
   });
 
   const handleCancelConfirm = () => {
-    if (order?.saleOrderId) {
-      cancelOrder({ id: order.saleOrderId, remarks: cancelRemarks });
+    if (order?._id) {
+      cancelOrder({ id: order._id, remarks: cancelRemarks });
     }
   };
 

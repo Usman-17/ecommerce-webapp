@@ -7,33 +7,38 @@ import TrackingResultDesktop from "./TrackingResultDesktop";
 const TrackingResult = ({ order, onCancelClick }) => {
   if (!order) return null;
 
-  const apiSteps = order.saleOrderTrackingWebRequests || [];
+  const statusOrder = ["Order Placed", "Processing", "Shipped", "Delivered"];
+  const currentStatusIndex =
+    order.status === "Cancelled" ? -1 : statusOrder.indexOf(order.status);
 
-  // Map API steps to the 4 visual steps
   const visualSteps = [
     {
       label: "Order Placed",
       icon: Package,
       desc: "Your order has been placed successfully.",
-      steps: [apiSteps[0]],
+      isCompleted: currentStatusIndex >= 0,
+      timestamp: currentStatusIndex >= 0 ? order.createdAt : null,
     },
     {
       label: "Processing",
       icon: Clock,
       desc: "We are processing your order.",
-      steps: [apiSteps[1], apiSteps[2]],
+      isCompleted: currentStatusIndex >= 1,
+      timestamp: currentStatusIndex >= 1 ? order.updatedAt : null,
     },
     {
       label: "Shipped",
       icon: TruckElectric,
       desc: "Your order is on the way.",
-      steps: [apiSteps[3], apiSteps[4]],
+      isCompleted: currentStatusIndex >= 2,
+      timestamp: currentStatusIndex >= 2 ? order.updatedAt : null,
     },
     {
       label: "Delivered",
       icon: MapPinHouse,
       desc: "Your order has been delivered.",
-      steps: [apiSteps[5]],
+      isCompleted: currentStatusIndex >= 3,
+      timestamp: order.deliveredAt || null,
     },
   ];
 
@@ -60,32 +65,17 @@ const TrackingResult = ({ order, onCancelClick }) => {
     return "bg-gray-50 text-gray-500 border-gray-100";
   };
 
-  const isCancelled = order.saleOrderStatusName === "Cancelled";
+  let stepsToDisplay = visualSteps;
 
-  // Prepare the steps to display
-  let stepsToDisplay = visualSteps.map((vStep) => {
-    const completedSteps = vStep.steps.filter(
-      (s) => s && s.saleOrderTrackingId > 0 && !s.createdOn.startsWith("1900"),
-    );
-    return {
-      ...vStep,
-      isCompleted: completedSteps.length > 0,
-      latestStep: completedSteps[completedSteps.length - 1] || vStep.steps[0],
-    };
-  });
-
-  if (isCancelled) {
+  if (order.status === "Cancelled") {
     stepsToDisplay = stepsToDisplay.filter((s) => s.isCompleted);
     stepsToDisplay.push({
       label: "Order Cancelled",
       icon: Ban,
-      desc: order.statusRemarks,
+      desc: order.cancelRemarks || "This order has been cancelled.",
       isCompleted: true,
       isCancelled: true,
-      latestStep: {
-        createdOn: order.saleOrderOn,
-        saleOrderStatusName: "Cancelled",
-      },
+      timestamp: order.cancelledAt,
     });
   }
 

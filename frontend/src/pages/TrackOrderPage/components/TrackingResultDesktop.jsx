@@ -15,6 +15,8 @@ const TrackingResultDesktop = ({
   getStatusStyle,
   stepsToDisplay,
 }) => {
+  const address = order.address || {};
+
   return (
     <Motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,17 +39,17 @@ const TrackingResultDesktop = ({
 
         <div
           className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs font-black border self-start uppercase tracking-widest ${getStatusStyle(
-            order.saleOrderStatusName,
+            order.status,
           )}`}
         >
           <div
             className={`w-2 h-2 rounded-full ${
-              order.saleOrderStatusName === "Cancelled"
+              order.status === "Cancelled"
                 ? "bg-red-500"
                 : "bg-accent animate-pulse"
-            } ${order.saleOrderStatusName === "Delivered" ? "animate-none" : ""}`}
+            } ${order.status === "Delivered" ? "animate-none" : ""}`}
           />
-          {order.saleOrderStatusName || "Processing"}
+          {order.status || "Processing"}
         </div>
       </div>
 
@@ -55,15 +57,15 @@ const TrackingResultDesktop = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         {[
           {
-            label: "Order Number",
-            value: `#${order.saleOrderNo}`,
+            label: "Tracking Number",
+            value: order.trackingNo,
             icon: ReceiptText,
           },
 
           {
             label: "Order Date",
-            value: order.saleOrderOn
-              ? new Date(order.saleOrderOn).toLocaleDateString("en-US", {
+            value: order.createdAt
+              ? new Date(order.createdAt).toLocaleDateString("en-US", {
                   month: "long",
                   day: "numeric",
                   year: "numeric",
@@ -74,7 +76,7 @@ const TrackingResultDesktop = ({
 
           {
             label: "Payment Method",
-            value: order.paymentModeName,
+            value: order.paymentMethod,
             icon: CreditCard,
           },
         ].map((info, idx) => (
@@ -104,7 +106,6 @@ const TrackingResultDesktop = ({
         <div className="space-y-12 relative pt-4">
           {stepsToDisplay.map((vStep, idx) => {
             const isCompleted = vStep.isCompleted;
-            const latestStep = vStep.latestStep;
 
             const nextStepIsCompleted =
               idx < stepsToDisplay.length - 1 &&
@@ -162,9 +163,7 @@ const TrackingResultDesktop = ({
                       <p
                         className={`text-sm font-bold mt-1.5 ${isCompleted ? "text-gray-500" : "text-gray-300"}`}
                       >
-                        {isCompleted
-                          ? latestStep.saleOrderStatusName
-                          : vStep.desc}
+                        {vStep.desc}
                       </p>
                     </div>
 
@@ -185,30 +184,28 @@ const TrackingResultDesktop = ({
                             : "Pending"}
                       </span>
 
-                      {isCompleted &&
-                        latestStep?.createdOn &&
-                        !latestStep.createdOn.startsWith("1900") && (
-                          <p
-                            className={`text-[11px] font-bold ${vStep.isCancelled ? "text-red-500" : "text-gray-400"}`}
-                          >
-                            {new Date(latestStep.createdOn).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              },
-                            )}{" "}
-                            •{" "}
-                            {new Date(latestStep.createdOn).toLocaleTimeString(
-                              "en-US",
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              },
-                            )}
-                          </p>
-                        )}
+                      {isCompleted && vStep.timestamp && (
+                        <p
+                          className={`text-[11px] font-bold ${vStep.isCancelled ? "text-red-500" : "text-gray-400"}`}
+                        >
+                          {new Date(vStep.timestamp).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            },
+                          )}{" "}
+                          •{" "}
+                          {new Date(vStep.timestamp).toLocaleTimeString(
+                            "en-US",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -229,51 +226,26 @@ const TrackingResultDesktop = ({
 
             <div className="text-sm text-gray-500 font-bold leading-relaxed mb-8">
               <p className="text-primary font-black text-base mb-1.5">
-                {order.userName}
+                {address.firstName} {address.lastName}
               </p>
-              <p>{order.addressDetail}</p>
-              <p>{order.cityName}</p>
-              <p className="mt-3 text-xs text-gray-400">{order.userCellNo}</p>
+              <p>{address.address}</p>
+              <p>{address.city}</p>
+              <p className="mt-3 text-xs text-gray-400">{address.phone}</p>
             </div>
 
             <div className="space-y-4 pt-8 border-t border-gray-50">
               <div className="flex items-center justify-between">
                 <span className="text-gray-400 font-black text-xs uppercase tracking-widest">
-                  Subtotal
-                </span>
-                <span className="text-primary font-black text-sm">
-                  Rs. {order.totalGross?.toLocaleString()}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400 font-black text-xs uppercase tracking-widest">
-                  Delivery
-                </span>
-                <span className="text-primary font-black text-sm">
-                  Rs. {order.totalFreight || 0}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between pt-5 border-t-2 border-gray-100">
-                <span className="text-primary font-bold text-lg">
                   Total Amount
                 </span>
                 <span className="text-accent font-black text-xl">
-                  Rs.{" "}
-                  {(
-                    order.totalNet ||
-                    order.totalReceivable ||
-                    0
-                  ).toLocaleString()}
+                  Rs. {order.amount?.toLocaleString()}
                 </span>
               </div>
             </div>
 
             {/* Cancel Order Button */}
-            {!["Shipped", "Delivered", "Cancelled"].includes(
-              order.saleOrderStatusName,
-            ) && (
+            {!["Shipped", "Delivered", "Cancelled"].includes(order.status) && (
               <button
                 onClick={onCancelClick}
                 className="w-full mt-8 flex items-center justify-center gap-2 py-4 px-6 rounded-lg border-2 border-red-50 text-red-500 font-black text-sm hover:bg-red-50 transition-all group"

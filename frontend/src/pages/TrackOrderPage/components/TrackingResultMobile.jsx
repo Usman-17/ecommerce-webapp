@@ -17,6 +17,8 @@ const TrackingResultMobile = ({
   getStatusStyle,
   stepsToDisplay,
 }) => {
+  const address = order.address || {};
+
   return (
     <div className="space-y-2.5 mb-2 px-1">
       {/* Mobile Header Card */}
@@ -28,24 +30,22 @@ const TrackingResultMobile = ({
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-[14px] sm:text-lg font-black text-primary flex items-center gap-2">
-              {order.saleOrderNo}
+              {order.trackingNo}
             </h3>
 
-            {/* date */}
             <p className="text-gray-400 text-[12px] font-medium mt-1">
-              {moment(order.saleOrderOn).isValid()
-                ? moment(order.saleOrderOn).format("MMM DD, YYYY [at] hh:mm A")
+              {moment(order.createdAt).isValid()
+                ? moment(order.createdAt).format("MMM DD, YYYY [at] hh:mm A")
                 : "Order Date Unavailable"}
             </p>
           </div>
 
-          {/* Status */}
           <span
             className={`text-[10px] font-black px-3 py-1.5 rounded-full border uppercase sm:tracking-wider ${getStatusStyle(
-              order.saleOrderStatusName,
+              order.status,
             )}`}
           >
-            {order.saleOrderStatusName}
+            {order.status}
           </span>
         </div>
 
@@ -59,7 +59,7 @@ const TrackingResultMobile = ({
                 Payment
               </p>
               <p className="text-[11px] text-primary font-black truncate">
-                {order.paymentModeName}
+                {order.paymentMethod}
               </p>
             </div>
           </div>
@@ -74,12 +74,7 @@ const TrackingResultMobile = ({
                 Total
               </p>
               <p className="text-[11px] text-primary font-black truncate">
-                Rs.{" "}
-                {(
-                  order.totalNet ||
-                  order.totalReceivable ||
-                  0
-                ).toLocaleString()}
+                Rs. {order.amount?.toLocaleString()}
               </p>
             </div>
           </div>
@@ -98,10 +93,9 @@ const TrackingResultMobile = ({
           Tracking Status
         </h4>
 
-        <div className="space-y-0 relative">
+        <div className="space-y0 relative">
           {stepsToDisplay.map((vStep, idx) => {
             const isCompleted = vStep.isCompleted;
-            const latestStep = vStep.latestStep;
             const nextStepIsCompleted =
               idx < stepsToDisplay.length - 1 &&
               stepsToDisplay[idx + 1].isCompleted;
@@ -152,36 +146,32 @@ const TrackingResultMobile = ({
                       <p
                         className={`text-[11px] font-bold mt-0.5 ${isCompleted ? "text-gray-500" : "text-gray-300"}`}
                       >
-                        {isCompleted
-                          ? latestStep.saleOrderStatusName
-                          : vStep.desc}
+                        {vStep.desc}
                       </p>
                     </div>
 
-                    {isCompleted &&
-                      latestStep?.createdOn &&
-                      !latestStep.createdOn.startsWith("1900") && (
-                        <div className="text-right">
-                          <p className="text-[10px] text-gray-400 font-bold">
-                            {new Date(latestStep.createdOn).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                              },
-                            )}
-                          </p>
-                          <p className="text-[9px] text-gray-300 font-bold uppercase">
-                            {new Date(latestStep.createdOn).toLocaleTimeString(
-                              "en-US",
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              },
-                            )}
-                          </p>
-                        </div>
-                      )}
+                    {isCompleted && vStep.timestamp && (
+                      <div className="text-right">
+                        <p className="text-[10px] text-gray-400 font-bold">
+                          {new Date(vStep.timestamp).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                            },
+                          )}
+                        </p>
+                        <p className="text-[9px] text-gray-300 font-bold uppercase">
+                          {new Date(vStep.timestamp).toLocaleTimeString(
+                            "en-US",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -203,21 +193,19 @@ const TrackingResultMobile = ({
         </h4>
 
         <div className="text-[13px] text-gray-500 font-bold leading-relaxed">
-          <p className="text-primary font-black mb-1">{order.userName}</p>
-          <p>{order.addressDetail}</p>
-
-          <p>{order.cityName}</p>
-
+          <p className="text-primary font-black mb-1">
+            {address.firstName} {address.lastName}
+          </p>
+          <p>{address.address}</p>
+          <p>{address.city}</p>
           <p className="mt-2 text-[11px] text-gray-400 font-bold">
-            {order.userCellNo}
+            {address.phone}
           </p>
         </div>
       </Motion.div>
 
       {/* Cancel Order Button Mobile */}
-      {!["Shipped", "Delivered", "Cancelled"].includes(
-        order.saleOrderStatusName,
-      ) && (
+      {!["Shipped", "Delivered", "Cancelled"].includes(order.status) && (
         <Motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

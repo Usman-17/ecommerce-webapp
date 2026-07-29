@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "../utils/authFetch";
 
 const useTrackOrder = (trackingNo) => {
   return useQuery({
@@ -7,13 +6,14 @@ const useTrackOrder = (trackingNo) => {
     enabled: !!trackingNo,
 
     queryFn: async () => {
-      const json = await apiRequest(
-        `/api/SALE/WebOrder/GetByTrackingNo?TrackingNo=${encodeURIComponent(trackingNo)}`,
-        { headers: { accept: "text/plain" } },
+      const res = await fetch(
+        `/api/order/track?trackingNo=${encodeURIComponent(trackingNo)}`,
       );
 
-      if (!json.data) {
-        throw new Error(json.message || "No record found.");
+      const json = await res.json();
+
+      if (!res.ok || !json.data) {
+        throw new Error(json.error || "No record found.");
       }
 
       return json.data;
