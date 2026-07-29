@@ -9,6 +9,8 @@ import {
   ChevronDown,
   Truck,
   Users,
+  Sparkles,
+  ShoppingBag,
 } from "lucide-react";
 
 import CustomTable from "../components/CustomTable";
@@ -156,6 +158,7 @@ const OrdersPage = () => {
     "customerPhone",
     "amountStr",
     "status",
+    "orderTypeLabel",
   ]);
 
   const columns = [
@@ -179,6 +182,30 @@ const OrdersPage = () => {
             <p className="text-xs text-gray-400">{record.customerPhone}</p>
           )}
         </div>
+      ),
+    },
+    {
+      title: "Type",
+      dataIndex: "orderType",
+      key: "orderType",
+      width: 120,
+      align: "center",
+      sorter: (a, b) => a.orderType.localeCompare(b.orderType),
+      render: (_, record) => (
+        <span
+          className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${
+            record.orderType === "scoop"
+              ? "bg-accent/10 text-accent"
+              : "bg-gray-100 text-gray-600"
+          }`}
+        >
+          {record.orderType === "scoop" ? (
+            <Sparkles size={10} />
+          ) : (
+            <ShoppingBag size={10} />
+          )}
+          {record.orderTypeLabel}
+        </span>
       ),
     },
     {
@@ -373,6 +400,20 @@ const OrdersPage = () => {
                   minute: "2-digit",
                 })}
               </span>
+              <span
+                className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${
+                  viewOrder.orderType === "scoop"
+                    ? "bg-accent/10 text-accent"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {viewOrder.orderType === "scoop" ? (
+                  <Sparkles size={10} />
+                ) : (
+                  <ShoppingBag size={10} />
+                )}
+                {viewOrder.orderTypeLabel}
+              </span>
               <div className="flex-1" />
               <span
                 className={`inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg ${statusColors[viewOrder.status] || "bg-yellow-100 text-yellow-700"}`}
@@ -512,6 +553,39 @@ const OrdersPage = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Scoop Details (only for scoop orders) */}
+                {viewOrder.orderType === "scoop" && viewOrder.scoopDetails && (
+                  <div className="bg-accent/5 border border-accent/20 rounded-2xl p-5">
+                    <h3 className="text-xs font-bold text-accent uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                      <Sparkles size={12} />
+                      Scoop Details
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">Type</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {viewOrder.scoopDetails.scoopType}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">Scoops</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {viewOrder.scoopDetails.quantity}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">
+                          Fixed Price
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          Rs.{" "}
+                          {viewOrder.scoopDetails.fixedPrice?.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Update Status */}
                 <div className="bg-white border border-gray-200 rounded-2xl p-5">

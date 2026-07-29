@@ -30,6 +30,11 @@ const useGetAllOrders = () => {
         customerPhone: item.address?.phone || "",
         amountStr: `Rs. ${item.amount.toLocaleString()} ${item.amount}`,
         itemsCount: item.items?.length || 0,
+        orderType: item.orderType || "normal",
+        orderTypeLabel:
+          item.orderType === "scoop"
+            ? item.scoopDetails?.scoopType || "Scoop Deal"
+            : "Normal",
         dateFormatted: new Date(item.date).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
