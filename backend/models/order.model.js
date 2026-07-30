@@ -74,7 +74,7 @@ const orderSchema = new mongoose.Schema(
 
     orderType: {
       type: String,
-      enum: ["normal", "scoop"],
+      enum: ["normal", "scoop", "deal"],
       default: "normal",
     },
 
