@@ -475,50 +475,65 @@ const OrdersPage = () => {
                   <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-1">
                     Items ({viewOrder.items.length})
                   </h3>
-                  <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden divide-y divide-gray-100">
-                    {viewOrder.items.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-4 p-4">
-                        <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden shrink-0">
-                          {item.productImages?.[0]?.url ? (
-                            <img
-                              src={item.productImages[0].url}
-                              alt={item.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">
-                              No Image
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate text-[15px]">
-                            {item.title}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1.5">
-                            <span className="text-sm text-gray-500">
-                              Rs. {item.price.toLocaleString()}
-                            </span>
-                            <span className="text-gray-300">×</span>
-                            <span className="text-sm text-gray-500">
-                              {item.quantity}
-                            </span>
-                            {item.variantName && (
-                              <>
-                                <span className="text-gray-300">•</span>
-                                <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-medium">
-                                  {item.variantName}
-                                </span>
-                              </>
+                  {viewOrder.items.length === 0 &&
+                  viewOrder.orderType === "deal" ? (
+                    <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5 text-center">
+                      <Tag size={24} className="text-purple-400 mx-auto mb-2" />
+                      <p className="text-sm font-semibold text-purple-700">
+                        {viewOrder.dealDetails?.dealType || "Deal Order"}
+                      </p>
+                      <p className="text-xs text-purple-400 mt-1">
+                        Fixed price: Rs.{" "}
+                        {viewOrder.dealDetails?.fixedPrice?.toLocaleString() ||
+                          viewOrder.amount?.toLocaleString()}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden divide-y divide-gray-100">
+                      {viewOrder.items.map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-4 p-4">
+                          <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden shrink-0">
+                            {item.productImages?.[0]?.url ? (
+                              <img
+                                src={item.productImages[0].url}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">
+                                No Image
+                              </div>
                             )}
                           </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 truncate text-[15px]">
+                              {item.title}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span className="text-sm text-gray-500">
+                                Rs. {item.price.toLocaleString()}
+                              </span>
+                              <span className="text-gray-300">×</span>
+                              <span className="text-sm text-gray-500">
+                                {item.quantity}
+                              </span>
+                              {item.variantName && (
+                                <>
+                                  <span className="text-gray-300">•</span>
+                                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-md font-medium">
+                                    {item.variantName}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <span className="font-bold text-gray-900 whitespace-nowrap">
+                            Rs. {(item.price * item.quantity).toLocaleString()}
+                          </span>
                         </div>
-                        <span className="font-bold text-gray-900 whitespace-nowrap">
-                          Rs. {(item.price * item.quantity).toLocaleString()}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -590,6 +605,33 @@ const OrdersPage = () => {
                         <span className="text-sm font-semibold text-gray-900">
                           Rs.{" "}
                           {viewOrder.scoopDetails.fixedPrice?.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Deal Details (only for deal orders) */}
+                {viewOrder.orderType === "deal" && viewOrder.dealDetails && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-2xl p-5">
+                    <h3 className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                      <Tag size={12} />
+                      Deal Details
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">Type</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {viewOrder.dealDetails.dealType}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">
+                          Fixed Price
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          Rs.{" "}
+                          {viewOrder.dealDetails.fixedPrice?.toLocaleString()}
                         </span>
                       </div>
                     </div>

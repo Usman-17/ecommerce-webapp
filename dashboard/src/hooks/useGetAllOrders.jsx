@@ -33,7 +33,7 @@ const useGetAllOrders = () => {
         orderType: item.orderType || "normal",
         orderTypeLabel:
           item.orderType === "scoop"
-            ? item.scoopDetails?.scoopType || "Scoop Deal"
+            ? "Scoop"
             : item.orderType === "deal"
               ? "Deal"
               : "Normal",
