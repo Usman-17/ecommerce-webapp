@@ -20,7 +20,7 @@ const SuccessModal = ({
     <AnimatePresence>
       {open && (
         <Motion.div
-          className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm bg-black/10"
+          className="fixed inset-0 z-[999999] flex items-center justify-center backdrop-blur-sm bg-black/10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

@@ -11,7 +11,9 @@ export const useGetAllProducts = () => {
   } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const response = await fetch("/api/product/all");
+      const response = await fetch("/api/product/admin/all", {
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch products");
       }

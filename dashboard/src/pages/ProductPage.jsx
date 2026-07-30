@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { useLocation } from "react-router";
 import { useState, useEffect, useRef } from "react";
-import { SquarePen, Plus, Upload ,X} from "lucide-react";
+import { SquarePen, Plus, Upload, X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import TagsInput from "../components/TagsInput";
@@ -61,6 +61,7 @@ const ProductPage = () => {
     sold: "",
     tags: [],
     price: "",
+    purchasePrice: "",
     secondaryPrice: "",
     productImages: [],
     existingImages: [],
@@ -98,7 +99,11 @@ const ProductPage = () => {
         ? `/api/product/update/${editItem._id}`
         : "/api/product/create";
 
-      const res = await fetch(url, { method, body: formDataToSend });
+      const res = await fetch(url, {
+        method,
+        body: formDataToSend,
+        credentials: "include",
+      });
       if (!res.ok) {
         const result = await res.json();
         throw new Error(result.error || "Failed to save product");
@@ -125,7 +130,10 @@ const ProductPage = () => {
 
   const { mutate: deleteProduct, isPending: isDeleting } = useMutation({
     mutationFn: async (id) => {
-      const res = await fetch(`/api/product/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/product/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("Failed to delete product");
       return res.json();
     },
@@ -152,6 +160,7 @@ const ProductPage = () => {
       sold: "",
       tags: [],
       price: "",
+      purchasePrice: "",
       secondaryPrice: "",
       productImages: [],
       existingImages: [],
@@ -164,48 +173,61 @@ const ProductPage = () => {
   };
 
   const handleOpenEdit = async (record) => {
-    const res = await fetch(`/api/product/${record._id}`);
-    const data = await res.json();
+    try {
+      const res = await fetch(`/api/product/admin/${record._id}`, {
+        credentials: "include",
+      });
 
-    setEditItem(record);
-    setFormData({
-      title: data.title || "",
-      description: data.description || "",
-      area: data.areaId || "",
-      category: data.categoryId || "",
-      subCategory: data.subCategoryId || "",
-      brand: data.brandId || "",
-      tags: data.tags || [],
-      price: data.price || "",
-      secondaryPrice: data.secondaryPrice || "",
-      sold: data.sold || "",
-      productImages: data.productImages || [],
-      existingImages: data.productImages || [],
-    });
+      const data = await res.json();
 
-    setProductImgPreview(data.productImages?.map((img) => img.url) || []);
-    setProductImages([]);
+      if (!res.ok) {
+        toast.error(data.error || "Failed to load product");
+        return;
+      }
 
-    if (data.variants && data.variants.length > 0) {
-      setVariants(
-        data.variants.map((v) => {
-          const variantImages = v.images || (v.image ? [v.image] : []);
-          return {
-            _id: v._id,
-            name: v.name || "",
-            price: v.price ?? "",
-            images: [],
-            imagePreviews: variantImages.map((img) => img.url),
-            existingImages: variantImages,
-          };
-        }),
-      );
-    } else {
-      setVariants([emptyVariant()]);
+      setFormData({
+        title: data.title || "",
+        description: data.description || "",
+        area: data.areaId || "",
+        category: data.categoryId || "",
+        subCategory: data.subCategoryId || "",
+        brand: data.brandId || "",
+        tags: data.tags || [],
+        price: data.price || "",
+        purchasePrice: data.purchasePrice || "",
+        secondaryPrice: data.secondaryPrice || "",
+        sold: data.sold || "",
+        productImages: data.productImages || [],
+        existingImages: data.productImages || [],
+      });
+
+      setProductImgPreview(data.productImages?.map((img) => img.url) || []);
+      setProductImages([]);
+
+      if (data.variants && data.variants.length > 0) {
+        setVariants(
+          data.variants.map((v) => {
+            const variantImages = v.images || (v.image ? [v.image] : []);
+            return {
+              _id: v._id,
+              name: v.name || "",
+              price: v.price ?? "",
+              images: [],
+              imagePreviews: variantImages.map((img) => img.url),
+              existingImages: variantImages,
+            };
+          }),
+        );
+      } else {
+        setVariants([emptyVariant()]);
+      }
+
+      setEditItem(record);
+      setActiveTab("Basic Info");
+      setAddModal(true);
+    } catch {
+      toast.error("Failed to load product");
     }
-
-    setActiveTab("Basic Info");
-    setAddModal(true);
   };
 
   const handleCloseModal = () => {
@@ -221,6 +243,7 @@ const ProductPage = () => {
       sold: "",
       tags: [],
       price: "",
+      purchasePrice: "",
       secondaryPrice: "",
       productImages: [],
       existingImages: [],
@@ -234,16 +257,18 @@ const ProductPage = () => {
   const handleSave = (saveAndClose = true) => {
     isSavingAndCloseRef.current = saveAndClose;
     setIsSavingAndClose(saveAndClose);
-    if (!formData.title.trim()) {
-      toast.error("Product title is required");
-      return;
-    }
-    if (!formData.price) {
-      toast.error("Product price is required");
-      return;
-    }
-    if (!formData.category) {
-      toast.error("Please select a category");
+
+    const missingFields = [];
+    if (!formData.title.trim()) missingFields.push("Title");
+    if (!formData.price) missingFields.push("Price");
+    if (!formData.description.trim()) missingFields.push("Description");
+    if (!formData.tags || formData.tags.length === 0)
+      missingFields.push("Tags");
+
+    if (missingFields.length > 0) {
+      toast.error(
+        `${missingFields.join(", ")} ${missingFields.length > 1 ? "are" : "is"} required`,
+      );
       return;
     }
 
@@ -428,16 +453,26 @@ const ProductPage = () => {
     },
     {
       title: "Category",
-      dataIndex: "categoryName",
-      key: "categoryName",
-      sorter: (a, b) => a.categoryName.localeCompare(b.categoryName),
+      key: "categorySubCategory",
+      render: (_, record) => (
+        <div>
+          <div>{record.categoryName || "-"}</div>
+          <div className="text-xs text-gray-400">
+            {record.subCategoryName || "-"}
+          </div>
+        </div>
+      ),
+      sorter: (a, b) =>
+        (a.categoryName || "").localeCompare(b.categoryName || ""),
     },
     {
-      title: "SubCategory",
-      dataIndex: "subCategoryName",
-      key: "subCategoryName",
-      sorter: (a, b) =>
-        (a.subCategoryName || "").localeCompare(b.subCategoryName || ""),
+      title: "Purchase Price",
+      dataIndex: "purchasePrice",
+      key: "purchasePrice",
+      width: 120,
+      align: "center",
+      render: (val) => val || 0,
+      sorter: (a, b) => (a.purchasePrice || 0) - (b.purchasePrice || 0),
     },
     {
       title: "Price",
@@ -446,6 +481,23 @@ const ProductPage = () => {
       width: 100,
       align: "center",
       sorter: (a, b) => a.price - b.price,
+    },
+
+    {
+      title: "Secondary Price",
+      dataIndex: "secondaryPrice",
+      key: "secondaryPrice",
+      width: 130,
+      align: "center",
+      render: (val, record) =>
+        val ? (
+          <span className={record.price ? "line-through text-gray-400" : ""}>
+            {val}
+          </span>
+        ) : (
+          "-"
+        ),
+      sorter: (a, b) => (a.secondaryPrice || 0) - (b.secondaryPrice || 0),
     },
     {
       title: "Action",
@@ -519,9 +571,7 @@ const ProductPage = () => {
             ))}
           </div>
 
-          {/* Tab Content */}
           <div className="flex-1 min-h-[300px]">
-            {/* Basic Info Tab */}
             {activeTab === "Basic Info" && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
@@ -566,9 +616,9 @@ const ProductPage = () => {
                       value: a._id,
                     }))}
                   />
+
                   <CustomSelect
                     label="Category"
-                    required
                     placeholder="Select Category"
                     value={formData.category}
                     onChange={(val) => handleSelectChange(val, "category")}
@@ -577,6 +627,7 @@ const ProductPage = () => {
                       value: c._id,
                     }))}
                   />
+
                   <CustomSelect
                     label="SubCategory"
                     placeholder="Select SubCategory"
@@ -589,12 +640,27 @@ const ProductPage = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                  <CustomInput
+                    id="purchasePrice"
+                    label="Purchase Price"
+                    type="number"
+                    value={formData.purchasePrice}
+                    placeholder="Enter Purchase Price"
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        purchasePrice: e.target.value,
+                      }))
+                    }
+                  />
+
                   <CustomInput
                     id="productPrice"
                     label="Price"
                     required
                     type="number"
+                    placeholder="Enter Product Price"
                     value={formData.price}
                     onChange={(e) =>
                       setFormData((prev) => ({
@@ -602,12 +668,13 @@ const ProductPage = () => {
                         price: e.target.value,
                       }))
                     }
-                    placeholder="Enter Product Price"
                   />
+
                   <CustomInput
                     id="secondaryPrice"
                     label="Secondary Price"
                     type="number"
+                    placeholder="Enter Secondary Price"
                     value={formData.secondaryPrice}
                     onChange={(e) =>
                       setFormData((prev) => ({
@@ -615,11 +682,12 @@ const ProductPage = () => {
                         secondaryPrice: e.target.value,
                       }))
                     }
-                    placeholder="Enter Secondary Price"
                   />
+
                   <CustomInput
                     id="sold"
                     label="Sold"
+                    placeholder="Enter number sold"
                     value={formData.sold}
                     onChange={(e) =>
                       setFormData((prev) => ({
@@ -627,12 +695,12 @@ const ProductPage = () => {
                         sold: e.target.value,
                       }))
                     }
-                    placeholder="Enter number sold"
                   />
                 </div>
 
                 <TagsInput
                   label="Tags"
+                  required
                   value={formData.tags}
                   onChange={(val) => handleSelectChange(val, "tags")}
                 />
@@ -808,7 +876,11 @@ const ProductPage = () => {
             submitText="Save"
             saveAndCloseText={editItem ? "Update & Close" : "Save & Close"}
             isDisabled={
-              !formData.title.trim() || !formData.price || !formData.category
+              !formData.title.trim() ||
+              !formData.price ||
+              !formData.description.trim() ||
+              !formData.tags ||
+              formData.tags.length === 0
             }
             isSubmitting={isSaving && !isSavingAndClose}
             isSavingAndClosing={isSaving && isSavingAndClose}

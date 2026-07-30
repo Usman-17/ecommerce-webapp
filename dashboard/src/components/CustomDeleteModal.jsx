@@ -33,7 +33,7 @@ const CustomDeleteModal = ({
     <AnimatePresence>
       {open && (
         <Motion.div
-          className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm bg-black/10"
+          className="fixed inset-0 z-[999999] flex items-center justify-center backdrop-blur-sm bg-black/10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -44,8 +44,9 @@ const CustomDeleteModal = ({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
           >
-            <h2 className="flex items-center gap-2 text-xl font-semibold mb-2 text-(--secondary-color)">
-              <AlertTriangle className="w-5 h-5 text-(--secondary-color)" />
+            <h2 className="flex items-center gap-2 text-xl font-semibold mb-2 text-(--secondary-color) overflow-hidden text-ellipsis whitespace-nowrap">
+              <AlertTriangle className="w-5 h-5 text-(--secondary-color) shrink-0" />
+              {title}
               {title || "Confirm Deletion"}
             </h2>
 
@@ -57,7 +58,9 @@ const CustomDeleteModal = ({
                   Are you sure you want to delete
                   {title ? (
                     <span className="font-bold text-red-500 mx-1 decoration-red-400">
-                      "{title}"
+                      &quot;
+                      {title.length > 30 ? title.slice(0, 30) + "..." : title}
+                      &quot;
                     </span>
                   ) : (
                     " this record"
