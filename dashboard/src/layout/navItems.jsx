@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Mails,
   ShoppingBag,
+  Tag,
   Users,
 } from "lucide-react";
 
@@ -22,6 +23,11 @@ const navItems = [
       { name: "Sub Category", path: "/subcategory" },
       { name: "Products", path: "/product" },
     ],
+  },
+  {
+    name: "Deals",
+    icon: <Tag size={18} />,
+    path: "/deals",
   },
   {
     name: "Users",

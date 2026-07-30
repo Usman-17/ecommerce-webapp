@@ -23,6 +23,7 @@ const SubCategoryPage = lazy(() => import("./pages/SubCategoryPage"));
 
 const UsersPage = lazy(() => import("./pages/UsersPage"));
 const OrdersPage = lazy(() => import("./pages/OrdersPage"));
+const DealsPage = lazy(() => import("./pages/DealsPage"));
 const EnquiriesPage = lazy(() => import("./pages/EnquiriesPage"));
 const EnquiryDetailsPage = lazy(() => import("./pages/EnquiryDetailsPage"));
 
@@ -111,6 +112,11 @@ const App = () => {
             <Route
               path="/orders"
               element={authUser ? <OrdersPage /> : <LoginPage />}
+            />
+
+            <Route
+              path="/deals"
+              element={authUser ? <DealsPage /> : <LoginPage />}
             />
 
             {/* Enquiry Routes */}

@@ -11,6 +11,7 @@ import {
   Users,
   Sparkles,
   ShoppingBag,
+  Tag,
 } from "lucide-react";
 
 import CustomTable from "../components/CustomTable";
@@ -196,11 +197,15 @@ const OrdersPage = () => {
           className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${
             record.orderType === "scoop"
               ? "bg-accent/10 text-accent"
-              : "bg-gray-100 text-gray-600"
+              : record.orderType === "deal"
+                ? "bg-purple-100 text-purple-600"
+                : "bg-gray-100 text-gray-600"
           }`}
         >
           {record.orderType === "scoop" ? (
             <Sparkles size={10} />
+          ) : record.orderType === "deal" ? (
+            <Tag size={10} />
           ) : (
             <ShoppingBag size={10} />
           )}
@@ -404,11 +409,15 @@ const OrdersPage = () => {
                 className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${
                   viewOrder.orderType === "scoop"
                     ? "bg-accent/10 text-accent"
-                    : "bg-gray-100 text-gray-600"
+                    : viewOrder.orderType === "deal"
+                      ? "bg-purple-100 text-purple-600"
+                      : "bg-gray-100 text-gray-600"
                 }`}
               >
                 {viewOrder.orderType === "scoop" ? (
                   <Sparkles size={10} />
+                ) : viewOrder.orderType === "deal" ? (
+                  <Tag size={10} />
                 ) : (
                   <ShoppingBag size={10} />
                 )}
