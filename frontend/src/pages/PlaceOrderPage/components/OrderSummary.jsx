@@ -31,6 +31,7 @@ const OrderSummary = ({
   onApplyCoupon,
   orderType,
   scoopType,
+  dealType,
 }) => {
   return (
     <div className="hidden sm:block bg-[#fff8f8] rounded-xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden relative">
@@ -46,6 +47,11 @@ const OrderSummary = ({
             <span className="inline-flex items-center gap-1.5 bg-accent/10 text-accent text-xs font-bold px-3 py-1.5 rounded-full">
               <Sparkles size={12} />
               {scoopType || "Scoop Deal"}
+            </span>
+          ) : orderType === "deal" ? (
+            <span className="inline-flex items-center gap-1.5 bg-purple-100 text-purple-600 text-xs font-bold px-3 py-1.5 rounded-full">
+              <Tag size={12} />
+              {dealType || "Deal"}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1.5 rounded-full">

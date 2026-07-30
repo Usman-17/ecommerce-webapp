@@ -185,6 +185,21 @@ const PlaceOrderPage = () => {
         };
       }
 
+      if (dealData) {
+        payload.deal = {
+          dealId: dealData.dealId,
+          dealType: dealData.dealType,
+          fixedPrice: dealData.totalAmount,
+          products:
+            dealData.dealProducts?.map((p) => ({
+              productId: p._id,
+              title: p.title,
+              productImages: p.productImages,
+              selectedVariant: p.selectedVariant || null,
+            })) || [],
+        };
+      }
+
       saveOrder(payload);
     },
   });
@@ -234,6 +249,22 @@ const PlaceOrderPage = () => {
   // Scoop data from ScoopPage (passed via navigate state)
   const scoopData = location.state?.scoopProducts ? location.state : null;
 
+  // Deal data from DealDetailPage (passed via navigate state)
+  const dealData = location.state?.dealProducts ? location.state : null;
+
+  // Detect if items are deal items from cart
+  const isDealFromCart =
+    !dealData &&
+    !scoopData &&
+    cartItems.length > 0 &&
+    cartItems.every((item) => item.isDealItem);
+
+  const computedOrderType = scoopData
+    ? "scoop"
+    : dealData || isDealFromCart
+      ? "deal"
+      : "normal";
+
   const itemsToShow = scoopData
     ? scoopData.scoopProducts.map((p) => ({
         productId: p._id,
@@ -246,9 +277,23 @@ const PlaceOrderPage = () => {
         selectedVariants: [],
         _scoopInstanceId: p._instanceId,
       }))
-    : buyNowItem
-      ? [buyNowItem]
-      : cartItems;
+    : dealData
+      ? [
+          {
+            productId: dealData.dealId,
+            variantId: null,
+            name: dealData.dealType,
+            price: dealData.totalAmount / (dealData.dealQuantity || 1),
+            quantity: dealData.dealQuantity || 1,
+            total: dealData.totalAmount,
+            image: dealData.dealImage || "",
+            selectedVariants: [],
+            isDealItem: true,
+          },
+        ]
+      : buyNowItem
+        ? [buyNowItem]
+        : cartItems;
 
   const estimatedArrival =
     moment().add(2, "days").format("DD MMM") +
@@ -258,8 +303,8 @@ const PlaceOrderPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
 
-    // Clear coupon for Buy Now or Scoop orders
-    if (buyNowItem || scoopData) {
+    // Clear coupon for Buy Now, Scoop, or Deal orders
+    if (buyNowItem || scoopData || dealData) {
       setAppliedCoupon(null);
       setCouponCode("");
       setCouponSuccess("");
@@ -371,7 +416,9 @@ const PlaceOrderPage = () => {
   // Calculate totals
   const subtotal = scoopData
     ? scoopData.totalAmount
-    : itemsToShow.reduce((sum, item) => sum + (item.total || 0), 0);
+    : dealData
+      ? dealData.totalAmount
+      : itemsToShow.reduce((sum, item) => sum + (item.total || 0), 0);
 
   const FREE_SHIPPING_THRESHOLD = 5000;
   const MIN_ORDER_AMOUNT = 500;
@@ -468,8 +515,9 @@ const PlaceOrderPage = () => {
               couponError={couponError}
               couponSuccess={couponSuccess}
               onApplyCoupon={handleApplyCoupon}
-              orderType={scoopData ? "scoop" : "normal"}
+              orderType={computedOrderType}
               scoopType={scoopData?.scoopType}
+              dealType="Deal"
             />
           </div>
 
@@ -491,8 +539,9 @@ const PlaceOrderPage = () => {
               couponError={couponError}
               couponSuccess={couponSuccess}
               onApplyCoupon={handleApplyCoupon}
-              orderType={scoopData ? "scoop" : "normal"}
+              orderType={computedOrderType}
               scoopType={scoopData?.scoopType}
+              dealType="Deal"
             />
 
             {isBelowMinimum && <SuggestedProducts currentItems={itemsToShow} />}

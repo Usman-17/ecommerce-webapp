@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Sparkles,
   ShoppingBag,
+  Tag,
 } from "lucide-react";
 
 import { vibrate } from "../../../utils/vibrate";
@@ -25,6 +26,7 @@ const MobileOrderSummary = ({
   onApplyCoupon,
   orderType,
   scoopType,
+  dealType,
 }) => {
   const inputClass = useMemo(
     () =>
@@ -53,6 +55,11 @@ const MobileOrderSummary = ({
             <span className="inline-flex items-center gap-1 bg-accent/10 text-accent text-[10px] font-bold px-2 py-1 rounded-full">
               <Sparkles size={10} />
               {scoopType || "Scoop Deal"}
+            </span>
+          ) : orderType === "deal" ? (
+            <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-600 text-[10px] font-bold px-2 py-1 rounded-full">
+              <Tag size={10} />
+              {dealType || "Deal"}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-full">
