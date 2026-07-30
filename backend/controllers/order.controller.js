@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
+import Deal from "../models/deal.model.js";
 
 const generateTrackingNo = () => {
   const prefix = "JMZ";
@@ -41,66 +42,108 @@ export const placeOrder = async (req, res) => {
 
     const items = [];
 
-    for (const productId in cart) {
-      const variantQuantities = cart[productId];
+    // Skip cart item parsing for scoop/deal orders
+    if (!scoop && !deal) {
+      for (const productId in cart) {
+        const variantQuantities = cart[productId];
 
-      if (typeof variantQuantities === "number") {
-        items.push({
-          productId,
-          quantity: variantQuantities,
-          variantId: null,
-        });
-      } else if (typeof variantQuantities === "object") {
-        for (const variantId in variantQuantities) {
-          const quantity = variantQuantities[variantId];
-
+        if (typeof variantQuantities === "number") {
           items.push({
             productId,
-            quantity,
-            variantId: variantId || null,
+            quantity: variantQuantities,
+            variantId: null,
           });
+        } else if (typeof variantQuantities === "object") {
+          for (const variantId in variantQuantities) {
+            const quantity = variantQuantities[variantId];
+
+            items.push({
+              productId,
+              quantity,
+              variantId: variantId || null,
+            });
+          }
         }
       }
     }
 
-    // Fetch product details
-    const orderItems = await Promise.all(
-      items.map(async (item) => {
-        const product = await Product.findById(item.productId);
+    // Fetch product details (skip for scoop/deal orders)
+    let orderItems = [];
+    if (!scoop && !deal) {
+      orderItems = await Promise.all(
+        items.map(async (item) => {
+          const product = await Product.findById(item.productId);
 
-        if (!product) {
-          throw new Error(`Product not found with ID: ${item.productId}`);
-        }
-
-        let itemPrice = product.price;
-        let itemImages = product.productImages;
-        let variantName = null;
-        let variantAttributes = null;
-
-        if (item.variantId) {
-          const variant = product.variants.id(item.variantId);
-          if (!variant) {
-            throw new Error(`Variant not found with ID: ${item.variantId}`);
+          if (!product) {
+            throw new Error(`Product not found with ID: ${item.productId}`);
           }
 
-          itemPrice = variant.price || product.price;
-          itemImages = variant.image ? [variant.image] : product.productImages;
-          variantName = variant.name;
-          variantAttributes = variant.attributes;
-        }
+          let itemPrice = product.price;
+          let itemImages = product.productImages;
+          let variantName = null;
+          let variantAttributes = null;
 
-        return {
-          productId: item.productId,
-          title: product.title,
-          price: itemPrice,
-          quantity: item.quantity,
-          variantId: item.variantId,
-          variantName,
-          variantAttributes,
-          productImages: itemImages,
-        };
-      }),
-    );
+          if (item.variantId) {
+            const variant = product.variants.id(item.variantId);
+            if (!variant) {
+              throw new Error(`Variant not found with ID: ${item.variantId}`);
+            }
+
+            itemPrice = variant.price || product.price;
+            itemImages = variant.image
+              ? [variant.image]
+              : product.productImages;
+            variantName = variant.name;
+            variantAttributes = variant.attributes;
+          }
+
+          return {
+            productId: item.productId,
+            title: product.title,
+            price: itemPrice,
+            quantity: item.quantity,
+            variantId: item.variantId,
+            variantName,
+            variantAttributes,
+            productImages: itemImages,
+          };
+        }),
+      );
+    }
+
+    // For deal orders, populate items from the deal's products with selected variants
+    if (deal) {
+      if (deal.products?.length > 0) {
+        // Use products with selected variants sent from frontend
+        orderItems = deal.products.map((p) => ({
+          productId: p.productId || p._id,
+          title: p.title,
+          price: 0,
+          quantity: 1,
+          variantId: p.selectedVariant?._id || null,
+          variantName: p.selectedVariant?.name || null,
+          variantAttributes: p.selectedVariant?.attributes || null,
+          productImages: p.selectedVariant?.image?.url
+            ? [p.selectedVariant.image]
+            : p.productImages,
+        }));
+      } else {
+        // Fallback: fetch products from deal document
+        const dealDoc = await Deal.findById(deal.dealId).populate("products");
+        if (dealDoc?.products) {
+          orderItems = dealDoc.products.map((product) => ({
+            productId: product._id,
+            title: product.title,
+            price: 0,
+            quantity: 1,
+            variantId: null,
+            variantName: null,
+            variantAttributes: null,
+            productImages: product.productImages,
+          }));
+        }
+      }
+    }
 
     // Save order
     const orderData = {
