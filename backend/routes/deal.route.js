@@ -7,11 +7,13 @@ import {
   deleteDeal,
   getAllDeals,
   getDeal,
+  getDealBySlug,
   updateDeal,
 } from "../controllers/deal.controller.js";
 import { isAdmin, protectRoute } from "../middlewares/authMiddleware.js";
 
 router.get("/all", getAllDeals);
+router.get("/slug/:slug", getDealBySlug);
 router.get("/:id", getDeal);
 
 // Admin Routes

@@ -8,6 +8,12 @@ const dealSchema = new mongoose.Schema(
       trim: true,
     },
 
+    slug: {
+      type: String,
+      unique: true,
+      lowercase: true,
+    },
+
     description: {
       type: String,
       default: "",
