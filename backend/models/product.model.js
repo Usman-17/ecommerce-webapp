@@ -54,6 +54,12 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
 
+    purchasePrice: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+
     secondaryPrice: {
       type: Number,
       min: 0,
@@ -61,14 +67,13 @@ const productSchema = new mongoose.Schema(
 
     sold: {
       type: String,
-      required: true,
-      min: 0,
+      default: "0",
     },
 
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: true,
+      default: null,
     },
 
     subCategory: {

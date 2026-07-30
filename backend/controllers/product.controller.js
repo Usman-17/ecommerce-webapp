@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 import { Brand } from "../models/brand.model.js";
 import { Category } from "../models/category.model.js";
@@ -56,6 +57,16 @@ const formatProduct = (prod) => {
   };
 };
 
+const formatProductAdmin = (prod) => {
+  const base = formatProduct(prod);
+  const obj = prod.toObject ? prod.toObject() : prod;
+  return {
+    ...base,
+    purchasePrice: obj.purchasePrice || 0,
+    profit: (obj.price || 0) - (obj.purchasePrice || 0),
+  };
+};
+
 // PATH     : /api/product/create
 // METHOD   : POST
 // ACCESS   : Private Admin
@@ -66,6 +77,7 @@ export const createProduct = async (req, res) => {
       title,
       description,
       price,
+      purchasePrice,
       category,
       subCategory,
       area,
@@ -76,8 +88,17 @@ export const createProduct = async (req, res) => {
       variants: variantsJson,
     } = req.body;
 
-    if (!title || !description || !price || !category || !tags) {
-      return res.status(400).json({ error: "All fields are required" });
+    const missingFields = [];
+    if (!title || !title.trim()) missingFields.push("Title");
+    if (!description || !description.trim()) missingFields.push("Description");
+    if (!price) missingFields.push("Price");
+    if (!tags || (Array.isArray(tags) && tags.length === 0))
+      missingFields.push("Tags");
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        error: `${missingFields.join(", ")} ${missingFields.length > 1 ? "are" : "is"} required`,
+      });
     }
 
     if (brand && brand !== "undefined" && brand !== "null" && brand !== "") {
@@ -87,9 +108,16 @@ export const createProduct = async (req, res) => {
       }
     }
 
-    const categoryExists = await Category.findById(category);
-    if (!categoryExists) {
-      return res.status(400).json({ error: "Invalid category ID" });
+    if (
+      category &&
+      category !== "undefined" &&
+      category !== "null" &&
+      category !== ""
+    ) {
+      const categoryExists = await Category.findById(category);
+      if (!categoryExists) {
+        return res.status(400).json({ error: "Invalid category ID" });
+      }
     }
 
     const slug = slugify(title, { lower: true });
@@ -120,6 +148,9 @@ export const createProduct = async (req, res) => {
       }
     }
 
+    // Filter out variants with empty names
+    parsedVariants = parsedVariants.filter((v) => v.name && v.name.trim());
+
     for (let i = 0; i < parsedVariants.length; i++) {
       const variant = parsedVariants[i];
       const imageKey = `variant_${i}_image`;
@@ -139,15 +170,16 @@ export const createProduct = async (req, res) => {
       slug,
       description,
       price,
+      purchasePrice: purchasePrice || 0,
       secondaryPrice,
-      category,
+      category: category || undefined,
       subCategory: subCategory || undefined,
       area: area || undefined,
-      brand,
-      sold,
+      brand: brand || undefined,
+      sold: sold || "0",
       tags,
       productImages: uploadedProductImages,
-      variants: parsedVariants,
+      variants: parsedVariants.filter((v) => v.name && v.name.trim()),
     });
 
     await newProduct.save();
@@ -172,6 +204,7 @@ export const updateProduct = async (req, res) => {
       title,
       description,
       price,
+      purchasePrice,
       secondaryPrice,
       category,
       subCategory,
@@ -226,8 +259,13 @@ export const updateProduct = async (req, res) => {
 
     if (description) product.description = description;
     if (tags) product.tags = tags;
-    if (price) product.price = price;
-    if (secondaryPrice) product.secondaryPrice = secondaryPrice;
+    if (price) product.price = Number(price) || product.price;
+    if (purchasePrice !== undefined)
+      product.purchasePrice = Number(purchasePrice) || 0;
+    if (secondaryPrice !== undefined)
+      product.secondaryPrice = secondaryPrice
+        ? Number(secondaryPrice)
+        : undefined;
     if (quantity) product.quantity = quantity;
     if (sold) product.sold = sold;
     if (foundCategory) product.category = foundCategory._id;
@@ -306,12 +344,12 @@ export const updateProduct = async (req, res) => {
         }
       }
 
-      product.variants = parsedVariants;
+      product.variants = parsedVariants.filter((v) => v.name && v.name.trim());
     }
 
     await product.save();
     const populated = await product.populate("brand category subCategory area");
-    res.status(200).json(formatProduct(populated));
+    res.status(200).json(formatProductAdmin(populated));
   } catch (error) {
     console.log("Update Product Error:", error);
     res.status(500).json({ error: "Something went wrong" });
@@ -383,6 +421,52 @@ export const getProductBySlug = async (req, res) => {
   }
 };
 
+// PATH     : /api/product/admin/all
+// METHOD   : GET
+// ACCESS   : Private Admin
+// DESC     : Get all products with purchasePrice for dashboard
+export const getAllProductsAdmin = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .populate("brand")
+      .populate("category")
+      .populate("subCategory")
+      .populate("area")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json(products.map(formatProductAdmin));
+  } catch (error) {
+    console.error("Error in getAllProductsAdmin:", error.message);
+    return res.status(500).json({ error: "Failed to fetch products" });
+  }
+};
+
+// PATH     : /api/product/admin/:id
+// METHOD   : GET
+// ACCESS   : Private Admin
+// DESC     : Get single product with purchasePrice for dashboard
+export const getProductAdmin = async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid product ID" });
+    }
+    const product = await Product.findById(id)
+      .populate("brand")
+      .populate("category")
+      .populate("subCategory")
+      .populate("area");
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    return res.status(200).json(formatProductAdmin(product));
+  } catch (error) {
+    console.error("Error in getProductAdmin:", error.message);
+    return res.status(500).json({ error: "Failed to fetch product" });
+  }
+};
+
 // PATH     : /api/product/:id
 // METHOD   : DELETE
 // ACCESS   : PRIVATE
@@ -398,7 +482,9 @@ export const deleteProduct = async (req, res) => {
     }
 
     if (product.productImages && product.productImages.length > 0) {
-      await deleteImages(product.productImages);
+      for (const img of product.productImages) {
+        await deleteImage(img);
+      }
     }
 
     if (product.variants && product.variants.length > 0) {
