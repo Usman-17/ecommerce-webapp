@@ -31,8 +31,10 @@ const formatDeal = (deal) => ({
     deal.products?.map((p) => ({
       _id: p._id,
       title: p.title,
+      slug: p.slug,
       price: p.price,
       productImages: p.productImages,
+      variants: p.variants || [],
     })) || [],
   productIds:
     deal.products?.map((p) => p._id?.toString?.() || p.toString?.()) || [],

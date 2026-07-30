@@ -16,7 +16,7 @@ const generateTrackingNo = () => {
 export const placeOrder = async (req, res) => {
   try {
     const userId = req.user?._id || null;
-    const { cart, totalAmount, deliveryInfo, scoop } = req.body;
+    const { cart, totalAmount, deliveryInfo, scoop, deal } = req.body;
 
     if (!cart || Object.keys(cart).length === 0) {
       return res
@@ -119,7 +119,7 @@ export const placeOrder = async (req, res) => {
       paymentMethod: "COD",
       payment: false,
       date: Date.now(),
-      orderType: scoop ? "scoop" : "normal",
+      orderType: scoop ? "scoop" : deal ? "deal" : "normal",
     };
 
     if (scoop) {
@@ -127,7 +127,17 @@ export const placeOrder = async (req, res) => {
         scoopType: scoop.type,
         quantity: scoop.quantity,
         fixedPrice: scoop.fixedPrice,
-        selections: scoop.selections ? new Map(Object.entries(scoop.selections)) : undefined,
+        selections: scoop.selections
+          ? new Map(Object.entries(scoop.selections))
+          : undefined,
+      };
+    }
+
+    if (deal) {
+      orderData.dealDetails = {
+        dealId: deal.dealId,
+        dealType: deal.dealType,
+        fixedPrice: deal.fixedPrice,
       };
     }
 

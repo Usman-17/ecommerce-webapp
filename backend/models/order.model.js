@@ -84,6 +84,12 @@ const orderSchema = new mongoose.Schema(
       fixedPrice: { type: Number },
       selections: { type: Map, of: String },
     },
+
+    dealDetails: {
+      dealId: { type: mongoose.Schema.Types.ObjectId, ref: "Deal" },
+      dealType: { type: String },
+      fixedPrice: { type: Number },
+    },
   },
   { timestamps: true },
 );
