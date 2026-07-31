@@ -120,11 +120,11 @@ export const placeOrder = async (req, res) => {
           deal.products.map(async (p) => {
             const dbProduct = await Product.findById(
               p.productId || p._id,
-            ).select("purchasePrice");
+            ).select("price purchasePrice");
             return {
               productId: p.productId || p._id,
               title: p.title,
-              price: 0,
+              price: dbProduct?.price || 0,
               purchasePrice: dbProduct?.purchasePrice || 0,
               quantity: 1,
               variantId: p.selectedVariant?._id || null,
@@ -252,11 +252,14 @@ export const allOrders = async (req, res) => {
 
         orderObj.items = await Promise.all(
           orderObj.items.map(async (item) => {
-            if (!item.purchasePrice || item.purchasePrice === 0) {
-              const product = await Product.findById(item.productId).select(
-                "purchasePrice",
-              );
-              if (product) {
+            const product = await Product.findById(item.productId).select(
+              "price purchasePrice",
+            );
+            if (product) {
+              if (!item.price || item.price === 0) {
+                item.price = product.price || 0;
+              }
+              if (!item.purchasePrice || item.purchasePrice === 0) {
                 item.purchasePrice = product.purchasePrice || 0;
               }
             }
