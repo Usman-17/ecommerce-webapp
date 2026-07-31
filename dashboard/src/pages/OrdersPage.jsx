@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   Tag,
   TrendingUp,
+  RefreshCw,
 } from "lucide-react";
 
 import CustomTable from "../components/CustomTable";
@@ -44,7 +45,13 @@ const statusColors = {
 
 const OrdersPage = () => {
   const queryClient = useQueryClient();
-  const { orders = [], error, isLoading, isError } = useGetAllOrders();
+  const {
+    orders = [],
+    error,
+    isLoading,
+    isError,
+    isRefetching,
+  } = useGetAllOrders();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -379,6 +386,18 @@ const OrdersPage = () => {
             Clear
           </button>
         )}
+
+        <div className="flex-1" />
+        <button
+          onClick={() =>
+            queryClient.invalidateQueries({ queryKey: ["orders"] })
+          }
+          disabled={isLoading || isRefetching}
+          className="flex items-center gap-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
+        >
+          <RefreshCw size={14} className={isRefetching ? "animate-spin" : ""} />
+          Refresh
+        </button>
       </div>
 
       <CustomTable
