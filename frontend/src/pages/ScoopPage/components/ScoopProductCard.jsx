@@ -5,7 +5,7 @@ import { calculateProductPrice } from "../../../utils/productPriceUtils";
 
 const ScoopProductCard = ({
   product,
-  selections,
+  selectedVariants,
   onVariantSelect,
   onQuickViewOpen,
 }) => {
@@ -14,21 +14,16 @@ const ScoopProductCard = ({
 
   const instanceId = product._instanceId || product._id;
 
-  const options = product.productOptionResponses || [];
-  const requiredOptions = options.filter(
-    (opt) => opt.productOptionDetailResponses?.length > 1,
-  );
-  const hasVariants = requiredOptions.length > 0;
+  const variants = product.variants || [];
+  const hasVariants = variants.length > 0;
 
-  const allSelected = hasVariants
-    ? requiredOptions.every(
-        (opt) => selections[`${instanceId}-${opt.productOptionTypeName}`],
-      )
-    : true;
+  const allSelected = hasVariants ? !!selectedVariants?.[instanceId] : true;
 
   const { displayPrice, oldPrice, isSale } = calculateProductPrice(product);
 
-  const allImages = (product.productImages || []).map((img) => img.url).filter(Boolean);
+  const allImages = (product.productImages || [])
+    .map((img) => img.url)
+    .filter(Boolean);
 
   const hasMultipleImages = allImages.length > 1;
 
@@ -74,7 +69,7 @@ const ScoopProductCard = ({
       >
         {allImages.length > 0 ? (
           <img
-            src={allImages[currentImageIndex]}
+            src={selectedVariants?.[instanceId]?.image?.url || allImages[currentImageIndex]}
             alt={`${product.title} - Image ${currentImageIndex + 1}`}
             className="w-full h-full object-cover"
             loading="lazy"
@@ -130,76 +125,30 @@ const ScoopProductCard = ({
 
         {/* Variants */}
         {hasVariants ? (
-          <div className="space-y-2 pt-0.5">
-            {requiredOptions.map((opt) => {
-              const isColor =
-                (opt.productOptionTypeName || "").toLowerCase() === "color";
-              const details = opt.productOptionDetailResponses || [];
-              return isColor ? (
-                <div key={opt.productOptionId} className="flex flex-wrap gap-1">
-                  {details.map((detail) => {
-                    const isSelected =
-                      selections[
-                        `${instanceId}-${opt.productOptionTypeName}`
-                      ] === detail.productOptionDetailId;
-                    return (
-                      <button
-                        key={detail.productOptionDetailId}
-                        onClick={() =>
-                          onVariantSelect(
-                            instanceId,
-                            opt.productOptionTypeName,
-                            detail.productOptionDetailId,
-                          )
-                        }
-                        title={detail.optionDetailName}
-                        className={`relative h-5 w-5 rounded-full border transition-all duration-100 ${
-                          isSelected
-                            ? "border-gray-400 ring-1 ring-gray-300 scale-110"
-                            : "border-gray-200 hover:border-gray-400"
-                        }`}
-                        style={{
-                          backgroundColor: detail.optionDetailHEXCode || "#ccc",
-                        }}
-                      >
-                        {isSelected && (
-                          <Check
-                            size={10}
-                            strokeWidth={3}
-                            className="absolute inset-0 m-auto text-white"
-                          />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : null;
-            })}
-
-            {!allSelected && (
-              <div className="flex items-center gap-1.5 pt-0.5">
-                <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-accent rounded-full transition-all duration-500"
-                    style={{
-                      width: `${(Object.keys(selections).filter((k) => k.startsWith(instanceId)).length / requiredOptions.length) * 100}%`,
-                    }}
-                  />
-                </div>
-                <span className="text-[9px] font-bold text-gray-400">
-                  {
-                    Object.keys(selections).filter((k) =>
-                      k.startsWith(instanceId),
-                    ).length
-                  }
-                  /{requiredOptions.length}
-                </span>
-              </div>
-            )}
+          <div className="space-y-1 pt-0.5">
+            <div className="flex flex-wrap gap-1">
+              {variants.map((variant) => {
+                const isSelected =
+                  selectedVariants?.[instanceId]?._id === variant._id;
+                return (
+                  <button
+                    key={variant._id}
+                    onClick={() => onVariantSelect(instanceId, variant)}
+                    className={`px-2 py-0.5 rounded-full text-[9px] font-bold transition-all duration-200 ${
+                      isSelected
+                        ? "bg-accent text-white"
+                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                    }`}
+                  >
+                    {variant.name}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <p className="text-[9px] text-green-600 font-semibold flex items-center gap-0.5">
-            <Check size={8} strokeWidth={3} /> No variants needed
+            <Check size={8} strokeWidth={3} /> No options
           </p>
         )}
       </div>

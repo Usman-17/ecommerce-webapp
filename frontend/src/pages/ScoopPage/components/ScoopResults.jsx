@@ -7,6 +7,7 @@ import InViewAnimation from "../../../components/InViewAnimation";
 const ScoopResults = ({
   products,
   selections,
+  selectedVariants,
   onVariantSelect,
   onQuickViewOpen,
 }) => {
@@ -34,6 +35,7 @@ const ScoopResults = ({
             key={product._instanceId || `${product._id}-${i}`}
             product={product}
             selections={selections}
+            selectedVariants={selectedVariants}
             onVariantSelect={onVariantSelect}
             onQuickViewOpen={onQuickViewOpen}
           />

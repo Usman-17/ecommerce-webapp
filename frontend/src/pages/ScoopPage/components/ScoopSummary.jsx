@@ -8,7 +8,7 @@ const ScoopSummary = ({
   selectedSize,
   selectedQuantity,
   scoopProducts,
-  selections,
+  selectedVariants,
   onBuyNow,
 }) => {
   const config = SCOOP_CONFIG[selectedSize];
@@ -20,33 +20,16 @@ const ScoopSummary = ({
   const totalProducts = scoopProducts.length;
   const readyCount = scoopProducts.filter((p) => {
     const instanceId = p._instanceId || p.productId;
-    const options = p.productOptionResponses || [];
-    const requiredOptions = options.filter(
-      (opt) => opt.productOptionDetailResponses?.length > 1,
-    );
-    if (requiredOptions.length === 0) return true;
-    return requiredOptions.every(
-      (opt) => selections[`${instanceId}-${opt.productOptionTypeName}`],
-    );
+    const variants = p.variants || [];
+    if (variants.length === 0) return true;
+    return !!selectedVariants?.[instanceId];
   }).length;
 
   const allReady = readyCount === totalProducts;
 
   const missingVariantTypes = [];
   if (!allReady) {
-    const typeSet = new Set();
-    scoopProducts.forEach((p) => {
-      const instanceId = p._instanceId || p.productId;
-      const options = p.productOptionResponses || [];
-      options
-        .filter((opt) => opt.productOptionDetailResponses?.length > 1)
-        .forEach((opt) => {
-          if (!selections[`${instanceId}-${opt.productOptionTypeName}`]) {
-            typeSet.add(opt.productOptionTypeName);
-          }
-        });
-    });
-    missingVariantTypes.push(...typeSet);
+    missingVariantTypes.push("variants");
   }
 
   const totalRetailPrice = scoopProducts.reduce((sum, p) => {

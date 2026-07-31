@@ -196,6 +196,14 @@ const QuickViewContent = ({
           )}
         </div>
 
+        {/* Description */}
+        {displayProduct.description && (
+          <div
+            className="text-xs text-gray-500 leading-relaxed prose prose-xs max-w-none"
+            dangerouslySetInnerHTML={{ __html: displayProduct.description }}
+          />
+        )}
+
         {/* Variants */}
         {displayProduct.variants && displayProduct.variants.length > 0 && (
           <div className="space-y-2">
@@ -285,19 +293,19 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/50 sm:backdrop-blur-sm"
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
             onClick={onClose}
           />
 
           {/* Modal */}
           <Motion.div
             ref={modalRef}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="relative bg-white w-full sm:max-w-3xl min-h-[80vh] sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col sm:flex-row sm:rounded-2xl rounded-t-2xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="relative bg-white w-full sm:max-w-3xl sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col sm:flex-row sm:rounded-2xl rounded-t-2xl"
           >
             {/* Close button */}
             <button

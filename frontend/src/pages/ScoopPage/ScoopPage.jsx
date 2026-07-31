@@ -30,6 +30,7 @@ const ScoopPage = () => {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [scoopProducts, setScoopProducts] = useState([]);
   const [selections, setSelections] = useState({});
+  const [selectedVariants, setSelectedVariants] = useState({});
   const [isScooping, setIsScooping] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [shakeSizeSelector, setShakeSizeSelector] = useState(false);
@@ -47,6 +48,7 @@ const ScoopPage = () => {
       setSelectedSize(sizeId);
       setScoopProducts([]);
       setSelections({});
+      setSelectedVariants({});
       setShowResults(false);
     },
     [selectedSize],
@@ -56,6 +58,7 @@ const ScoopPage = () => {
     setSelectedQuantity(quantity);
     setScoopProducts([]);
     setSelections({});
+    setSelectedVariants({});
     setShowResults(false);
   }, []);
 
@@ -101,30 +104,22 @@ const ScoopPage = () => {
     }));
     setScoopProducts(productsWithIds);
 
-    // Auto-select single-option variant groups
-    const autoSelections = {};
+    // Auto-select first variant for each product
+    const initialVariants = {};
     productsWithIds.forEach((p) => {
-      const options = p.productOptionResponses || [];
-      options
-        .filter((opt) => opt.productOptionDetailResponses?.length === 1)
-        .forEach((opt) => {
-          const singleDetail = opt.productOptionDetailResponses[0];
-          autoSelections[`${p._instanceId}-${opt.productOptionTypeName}`] =
-            singleDetail.productOptionDetailId;
-        });
+      if (p.variants?.length > 0) {
+        initialVariants[p._instanceId] = p.variants[0];
+      }
     });
-    setSelections(autoSelections);
+    setSelectedVariants(initialVariants);
   }, [selectedSize, selectedQuantity, allProducts]);
 
-  const handleVariantSelect = useCallback(
-    (instanceId, optionTypeName, detailId) => {
-      setSelections((prev) => ({
-        ...prev,
-        [`${instanceId}-${optionTypeName}`]: detailId,
-      }));
-    },
-    [],
-  );
+  const handleVariantSelect = useCallback((instanceId, variant) => {
+    setSelectedVariants((prev) => ({
+      ...prev,
+      [instanceId]: variant,
+    }));
+  }, []);
 
   const handleAnimationComplete = useCallback(() => {
     setIsScooping(false);
@@ -146,12 +141,20 @@ const ScoopPage = () => {
       state: {
         scoopProducts,
         selections,
+        selectedVariants,
         totalAmount,
         scoopType: config?.name,
         quantity: selectedQuantity,
       },
     });
-  }, [navigate, selectedSize, selectedQuantity, scoopProducts, selections]);
+  }, [
+    navigate,
+    selectedSize,
+    selectedQuantity,
+    scoopProducts,
+    selections,
+    selectedVariants,
+  ]);
 
   const handleScrollToSizes = () => {
     document
@@ -241,6 +244,7 @@ const ScoopPage = () => {
             <ScoopResults
               products={scoopProducts}
               selections={selections}
+              selectedVariants={selectedVariants}
               onVariantSelect={handleVariantSelect}
               onQuickViewOpen={handleOpenQuickView}
             />
@@ -251,6 +255,7 @@ const ScoopPage = () => {
                 selectedQuantity={selectedQuantity}
                 scoopProducts={scoopProducts}
                 selections={selections}
+                selectedVariants={selectedVariants}
                 onBuyNow={handleBuyNow}
               />
             </div>
