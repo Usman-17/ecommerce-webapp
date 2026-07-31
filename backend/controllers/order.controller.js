@@ -101,6 +101,7 @@ export const placeOrder = async (req, res) => {
             productId: item.productId,
             title: product.title,
             price: itemPrice,
+            purchasePrice: product.purchasePrice || 0,
             quantity: item.quantity,
             variantId: item.variantId,
             variantName,
@@ -114,19 +115,27 @@ export const placeOrder = async (req, res) => {
     // For deal orders, populate items from the deal's products with selected variants
     if (deal) {
       if (deal.products?.length > 0) {
-        // Use products with selected variants sent from frontend
-        orderItems = deal.products.map((p) => ({
-          productId: p.productId || p._id,
-          title: p.title,
-          price: 0,
-          quantity: 1,
-          variantId: p.selectedVariant?._id || null,
-          variantName: p.selectedVariant?.name || null,
-          variantAttributes: p.selectedVariant?.attributes || null,
-          productImages: p.selectedVariant?.image?.url
-            ? [p.selectedVariant.image]
-            : p.productImages,
-        }));
+        // Use products with selected variants sent from frontend, fetch purchasePrice
+        orderItems = await Promise.all(
+          deal.products.map(async (p) => {
+            const dbProduct = await Product.findById(
+              p.productId || p._id,
+            ).select("purchasePrice");
+            return {
+              productId: p.productId || p._id,
+              title: p.title,
+              price: 0,
+              purchasePrice: dbProduct?.purchasePrice || 0,
+              quantity: 1,
+              variantId: p.selectedVariant?._id || null,
+              variantName: p.selectedVariant?.name || null,
+              variantAttributes: p.selectedVariant?.attributes || null,
+              productImages: p.selectedVariant?.image?.url
+                ? [p.selectedVariant.image]
+                : p.productImages,
+            };
+          }),
+        );
       } else {
         // Fallback: fetch products from deal document
         const dealDoc = await Deal.findById(deal.dealId).populate("products");
@@ -135,6 +144,7 @@ export const placeOrder = async (req, res) => {
             productId: product._id,
             title: product.title,
             price: 0,
+            purchasePrice: product.purchasePrice || 0,
             quantity: 1,
             variantId: null,
             variantName: null,
@@ -233,7 +243,35 @@ export const userOrders = async (req, res) => {
 export const allOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
-    return res.status(200).json(orders);
+
+    // Enrich items with purchasePrice from Product collection
+    const enrichedOrders = await Promise.all(
+      orders.map(async (order) => {
+        const orderObj = order.toObject();
+        let totalPurchasePrice = 0;
+
+        orderObj.items = await Promise.all(
+          orderObj.items.map(async (item) => {
+            if (!item.purchasePrice || item.purchasePrice === 0) {
+              const product = await Product.findById(item.productId).select(
+                "purchasePrice",
+              );
+              if (product) {
+                item.purchasePrice = product.purchasePrice || 0;
+              }
+            }
+            totalPurchasePrice += (item.purchasePrice || 0) * item.quantity;
+            return item;
+          }),
+        );
+
+        orderObj.totalPurchasePrice = totalPurchasePrice;
+        orderObj.profit = orderObj.amount - totalPurchasePrice;
+        return orderObj;
+      }),
+    );
+
+    return res.status(200).json(enrichedOrders);
   } catch (error) {
     console.error("Error in allOrders Controller:", error.message);
     res.status(500).json({ error: "Internal Server Error" });

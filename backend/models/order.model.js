@@ -23,6 +23,7 @@ const orderSchema = new mongoose.Schema(
         },
         title: { type: String, required: true },
         price: { type: Number, required: true },
+        purchasePrice: { type: Number, default: 0 },
         quantity: { type: Number, required: true },
         variantId: { type: mongoose.Schema.Types.ObjectId },
         variantName: { type: String },

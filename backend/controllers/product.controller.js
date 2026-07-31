@@ -39,6 +39,7 @@ const formatProduct = (prod) => {
     slug: obj.slug,
     description: obj.description,
     price: obj.price,
+    purchasePrice: obj.purchasePrice || 0,
     secondaryPrice: obj.secondaryPrice,
     sold: obj.sold,
     tags: obj.tags,
