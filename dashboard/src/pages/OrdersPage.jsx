@@ -12,6 +12,7 @@ import {
   Sparkles,
   ShoppingBag,
   Tag,
+  TrendingUp,
 } from "lucide-react";
 
 import CustomTable from "../components/CustomTable";
@@ -116,6 +117,11 @@ const OrdersPage = () => {
   const pendingOrders = dateFilteredOrders.filter(
     (o) => !["Delivered", "Cancelled"].includes(o.status),
   ).length;
+
+  const totalProfit = dateFilteredOrders.reduce(
+    (sum, o) => sum + (o.profit ?? 0),
+    0,
+  );
 
   const statusFilteredOrders = statusFilter
     ? statusFilter === "Pending"
@@ -291,7 +297,7 @@ const OrdersPage = () => {
       />
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 my-6">
         <SummaryCard
           icon={Users}
           title="Total Orders"
@@ -335,6 +341,12 @@ const OrdersPage = () => {
             setStatusFilter("Cancelled");
             setSearchParams({ status: "cancelled" });
           }}
+        />
+        <SummaryCard
+          icon={TrendingUp}
+          title="Total Profit"
+          count={`Rs. ${totalProfit.toLocaleString()}`}
+          color="#10B981"
         />
       </div>
 
@@ -526,10 +538,29 @@ const OrdersPage = () => {
                                 </>
                               )}
                             </div>
+                            {item.purchasePrice > 0 && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-gray-400">
+                                  CP: Rs. {item.purchasePrice.toLocaleString()}
+                                </span>
+                                <span className="text-xs text-green-600 font-medium">
+                                  Profit: Rs.{" "}
+                                  {(
+                                    (item.price - item.purchasePrice) *
+                                    item.quantity
+                                  ).toLocaleString()}
+                                </span>
+                              </div>
+                            )}
                           </div>
                           <span className="font-bold text-gray-900 whitespace-nowrap">
                             Rs. {(item.price * item.quantity).toLocaleString()}
                           </span>
+                          {item.purchasePrice > 0 && (
+                            <span className="text-[10px] text-red-400 font-medium block text-right">
+                              Cost: Rs. {item.purchasePrice.toLocaleString()}
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -575,6 +606,43 @@ const OrdersPage = () => {
                         Rs. {viewOrder.amount.toLocaleString()}
                       </span>
                     </div>
+                    {viewOrder.items.some((i) => i.purchasePrice > 0) && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-500">
+                            Cost Price
+                          </span>
+                          <span className="text-sm font-semibold text-red-500">
+                            Rs.{" "}
+                            {(
+                              viewOrder.totalPurchasePrice ||
+                              viewOrder.items.reduce(
+                                (sum, i) =>
+                                  sum + (i.purchasePrice || 0) * i.quantity,
+                                0,
+                              )
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-bold text-green-600">
+                            Profit
+                          </span>
+                          <span className="text-sm font-bold text-green-600">
+                            Rs.{" "}
+                            {(
+                              viewOrder.profit ??
+                              viewOrder.amount -
+                                viewOrder.items.reduce(
+                                  (sum, i) =>
+                                    sum + (i.purchasePrice || 0) * i.quantity,
+                                  0,
+                                )
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
