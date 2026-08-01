@@ -83,7 +83,7 @@ export const signup = async (req, res) => {
 // DESC     : Login a User
 export const userLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     if (!email || !password)
       return res.status(400).json({ error: "Email and Password are required" });
@@ -121,7 +121,7 @@ export const userLogin = async (req, res) => {
 
     await user.save();
 
-    generateToken(user, res);
+    generateToken(user._id, res, rememberMe);
 
     res.status(200).json({
       _id: user._id,
@@ -182,7 +182,7 @@ export const updateProfile = async (req, res) => {
       if (user.password) {
         const isPasswordMatched = await bcrypt.compare(
           currentPassword,
-          user.password
+          user.password,
         );
 
         if (!isPasswordMatched) {
@@ -220,7 +220,7 @@ export const updateProfile = async (req, res) => {
       // Upload new profile image to Cloudinary
       const profileImgResponse = await cloudinary.uploader.upload(
         req.files.profileImg.tempFilePath,
-        { folder: "PROFILE_IMAGES" }
+        { folder: "PROFILE_IMAGES" },
       );
 
       user.profileImg = {
@@ -247,12 +247,17 @@ export const updateProfile = async (req, res) => {
 // ACCESS   : PUBLIC
 // DESC     : Forgot Password Token
 export const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+  const { email, type } = req.body;
 
   // Validate input
   if (!email || !/\S+@\S+\.\S+/.test(email)) {
     return res.status(400).json({ error: "Invalid email address" });
   }
+
+  const baseUrl =
+    type === "dashboard"
+      ? process.env.DASHBOARD_URL || process.env.FRONTEND_URL
+      : process.env.FRONTEND_URL;
 
   try {
     const user = await User.findOne({ email });
@@ -272,7 +277,7 @@ export const forgotPassword = async (req, res) => {
       <p>Hi ${user.fullName},</p>
       <p>Please click the button below to reset your password. This link will expire in 10 minutes:</p>
       <p>
-        <a href="${process.env.FRONTEND_URL}/reset-password/${token}" 
+        <a href="${baseUrl}/reset-password/${token}" 
            style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #4CAF50; text-decoration: none; border-radius: 4px;">Reset Password</a>
       </p>
       <p>If you did not request this, please ignore this email.</p>
