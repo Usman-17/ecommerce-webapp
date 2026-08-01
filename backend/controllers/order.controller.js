@@ -155,6 +155,32 @@ export const placeOrder = async (req, res) => {
       }
     }
 
+    // For scoop orders, populate items from the scoop's products
+    if (scoop) {
+      if (scoop.products?.length > 0) {
+        orderItems = await Promise.all(
+          scoop.products.map(async (p) => {
+            const dbProduct = await Product.findById(
+              p.productId || p._id,
+            ).select("price purchasePrice");
+            return {
+              productId: p.productId || p._id,
+              title: p.title,
+              price: dbProduct?.price || 0,
+              purchasePrice: dbProduct?.purchasePrice || 0,
+              quantity: 1,
+              variantId: p.selectedVariant?._id || null,
+              variantName: p.selectedVariant?.name || null,
+              variantAttributes: p.selectedVariant?.attributes || null,
+              productImages: p.selectedVariant?.image?.url
+                ? [p.selectedVariant.image]
+                : p.productImages,
+            };
+          }),
+        );
+      }
+    }
+
     // Save order
     const orderData = {
       userId,
