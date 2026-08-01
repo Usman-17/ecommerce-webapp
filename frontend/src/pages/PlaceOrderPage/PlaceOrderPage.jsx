@@ -182,6 +182,18 @@ const PlaceOrderPage = () => {
           quantity: scoopData.quantity,
           fixedPrice: scoopData.totalAmount,
           selections: scoopData.selections,
+          products:
+            scoopData.scoopProducts?.map((p) => {
+              const instanceId = p._instanceId || p._id;
+              const selectedVariant =
+                scoopData.selectedVariants?.[instanceId] || null;
+              return {
+                productId: p._id,
+                title: p.title,
+                productImages: p.productImages,
+                selectedVariant,
+              };
+            }) || [],
         };
       }
 
