@@ -5,6 +5,7 @@ import { SquarePen, Plus, Upload, X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import TagsInput from "../components/TagsInput";
+import WebLinksInput from "../components/WebLinksInput";
 import CustomTable from "../components/CustomTable";
 import CustomInput from "../components/CustomInput";
 import TipTapEditor from "../components/TipTapEditor";
@@ -60,6 +61,7 @@ const ProductPage = () => {
     brand: "",
     sold: "",
     tags: [],
+    webLinks: [],
     price: "",
     purchasePrice: "",
     secondaryPrice: "",
@@ -159,6 +161,7 @@ const ProductPage = () => {
       brand: "",
       sold: "",
       tags: [],
+      webLinks: [],
       price: "",
       purchasePrice: "",
       secondaryPrice: "",
@@ -193,6 +196,7 @@ const ProductPage = () => {
         subCategory: data.subCategoryId || "",
         brand: data.brandId || "",
         tags: data.tags || [],
+        webLinks: data.webLinks || [],
         price: data.price || "",
         purchasePrice: data.purchasePrice || "",
         secondaryPrice: data.secondaryPrice || "",
@@ -242,6 +246,7 @@ const ProductPage = () => {
       brand: "",
       sold: "",
       tags: [],
+      webLinks: [],
       price: "",
       purchasePrice: "",
       secondaryPrice: "",
@@ -703,6 +708,12 @@ const ProductPage = () => {
                   required
                   value={formData.tags}
                   onChange={(val) => handleSelectChange(val, "tags")}
+                />
+
+                <WebLinksInput
+                  label="Web Links"
+                  value={formData.webLinks || []}
+                  onChange={(val) => handleSelectChange(val, "webLinks")}
                 />
               </div>
             )}

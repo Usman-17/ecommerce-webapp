@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, GripVertical } from "lucide-react";
+import { X, GripVertical, Link } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -19,16 +19,15 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { Select } from "antd";
 
-const predefinedTags = [
-  { label: "⭐ Best Seller", value: "Best Seller" },
-  { label: "🏆 Top Rated", value: "Top Rated" },
-  { label: "🔥 Trending", value: "Trending" },
-  { label: "🆕 New", value: "New" },
-  { label: "💎 Special", value: "Special" },
-  { label: "👑 Popular", value: "Popular" },
-  { label: "🏷️ Sale", value: "Sale" },
-  { label: "✨ Limited Edition", value: "Limited Edition" },
-  { label: "📦 Back in Stock", value: "Back in Stock" },
+const predefinedWebLinks = [
+  { label: "All Products", value: "All Products" },
+  { label: "Best Sellers", value: "Best Sellers" },
+  { label: "New Arrivals", value: "New Arrivals" },
+  { label: "Scoop", value: "Scoop" },
+  { label: "Popular", value: "Popular" },
+  { label: "Special", value: "Special" },
+  { label: "Sale", value: "Sale" },
+  { label: "Trending", value: "Trending" },
 ];
 
 const SortableTag = ({ tag, onRemove }) => {
@@ -51,11 +50,11 @@ const SortableTag = ({ tag, onRemove }) => {
     <span
       ref={setNodeRef}
       style={style}
-      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-100 text-purple-700 text-sm font-medium select-none"
+      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 text-sm font-medium select-none"
     >
       <button
         type="button"
-        className="cursor-grab active:cursor-grabbing text-purple-400 hover:text-purple-600"
+        className="cursor-grab active:cursor-grabbing text-blue-400 hover:text-blue-600"
         {...attributes}
         {...listeners}
       >
@@ -65,7 +64,7 @@ const SortableTag = ({ tag, onRemove }) => {
       <button
         type="button"
         onClick={() => onRemove(tag)}
-        className="ml-0.5 text-purple-400 hover:text-purple-700"
+        className="ml-0.5 text-blue-400 hover:text-blue-700"
       >
         <X size={14} />
       </button>
@@ -73,10 +72,10 @@ const SortableTag = ({ tag, onRemove }) => {
   );
 };
 
-const TagsInput = ({
+const WebLinksInput = ({
   value = [],
   onChange,
-  options = predefinedTags,
+  options = predefinedWebLinks,
   label,
   required,
 }) => {
@@ -136,7 +135,8 @@ const TagsInput = ({
   return (
     <div className="flex flex-col gap-1 w-full">
       {label && (
-        <label className="block text-sm font-medium mb-1 text-gray-700">
+        <label className="block text-sm font-medium mb-1 text-gray-700 flex items-center gap-1.5">
+          <Link size={14} className="text-blue-500" />
           {label}{" "}
           {required ? (
             <span className="text-red-500 font-semibold">*</span>
@@ -170,7 +170,7 @@ const TagsInput = ({
       <Select
         showSearch
         allowClear
-        placeholder="Enter or Select Tags"
+        placeholder="Select pages to show product on"
         searchValue={inputValue}
         onSearch={setInputValue}
         onSelect={handleSelect}
@@ -189,4 +189,4 @@ const TagsInput = ({
   );
 };
 
-export default TagsInput;
+export default WebLinksInput;
