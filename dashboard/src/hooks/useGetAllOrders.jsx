@@ -33,9 +33,9 @@ const useGetAllOrders = () => {
         orderType: item.orderType || "normal",
         orderTypeLabel:
           item.orderType === "scoop"
-            ? "Scoop"
+            ? item.scoopDetails?.scoopType || "Scoop"
             : item.orderType === "deal"
-              ? "Deal"
+              ? item.dealDetails?.dealType || "Deal"
               : "Normal",
         dateFormatted: new Date(item.date).toLocaleDateString("en-US", {
           month: "short",

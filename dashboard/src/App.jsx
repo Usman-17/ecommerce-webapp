@@ -1,3 +1,7 @@
+import { Loader } from "lucide-react";
+import { Toaster } from "react-hot-toast";
+import { lazy, Suspense, useEffect } from "react";
+import "react-loading-skeleton/dist/skeleton.css";
 import {
   BrowserRouter,
   Navigate,
@@ -5,11 +9,9 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
+
 import Layout from "./layout/Layout";
-import { Toaster } from "react-hot-toast";
 import useGetAuth from "./hooks/useGetAuth";
-import "react-loading-skeleton/dist/skeleton.css";
-import { lazy, Suspense, useEffect } from "react";
 
 // Lazy load pages
 const LoginPage = lazy(() => import("./pages/LoginPage"));
@@ -28,6 +30,7 @@ const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const DealsPage = lazy(() => import("./pages/DealsPage"));
 const EnquiriesPage = lazy(() => import("./pages/EnquiriesPage"));
 const EnquiryDetailsPage = lazy(() => import("./pages/EnquiryDetailsPage"));
+// Imports End----
 
 const App = () => {
   const { data: authUser, isLoading } = useGetAuth();
@@ -35,7 +38,7 @@ const App = () => {
   if (isLoading && !authUser) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <Loader size={32} className="animate-spin text-gray-400" />
       </div>
     );
   }
@@ -57,7 +60,7 @@ const App = () => {
       <Suspense
         fallback={
           <div className="min-h-screen flex items-center justify-center bg-white">
-            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <Loader size={32} className="animate-spin text-gray-400" />
           </div>
         }
       >
