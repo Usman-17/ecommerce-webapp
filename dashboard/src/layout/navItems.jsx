@@ -30,11 +30,6 @@ const navItems = [
     path: "/deals",
   },
   {
-    name: "Users",
-    icon: <Users size={18} />,
-    path: "/users",
-  },
-  {
     name: "Orders",
     icon: <ShoppingBag size={18} />,
     subItems: [
@@ -43,6 +38,11 @@ const navItems = [
       { name: "Delivered", path: "/orders?status=delivered" },
       { name: "Cancelled", path: "/orders?status=cancelled" },
     ],
+  },
+  {
+    name: "Users",
+    icon: <Users size={18} />,
+    path: "/users",
   },
   {
     name: "Enquiries",

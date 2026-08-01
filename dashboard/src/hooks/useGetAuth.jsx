@@ -13,6 +13,7 @@ const useGetAuth = () => {
     staleTime: 0,
     refetchOnMount: true,
     refetchOnReconnect: true,
+    retry: false,
   });
 };
 

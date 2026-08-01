@@ -13,14 +13,18 @@ const useLogout = () => {
         credentials: "include",
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        console.error("Logout failed:", data);
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = {};
+        }
         throw new Error(data.error || "Failed to logout");
       }
 
-      return data;
+      return true;
     },
 
     onSuccess: () => {

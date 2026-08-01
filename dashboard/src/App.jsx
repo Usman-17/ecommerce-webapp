@@ -13,6 +13,8 @@ import { lazy, Suspense, useEffect } from "react";
 
 // Lazy load pages
 const LoginPage = lazy(() => import("./pages/LoginPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage"));
 const AddBrandPage = lazy(() => import("./pages/AddBrandPage"));
@@ -137,6 +139,16 @@ const App = () => {
           <Route
             path="/login"
             element={!authUser ? <LoginPage /> : <Navigate to="/" />}
+          />
+
+          <Route
+            path="/forgot-password"
+            element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/" />}
+          />
+
+          <Route
+            path="/reset-password/:token"
+            element={!authUser ? <ResetPasswordPage /> : <Navigate to="/" />}
           />
 
           <Route path="*" element={!authUser ? <LoginPage /> : <Layout />} />

@@ -1,25 +1,43 @@
-import { useState } from "react";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import LoadingSpinner from "../components/LoadingSpinner";
+
+const REMEMBER_ME_KEY = "dashboard_remember_me";
 
 const LoginPage = () => {
   const [isShow, setIsShow] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const saved = localStorage.getItem(REMEMBER_ME_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setEmail(parsed.email || "");
+        setPassword(parsed.password || "");
+        setRememberMe(true);
+      } catch {
+        localStorage.removeItem(REMEMBER_ME_KEY);
+      }
+    }
+  }, []);
+
   const { mutate: loginMutation, isPending } = useMutation({
-    mutationFn: async ({ email, password }) => {
+    mutationFn: async ({ email, password, rememberMe }) => {
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, rememberMe }),
         });
 
         const data = await res.json();
@@ -31,7 +49,18 @@ const LoginPage = () => {
       }
     },
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      if (variables.rememberMe) {
+        localStorage.setItem(
+          REMEMBER_ME_KEY,
+          JSON.stringify({
+            email: variables.email,
+            password: variables.password,
+          }),
+        );
+      } else {
+        localStorage.removeItem(REMEMBER_ME_KEY);
+      }
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
       navigate("/");
     },
@@ -47,7 +76,7 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    loginMutation({ email, password });
+    loginMutation({ email, password, rememberMe });
   };
 
   return (
@@ -81,9 +110,17 @@ const LoginPage = () => {
 
           {/* Password */}
           <div className="grid">
-            <label htmlFor="password" className="text-base font-medium">
-              Password
-            </label>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="text-base font-medium">
+                Password
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-gray-500 hover:text-black transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
 
             <div className="relative">
               <input
@@ -93,7 +130,7 @@ const LoginPage = () => {
                 required
                 placeholder="••••••••"
                 autoComplete="current-password"
-                className="w-full border border-gray-300 px-2 py-2 rounded text-black"
+                className="w-full border border-gray-300 px-2 py-2 rounded text-black pr-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -104,7 +141,7 @@ const LoginPage = () => {
                   aria-label={isShow ? "Hide password" : "Show password"}
                   tabIndex={0}
                   onClick={() => setIsShow(!isShow)}
-                  className="absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer text-black"
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer text-black"
                 >
                   {isShow ? <Eye size={18} /> : <EyeOff size={18} />}
                 </div>
@@ -112,8 +149,25 @@ const LoginPage = () => {
             </div>
           </div>
 
+          {/* Remember Me */}
+          <div className="flex items-center gap-2">
+            <input
+              id="rememberMe"
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300 accent-black cursor-pointer"
+            />
+            <label
+              htmlFor="rememberMe"
+              className="text-sm text-gray-600 cursor-pointer select-none"
+            >
+              Remember me
+            </label>
+          </div>
+
           {/* Submit */}
-          <div className="mt-3">
+          <div className="mt-2">
             <button
               type="submit"
               className="w-full bg-black text-white py-2 rounded hover:bg-gray-900 transition cursor-pointer select-none"
