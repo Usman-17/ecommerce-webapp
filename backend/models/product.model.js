@@ -96,6 +96,11 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
+    webLinks: {
+      type: [String],
+      default: [],
+    },
+
     productImages: [
       {
         public_id: { type: String, required: true },

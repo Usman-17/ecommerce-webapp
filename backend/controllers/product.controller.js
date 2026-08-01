@@ -43,6 +43,7 @@ const formatProduct = (prod) => {
     secondaryPrice: obj.secondaryPrice,
     sold: obj.sold,
     tags: obj.tags,
+    webLinks: obj.webLinks || [],
     productImages: obj.productImages,
     variants: obj.variants,
     categoryId: obj.category?._id || obj.category || null,
@@ -86,6 +87,7 @@ export const createProduct = async (req, res) => {
       tags,
       sold,
       secondaryPrice,
+      webLinks,
       variants: variantsJson,
     } = req.body;
 
@@ -179,6 +181,7 @@ export const createProduct = async (req, res) => {
       brand: brand || undefined,
       sold: sold || "0",
       tags,
+      webLinks: webLinks || [],
       productImages: uploadedProductImages,
       variants: parsedVariants.filter((v) => v.name && v.name.trim()),
     });
@@ -214,6 +217,7 @@ export const updateProduct = async (req, res) => {
       quantity,
       tags,
       sold,
+      webLinks,
       variants: variantsJson,
     } = req.body;
 
@@ -260,6 +264,7 @@ export const updateProduct = async (req, res) => {
 
     if (description) product.description = description;
     if (tags) product.tags = tags;
+    if (webLinks !== undefined) product.webLinks = webLinks;
     if (price) product.price = Number(price) || product.price;
     if (purchasePrice !== undefined)
       product.purchasePrice = Number(purchasePrice) || 0;
