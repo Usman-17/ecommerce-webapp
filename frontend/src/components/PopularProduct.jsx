@@ -7,11 +7,7 @@ import ProductCardSkeleton from "./Skeleton/ProductCardSkeleton";
 import { useGetAllProducts } from "../hooks/useGetAllProducts";
 
 const PopularProduct = () => {
-  const { products = [], productIsLoading } = useGetAllProducts();
-
-  const popularProducts = products?.filter((product) =>
-    product.tags.includes("Popular")
-  );
+  const { popularProducts, productIsLoading } = useGetAllProducts();
 
   return (
     <>

@@ -6,11 +6,7 @@ import SaleProductCard from "./SaleProductCard";
 import { useGetAllProducts } from "../hooks/useGetAllProducts";
 
 const SaleProducts = () => {
-  const { products = [] } = useGetAllProducts();
-
-  const saleProducts = products?.filter((product) =>
-    product.tags.includes("Sale")
-  );
+  const { saleProducts } = useGetAllProducts();
 
   const settings = {
     dots: true,

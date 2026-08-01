@@ -6,11 +6,7 @@ import InViewAnimation from "./InViewAnimation";
 import { useGetAllProducts } from "../hooks/useGetAllProducts";
 
 const SpecialProducts = () => {
-  const { products = [] } = useGetAllProducts();
-
-  const specialProducts = products?.filter((product) =>
-    product.tags.includes("Special")
-  );
+  const { specialProducts } = useGetAllProducts();
 
   return (
     <div className="py-5">

@@ -24,11 +24,11 @@ import bannerImgMobile from "../../assets/scoop/banner-m.webp";
 
 const ScoopPage = () => {
   const navigate = useNavigate();
-  const { products: allProducts, productIsLoading } = useGetAllProducts();
+  const { scoopProducts, productIsLoading } = useGetAllProducts();
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [scoopProducts, setScoopProducts] = useState([]);
+  const [scoopedItems, setScoopedItems] = useState([]);
   const [selections, setSelections] = useState({});
   const [selectedVariants, setSelectedVariants] = useState({});
   const [isScooping, setIsScooping] = useState(false);
@@ -46,7 +46,7 @@ const ScoopPage = () => {
       }
       lastToastTimeRef.current = 0;
       setSelectedSize(sizeId);
-      setScoopProducts([]);
+      setScoopedItems([]);
       setSelections({});
       setSelectedVariants({});
       setShowResults(false);
@@ -56,7 +56,7 @@ const ScoopPage = () => {
 
   const handleSelectQuantity = useCallback((quantity) => {
     setSelectedQuantity(quantity);
-    setScoopProducts([]);
+    setScoopedItems([]);
     setSelections({});
     setSelectedVariants({});
     setShowResults(false);
@@ -79,7 +79,7 @@ const ScoopPage = () => {
       return;
     }
 
-    if (!allProducts || allProducts.length === 0) {
+    if (!scoopProducts || scoopProducts.length === 0) {
       toast.error("Products not loaded yet. Please try again.");
       return;
     }
@@ -91,7 +91,7 @@ const ScoopPage = () => {
       const count =
         Math.floor(Math.random() * (config.maxItems - config.minItems + 1)) +
         config.minItems;
-      const products = getRandomProducts(allProducts, count);
+      const products = getRandomProducts(scoopProducts, count);
       allProductsList.push(...products);
     }
 
@@ -102,7 +102,7 @@ const ScoopPage = () => {
       ...p,
       _instanceId: `${p._id}-${index}`,
     }));
-    setScoopProducts(productsWithIds);
+    setScoopedItems(productsWithIds);
 
     // Auto-select first variant for each product
     const initialVariants = {};
@@ -112,7 +112,7 @@ const ScoopPage = () => {
       }
     });
     setSelectedVariants(initialVariants);
-  }, [selectedSize, selectedQuantity, allProducts]);
+  }, [selectedSize, selectedQuantity, scoopProducts]);
 
   const handleVariantSelect = useCallback((instanceId, variant) => {
     setSelectedVariants((prev) => ({
@@ -139,7 +139,7 @@ const ScoopPage = () => {
 
     navigate("/place-order", {
       state: {
-        scoopProducts,
+        scoopProducts: scoopedItems,
         selections,
         selectedVariants,
         totalAmount,
@@ -151,7 +151,7 @@ const ScoopPage = () => {
     navigate,
     selectedSize,
     selectedQuantity,
-    scoopProducts,
+    scoopedItems,
     selections,
     selectedVariants,
   ]);
@@ -185,7 +185,7 @@ const ScoopPage = () => {
         <HowItWorks />
 
         <ScoopProductSlider
-          products={allProducts}
+          products={scoopProducts}
           isLoading={productIsLoading}
         />
 
@@ -239,10 +239,10 @@ const ScoopPage = () => {
           onComplete={handleAnimationComplete}
         />
 
-        {showResults && scoopProducts.length > 0 && (
+        {showResults && scoopedItems.length > 0 && (
           <div ref={resultsRef}>
             <ScoopResults
-              products={scoopProducts}
+              products={scoopedItems}
               selections={selections}
               selectedVariants={selectedVariants}
               onVariantSelect={handleVariantSelect}
@@ -253,7 +253,7 @@ const ScoopPage = () => {
               <ScoopSummary
                 selectedSize={selectedSize}
                 selectedQuantity={selectedQuantity}
-                scoopProducts={scoopProducts}
+                scoopProducts={scoopedItems}
                 selections={selections}
                 selectedVariants={selectedVariants}
                 onBuyNow={handleBuyNow}
@@ -262,7 +262,7 @@ const ScoopPage = () => {
           </div>
         )}
 
-        {showResults && scoopProducts.length === 0 && (
+        {showResults && scoopedItems.length === 0 && (
           <div className="text-center py-16">
             <p className="text-gray-400 text-sm">
               No products available. Try again.

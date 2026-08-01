@@ -24,11 +24,9 @@ const BestSellerPage = () => {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const mobileDrawerRef = useRef(null);
 
-  const { bestSellerProducts, productIsLoading: productsLoading } =
-    useGetAllProducts();
+  const { bestSellerProducts, productIsLoading } = useGetAllProducts();
 
   const {
-    allProducts,
     sortedProducts,
     colors,
     sizes,
@@ -60,6 +58,9 @@ const BestSellerPage = () => {
   const toggleMobileFilter = () => setIsMobileFilterOpen((v) => !v);
   const closeMobileFilter = () => setIsMobileFilterOpen(false);
 
+  const displayProducts = sortedProducts;
+  const totalCount = bestSellerProducts.length;
+
   return (
     <div className="min-h-screen -mt-1.5 sm:mt-0 pb-10 sm:pb-4 sm:py-3 sm:px-[4vw]">
       <SEO
@@ -87,7 +88,7 @@ const BestSellerPage = () => {
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-        {productsLoading ? (
+        {productIsLoading ? (
           <FilterSkeleton />
         ) : (
           <DesktopFilterSidebar
@@ -127,8 +128,7 @@ const BestSellerPage = () => {
           <div className="mb-2 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <h1 className="hidden sm:block text-sm text-gray-700">
-                Best Sellers — {sortedProducts.length} of {allProducts.length}{" "}
-                results
+                Best Sellers — {displayProducts.length} of {totalCount} results
               </h1>
             </div>
 
@@ -182,7 +182,7 @@ const BestSellerPage = () => {
             />
 
             <section>
-              {sortedProducts.length === 0 ? (
+              {displayProducts.length === 0 ? (
                 <div className="col-span-full flex flex-col items-center justify-center py-8">
                   <Lottie
                     animationData={emptyAnimation}
@@ -197,7 +197,7 @@ const BestSellerPage = () => {
                 <div
                   className={`sm:grid ${getGridClass(gridColumns)} gap-1.5 sm:gap-2 columns-2 sm:columns-auto space-y-2 sm:space-y-0`}
                 >
-                  {sortedProducts.map((product) => (
+                  {displayProducts.map((product) => (
                     <div
                       key={product.productSlug}
                       className="break-inside-avoid mb-2 sm:mb-0"
