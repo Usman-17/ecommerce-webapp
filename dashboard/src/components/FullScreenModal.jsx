@@ -3,7 +3,15 @@ import { X } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 
-const FullScreenModal = ({ open, onClose, title, subtitle, children }) => {
+const FullScreenModal = ({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  showClose = true,
+  actions,
+}) => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
   useEffect(() => {
@@ -62,12 +70,15 @@ const FullScreenModal = ({ open, onClose, title, subtitle, children }) => {
                     <p className="text-xs text-gray-500">{subtitle}</p>
                   )}
                 </div>
-                <button
-                  onClick={onClose}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                >
-                  <X size={18} className="text-gray-500" />
-                </button>
+                {showClose && (
+                  <button
+                    onClick={onClose}
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <X size={18} className="text-gray-500" />
+                  </button>
+                )}
+                {actions}
               </div>
               <div className="flex-1">{children}</div>
             </div>

@@ -30,6 +30,7 @@ const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const DealsPage = lazy(() => import("./pages/DealsPage"));
 const EnquiriesPage = lazy(() => import("./pages/EnquiriesPage"));
 const EnquiryDetailsPage = lazy(() => import("./pages/EnquiryDetailsPage"));
+const ProductReviewsPage = lazy(() => import("./pages/ProductReviewsPage"));
 // Imports End----
 
 const App = () => {
@@ -134,6 +135,13 @@ const App = () => {
               path="/enquiries/:id"
               element={
                 authUser ? <EnquiryDetailsPage /> : <Navigate to="/login" />
+              }
+            />
+
+            <Route
+              path="/product-reviews"
+              element={
+                authUser ? <ProductReviewsPage /> : <Navigate to="/login" />
               }
             />
           </Route>
