@@ -102,7 +102,7 @@ const ProductPage = () => {
     const shareText = salePrice
       ? `Check out ${product?.title} - PKR ${salePrice.toLocaleString()} only at Jemzy!`
       : `Check out ${product?.title} at Jemzy!`;
-    const shareUrl = `${window.location.origin}/p/${slug}`;
+    const shareUrl = `${window.location.origin}/product/${slug}`;
     try {
       if (navigator.share) {
         await navigator.share({
