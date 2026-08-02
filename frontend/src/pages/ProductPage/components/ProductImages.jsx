@@ -188,7 +188,11 @@ const ProductImages = ({ images, activeVariantImage }) => {
 
             <div
               ref={thumbnailContainerRef}
-              className="flex gap-2 sm:gap-3 md:flex-col w-full overflow-x-auto md:overflow-y-auto no-scrollbar scroll-smooth p-1 md:p-2 md:max-h-[calc(4*6rem+3*0.75rem)] lg:max-h-[calc(4*7rem+3*0.75rem)]"
+              className={`flex md:flex-col w-full overflow-x-auto md:overflow-y-auto no-scrollbar scroll-smooth md:p-1 ${
+                images.length <= 4
+                  ? "md:h-84 lg:h-96 xl:h-122 gap-2 sm:gap-3 md:gap-2"
+                  : "gap-2 sm:gap-3 md:gap-2 md:max-h-[calc(4*6rem+3*0.5rem)] lg:max-h-[calc(4*7rem+3*0.5rem)]"
+              }`}
             >
               {images.map((img, i) => {
                 const isFourth = i === 3;
@@ -199,7 +203,9 @@ const ProductImages = ({ images, activeVariantImage }) => {
                 return (
                   <div
                     key={i}
-                    className="relative shrink-0 w-[calc(25%-6px)] sm:w-[calc(25%-8px)] md:w-full md:shrink"
+                    className={`relative shrink-0 w-[calc(25%-6px)] sm:w-[calc(25%-8px)] md:w-full md:shrink ${
+                      images.length <= 4 ? "md:h-1/4" : ""
+                    }`}
                   >
                     <img
                       ref={(el) => (thumbnailRefs.current[i] = el)}
@@ -209,7 +215,11 @@ const ProductImages = ({ images, activeVariantImage }) => {
                         setSelectedImageIndex(i);
                         pauseAutoplay();
                       }}
-                      className={`w-full h-20 sm:h-20 md:h-24 lg:h-26 cursor-pointer rounded-sm transition-all duration-300 object-contain bg-[#fffaf5] ${
+                      className={`w-full ${
+                        images.length <= 4
+                          ? "h-full"
+                          : "h-20 sm:h-20 md:h-24 lg:h-26"
+                      } cursor-pointer rounded-sm transition-all duration-300 object-contain bg-[#fffaf5] ${
                         selectedImageIndex === i
                           ? "ring-1 ring-[#CC0D39] shadow-sm"
                           : "border-gray-100 hover:scale-102"

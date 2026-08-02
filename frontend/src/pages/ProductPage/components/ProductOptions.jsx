@@ -14,14 +14,14 @@ const ProductOptions = ({
 
   return (
     <div
-      className={`space-y-2 ${shakeOptions ? "animate-shake" : ""}`}
+      className={`pt-3 ${shakeOptions ? "animate-shake" : ""}`}
       onAnimationEnd={() => setShakeOptions?.(false)}
     >
-      <label className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">
-        SELECT VARIANT
+      <label className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-3 block">
+        Select Variant
       </label>
 
-      <div className="flex flex-wrap gap-2.5">
+      <div className="flex flex-wrap gap-2">
         {variants.map((variant) => {
           const isSelected = selectedOptions["variant"] === variant.name;
 
@@ -32,7 +32,7 @@ const ProductOptions = ({
               animation="shift-away"
               arrow={false}
               offset={[0, 8]}
-              className="text-[10px]! font-bold! bg-primary! rounded-md!"
+              className="text-[10px]! font-bold! bg-gray-900! rounded-lg! text-white!"
             >
               <button
                 onClick={() => handleSelect("variant", variant.name)}

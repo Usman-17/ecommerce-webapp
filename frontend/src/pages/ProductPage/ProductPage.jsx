@@ -98,10 +98,15 @@ const ProductPage = () => {
   };
 
   const handleShare = async () => {
+    const salePrice = matchedVariant?.price || product?.salePrice;
+    const shareText = salePrice
+      ? `Check out ${product?.title} - PKR ${salePrice.toLocaleString()} only at Jemzy!`
+      : `Check out ${product?.title} at Jemzy!`;
+    const shareUrl = `${window.location.origin}/p/${slug}`;
     const shareData = {
       title: product?.title,
-      text: `Check out ${product?.title}`,
-      url: window.location.href,
+      text: shareText,
+      url: shareUrl,
     };
     try {
       if (navigator.share && navigator.canShare) {
@@ -122,7 +127,7 @@ const ProductPage = () => {
         }
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
         toast.success("Link copied to clipboard!");
       }
     } catch {
@@ -303,7 +308,7 @@ const ProductPage = () => {
 
           {/* Product Details Section */}
           <div className="lg:col-span-6 xl:col-span-6">
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-2 sm:space-y-0">
               <div className="space-y-1">
                 {discountPercent > 0 && (
                   <span className="sm:hidden inline-flex items-center text-[10px] sm:text-xs font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full shrink-0">
@@ -311,7 +316,7 @@ const ProductPage = () => {
                   </span>
                 )}
 
-                <h1 className="text-xl sm:text-3xl lg:text-3xl font-bold text-[#0f172a] leading-sung tracking-tight mb-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.08)] flex items-center gap-2 flex-wrap sm:mt-2">
+                <h1 className="text-lg sm:text-2xl lg:text-2xl font-bold text-[#0f172a] leading-snug tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.08)] flex items-center gap-2 flex-wrap sm:mt-2">
                   {product.title}
                 </h1>
 
