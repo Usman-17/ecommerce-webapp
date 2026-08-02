@@ -59,6 +59,10 @@ export const productPreview = async (req, res) => {
 </html>`;
 
     res.setHeader("Content-Type", "text/html");
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'",
+    );
     res.send(html);
   } catch (error) {
     console.log("Error in productPreview controller", error.message);
