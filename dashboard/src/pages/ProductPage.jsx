@@ -26,7 +26,13 @@ import { useGetAllCategories } from "../hooks/useGetAllCategories";
 import { useGetSubCategoriesByCategory } from "../hooks/useGetSubCategoriesByCategory";
 // Imports End-----
 
-const tabs = ["Basic Info", "Description", "Variants", "Images"];
+const tabs = [
+  "Basic Info",
+  "Tags & Links",
+  "Description",
+  "Variants",
+  "Images",
+];
 
 const emptyVariant = () => ({
   name: "",
@@ -62,6 +68,7 @@ const ProductPage = () => {
     sold: "",
     tags: [],
     webLinks: [],
+    isActive: true,
     price: "",
     purchasePrice: "",
     secondaryPrice: "",
@@ -162,6 +169,7 @@ const ProductPage = () => {
       sold: "",
       tags: [],
       webLinks: [],
+      isActive: true,
       price: "",
       purchasePrice: "",
       secondaryPrice: "",
@@ -197,6 +205,7 @@ const ProductPage = () => {
         brand: data.brandId || "",
         tags: data.tags || [],
         webLinks: data.webLinks || [],
+        isActive: data.isActive ?? true,
         price: data.price || "",
         purchasePrice: data.purchasePrice || "",
         secondaryPrice: data.secondaryPrice || "",
@@ -247,6 +256,7 @@ const ProductPage = () => {
       sold: "",
       tags: [],
       webLinks: [],
+      isActive: true,
       price: "",
       purchasePrice: "",
       secondaryPrice: "",
@@ -505,6 +515,23 @@ const ProductPage = () => {
       sorter: (a, b) => (a.secondaryPrice || 0) - (b.secondaryPrice || 0),
     },
     {
+      title: "Status",
+      dataIndex: "isActive",
+      key: "isActive",
+      width: 100,
+      align: "center",
+      sorter: (a, b) => Number(a.isActive) - Number(b.isActive),
+      render: (isActive) => (
+        <span
+          className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full ${
+            isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+          }`}
+        >
+          {isActive ? "Active" : "Inactive"}
+        </span>
+      ),
+    },
+    {
       title: "Action",
       key: "action",
       width: 120,
@@ -578,9 +605,9 @@ const ProductPage = () => {
 
           <div className="flex-1 min-h-[300px]">
             {activeTab === "Basic Info" && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
-                  <div className="sm:col-span-9">
+                  <div className="sm:col-span-8">
                     <CustomInput
                       ref={firstInputRef}
                       id="productTitle"
@@ -596,7 +623,7 @@ const ProductPage = () => {
                       placeholder="Enter Product Title"
                     />
                   </div>
-                  <div className="sm:col-span-3">
+                  <div className="sm:col-span-3 flex flex-col justify-end">
                     <CustomSelect
                       label="Brand"
                       placeholder="Select Brand"
@@ -607,6 +634,29 @@ const ProductPage = () => {
                         value: b._id,
                       }))}
                     />
+                  </div>
+                  <div className="sm:col-span-1 flex flex-col justify-end items-start sm:items-center">
+                    <label className="text-[11px] font-medium text-gray-500 mb-1 hidden sm:block">
+                      Active
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          isActive: !prev.isActive,
+                        }))
+                      }
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                        formData.isActive ? "bg-green-500" : "bg-gray-300"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          formData.isActive ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
                   </div>
                 </div>
 
@@ -702,7 +752,12 @@ const ProductPage = () => {
                     }
                   />
                 </div>
+              </div>
+            )}
 
+            {/* Tags & Links Tab */}
+            {activeTab === "Tags & Links" && (
+              <div className="space-y-4">
                 <TagsInput
                   label="Tags"
                   required

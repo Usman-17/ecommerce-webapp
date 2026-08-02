@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { X, GripVertical } from "lucide-react";
+import {
+  X,
+  GripVertical,
+  BadgeCheck,
+  Star,
+  TrendingUp,
+  Sparkles,
+  Gem,
+  Crown,
+  Tag,
+} from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -19,19 +29,28 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { Select } from "antd";
 
+const iconMap = {
+  "Best Seller": BadgeCheck,
+  "Top Rated": Star,
+  Trending: TrendingUp,
+  New: Sparkles,
+  Special: Gem,
+  Popular: Crown,
+  Sale: Tag,
+};
+
 const predefinedTags = [
-  { label: "⭐ Best Seller", value: "Best Seller" },
-  { label: "🏆 Top Rated", value: "Top Rated" },
-  { label: "🔥 Trending", value: "Trending" },
-  { label: "🆕 New", value: "New" },
-  { label: "💎 Special", value: "Special" },
-  { label: "👑 Popular", value: "Popular" },
-  { label: "🏷️ Sale", value: "Sale" },
-  { label: "✨ Limited Edition", value: "Limited Edition" },
-  { label: "📦 Back in Stock", value: "Back in Stock" },
+  { label: "Best Seller", icon: BadgeCheck },
+  { label: "Top Rated", icon: Star },
+  { label: "Trending", icon: TrendingUp },
+  { label: "New", icon: Sparkles },
+  { label: "Special", icon: Gem },
+  { label: "Popular", icon: Crown },
+  { label: "Sale", icon: Tag },
 ];
 
 const SortableTag = ({ tag, onRemove }) => {
+  const Icon = iconMap[tag];
   const {
     attributes,
     listeners,
@@ -51,7 +70,7 @@ const SortableTag = ({ tag, onRemove }) => {
     <span
       ref={setNodeRef}
       style={style}
-      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-100 text-purple-700 text-sm font-medium select-none"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-100 text-purple-700 text-sm font-medium select-none"
     >
       <button
         type="button"
@@ -61,6 +80,7 @@ const SortableTag = ({ tag, onRemove }) => {
       >
         <GripVertical size={14} />
       </button>
+      {Icon && <Icon size={13} />}
       {tag}
       <button
         type="button"
@@ -179,6 +199,15 @@ const TagsInput = ({
           (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
         }
         options={availableOptions}
+        optionRender={(option) => {
+          const Icon = iconMap[option.value];
+          return (
+            <div className="flex items-center gap-2">
+              {Icon && <Icon size={14} className="text-gray-500" />}
+              <span>{option.label}</span>
+            </div>
+          );
+        }}
         className="w-full my-custom-select"
         popupClassName="!z-[9999999]"
         dropdownStyle={{ zIndex: 9999 }}
