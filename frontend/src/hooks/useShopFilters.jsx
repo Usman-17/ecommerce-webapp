@@ -64,7 +64,7 @@ const useShopFilters = ({
   areaParam,
   subcategoryParam,
 } = {}) => {
-  const { products: allProducts, productIsLoading: isLoading } =
+  const { allProducts, productIsLoading: isLoading } =
     useGetAllProducts();
   const { colors, sizes, variantOptionsLoading } = useGetVariantOptions();
   const { categories, isLoading: categoriesLoading } = useGetAllCategories();
