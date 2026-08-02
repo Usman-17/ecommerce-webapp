@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 import { Brand } from "../models/brand.model.js";
 import { Category } from "../models/category.model.js";
+import ProductReview from "../models/productReview.model.js";
 
 import slugify from "slugify";
 import { v2 as cloudinary } from "cloudinary";
@@ -428,7 +429,20 @@ export const getProductBySlug = async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    res.status(200).json(formatProduct(product));
+    const reviews = await ProductReview.find({ product: product._id }).select(
+      "rating",
+    );
+    const reviewCount = reviews.length;
+    const avgRating =
+      reviewCount > 0
+        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+        : 0;
+
+    const formatted = formatProduct(product);
+    formatted.avgRating = Math.round(avgRating * 10) / 10;
+    formatted.reviewCount = reviewCount;
+
+    res.status(200).json(formatted);
   } catch (error) {
     console.log("Error in getProductBySlug Controller", error.message);
     res.status(500).json({ error: error.message });

@@ -22,6 +22,7 @@ import categoryRoutes from "./routes/category.route.js";
 import subCategoryRoutes from "./routes/subCategory.route.js";
 import reviewRoutes from "./routes/review.route.js";
 import dealRoutes from "./routes/deal.route.js";
+import productReviewRoutes from "./routes/productReview.route.js";
 // imports End
 
 const app = express();
@@ -88,6 +89,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/subcategory", subCategoryRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/deal", dealRoutes);
+app.use("/api/product-review", productReviewRoutes);
 
 // Running App
 const PORT = process.env.PORT || 9000;
