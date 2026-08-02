@@ -377,16 +377,40 @@ export const updateProduct = async (req, res) => {
 // DESC     : Get all products
 export const getAllproducts = async (req, res) => {
   try {
-    const product = await Product.find()
+    const products = await Product.find()
       .populate("brand")
       .populate("category")
       .populate("subCategory")
       .populate("area")
       .sort({ createdAt: -1 });
 
-    if (!product.length === 0) return res.status(200).json([]);
+    if (!products.length) return res.status(200).json([]);
 
-    return res.status(200).json(product.map(formatProduct));
+    const productIds = products.map((p) => p._id);
+
+    const reviews = await ProductReview.find({
+      product: { $in: productIds },
+    }).select("product rating");
+
+    const reviewMap = {};
+    for (const r of reviews) {
+      const id = r.product.toString();
+      if (!reviewMap[id]) reviewMap[id] = { total: 0, count: 0 };
+      reviewMap[id].total += r.rating;
+      reviewMap[id].count += 1;
+    }
+
+    const formatted = products.map((p) => {
+      const obj = formatProduct(p);
+      const stats = reviewMap[p._id.toString()];
+      obj.reviewCount = stats?.count || 0;
+      obj.avgRating = stats
+        ? Math.round((stats.total / stats.count) * 10) / 10
+        : 0;
+      return obj;
+    });
+
+    return res.status(200).json(formatted);
   } catch (error) {
     console.log("Error in getAllProduct Controller:", error.message);
     return res.status(500).json({ error: error.message });
