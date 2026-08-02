@@ -101,6 +101,11 @@ const productSchema = new mongoose.Schema(
       default: [],
     },
 
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
     productImages: [
       {
         public_id: { type: String, required: true },
