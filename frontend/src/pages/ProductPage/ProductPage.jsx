@@ -14,7 +14,6 @@ import SectionHeading from "../../components/SectionHeading";
 import WishlistButton from "../../components/WishlistButton";
 import Breadcrumbs from "../../components/common/Breadcrumbs";
 
-import ProductTabs from "./components/ProductTabs";
 import ProductPrice from "./components/ProductPrice";
 import ProductImages from "./components/ProductImages";
 import ProductActions from "./components/ProductActions";
@@ -23,6 +22,7 @@ import ProductFeatures from "./components/ProductFeatures";
 import RelatedProducts from "./components/RelatedProducts";
 import ProductSkeleton from "./components/ProductSkeleton";
 import MobileActionBar from "./components/MobileActionBar";
+import ProductReviews from "./components/ProductReviews";
 import SEO from "../../components/SEO";
 // Imports End-----
 
@@ -56,12 +56,10 @@ const ProductPage = () => {
     enabled: !!product?._id,
 
     queryFn: async () => {
-      const res = await fetch(
-        `/api/WAP/ProductReview/GetByProductId?Id=${product._id}`,
-      );
+      const res = await fetch(`/api/product-review/${product._id}`);
       if (!res.ok) return [];
-      const json = await res.json();
-      return Array.isArray(json?.data) ? json.data : [];
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
 
     retry: false,
@@ -321,9 +319,9 @@ const ProductPage = () => {
                   {/* Rating */}
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => {
-                      const rating = product?.totalReviewRating || 0;
-                      const isFull = i < Math.floor(rating);
-                      const isHalf = !isFull && i < rating;
+                      const avgRating = product?.avgRating || 0;
+                      const isFull = i < Math.floor(avgRating);
+                      const isHalf = !isFull && i < avgRating;
                       return (
                         <span
                           key={i}
@@ -356,8 +354,8 @@ const ProductPage = () => {
                       );
                     })}
                     <span className="ml-2 text-xs text-gray-500">
-                      {product?.totalReviewCounts > 0
-                        ? `${product.totalReviewRating} (${product.totalReviewCounts} reviews)`
+                      {product?.reviewCount > 0
+                        ? `${product.avgRating} (${product.reviewCount} reviews)`
                         : "No reviews yet"}
                     </span>
 
@@ -436,11 +434,7 @@ const ProductPage = () => {
         </div>
 
         {/* Tabs Section */}
-        <ProductTabs
-          productDescription={product.description}
-          reviews={reviews}
-          reviewsLoading={reviewsLoading}
-        />
+        <ProductReviews reviews={reviews} reviewsLoading={reviewsLoading} />
 
         {/* Related Products Section */}
         {relatedProductsCount > 0 && (

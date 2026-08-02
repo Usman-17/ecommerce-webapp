@@ -157,11 +157,10 @@ const ProductCard = ({ product, index = 0 }) => {
               <div
                 className="flex gap-0.5"
                 role="img"
-                aria-label={`Rating: ${product.totalReviewRating || product.rating || 5} out of 5 stars`}
+                aria-label={`Rating: ${product.avgRating || 0} out of 5 stars`}
               >
                 {[...Array(5)].map((_, i) => {
-                  const rating =
-                    product.totalReviewRating || product.rating || 5;
+                  const rating = product.avgRating || 0;
                   const isFull = i < Math.floor(rating);
                   const isHalf = !isFull && i < rating;
                   return (

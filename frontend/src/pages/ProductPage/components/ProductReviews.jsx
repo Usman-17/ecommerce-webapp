@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { File, Star, ChevronDown } from "lucide-react";
+import { Star, ChevronDown } from "lucide-react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 
-const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
+const ProductReviews = ({ reviews = [] }) => {
   const reviewCount = reviews.length;
 
   const averageRating =
@@ -10,21 +10,9 @@ const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
       ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount
       : 0;
 
-  const tabConfig = [
-    ...(productDescription?.trim() ? [{ id: "Description", icon: File }] : []),
-    ...(reviewCount > 0
-      ? [{ id: `Reviews (${reviewCount})`, icon: Star }]
-      : []),
-  ];
-  const hasMultipleTabs = tabConfig.length > 1;
-  const [activeTab, setActiveTab] = useState("");
   const [sortBy, setSortBy] = useState("Most Recent");
   const [sortOpen, setSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(3);
-
-  // Derive the effective active tab - always show first available tab
-  const effectiveTab =
-    tabConfig.find((t) => t.id === activeTab)?.id || tabConfig[0]?.id || "";
 
   const getRatingLabel = (rating) => {
     if (rating >= 4.5) return "Excellent";
@@ -37,7 +25,7 @@ const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
 
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortBy === "Most Recent") {
-      return new Date(b.approvedOn) - new Date(a.approvedOn);
+      return new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt);
     }
     if (sortBy === "Highest Rated") return b.rating - a.rating;
     if (sortBy === "Lowest Rated") return a.rating - b.rating;
@@ -48,60 +36,9 @@ const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
 
   return (
     <div className="mt-8 sm:mt-6">
-      {/* Tab Buttons - only show when multiple tabs */}
-      {hasMultipleTabs && (
-        <div className="flex justify-center">
-          <div className="flex w-auto gap-0 sm:gap-4">
-            {tabConfig.map(({ id, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => setActiveTab(id)}
-                className={`relative px-4 sm:px-6 py-2 text-xs sm:text-sm font-semibold tracking-wide transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2
-              ${
-                effectiveTab === id
-                  ? "text-gray-900"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-              >
-                <Icon size={16} />
-                <span>{id}</span>
-                {effectiveTab === id && (
-                  <Motion.div
-                    layoutId="activeTabUnderline"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900"
-                    transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       <div className="py-2 sm:py-4">
         <AnimatePresence mode="wait">
-          {/* Description Tab */}
-          {effectiveTab === "Description" && (
-            <Motion.div
-              key="spec"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              ref={specRef}
-              className="space-y-6"
-            >
-              <div className="bg-white rounded-xl p-3 sm:p-6 shadow-sm border border-gray-100">
-                <div
-                  className="text-gray-600 leading-relaxed space-y-1 [&_p]:mb-1.5 [&_ul]:list-disc [&_ul]:pl-5 transition-all duration-500 max-h-full text-sm sm:text-base"
-                  dangerouslySetInnerHTML={{ __html: productDescription }}
-                />
-              </div>
-            </Motion.div>
-          )}
-
-          {/* Reviews Tab */}
-          {effectiveTab.startsWith("Reviews") && (
+          {reviewCount > 0 ? (
             <Motion.div
               key="reviews"
               initial={{ opacity: 0, y: 8 }}
@@ -110,14 +47,12 @@ const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
               transition={{ duration: 0.2 }}
               className="space-y-4 sm:space-y-6"
             >
-              {/* Reviews Summary */}
               <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-[#F3E7DC]">
                 {/* Header */}
                 <div className="flex items-center justify-between gap-3 mb-5">
                   <h3 className="text-sm sm:text-lg font-bold text-gray-900">
                     Customer Reviews ({reviewCount})
                   </h3>
-                  {/* Sort Dropdown */}
                   <div className="relative shrink-0">
                     <button
                       onClick={() => setSortOpen(!sortOpen)}
@@ -218,45 +153,41 @@ const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
                   </div>
                 </div>
 
-                {/* Review List - inside same container */}
+                {/* Review List */}
                 <div className="mt-6 pt-5 border-t border-gray-100">
                   {sortedReviews.slice(0, visibleCount).map((review, index) => (
                     <div
-                      key={review.productReviewId}
+                      key={review._id}
                       className={`flex items-start gap-3 sm:gap-4 ${
                         index < Math.min(visibleCount, sortedReviews.length) - 1
                           ? "pb-4 mb-4 border-b border-gray-100"
                           : ""
                       }`}
                     >
-                      {/* Avatar */}
                       <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-warm flex items-center justify-center shrink-0">
                         <span className="text-sm font-semibold text-[#bfb3a8]">
-                          {(review.userName || "A").charAt(0).toUpperCase()}
+                          {(review.fullName || "A").charAt(0).toUpperCase()}
                         </span>
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        {/* Header */}
                         <div className="flex items-center justify-between gap-2">
                           <h4 className="font-semibold text-gray-900 text-sm truncate">
-                            {review.userName || "Anonymous"}
+                            {review.fullName || "Anonymous"}
                           </h4>
-                          {review.approvedOn && (
+                          {(review.date || review.createdAt) && (
                             <span className="text-[10px] sm:text-xs text-gray-400 shrink-0 whitespace-nowrap">
-                              {new Date(review.approvedOn).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                },
-                              )}
+                              {new Date(
+                                review.date || review.createdAt,
+                              ).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
                             </span>
                           )}
                         </div>
 
-                        {/* Stars */}
                         <div className="flex items-center gap-0.5 mt-1">
                           {[...Array(5)].map((_, i) => (
                             <Star
@@ -268,24 +199,15 @@ const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
                           ))}
                         </div>
 
-                        {/* Review Title */}
-                        {review.title && (
-                          <h5 className="font-semibold text-gray-800 text-sm mt-2">
-                            {review.title}
-                          </h5>
-                        )}
-
-                        {/* Review Comment */}
-                        {review.comment && (
+                        {review.review && (
                           <p className="text-gray-600 text-xs sm:text-sm mt-1 leading-relaxed">
-                            {review.comment}
+                            {review.review}
                           </p>
                         )}
                       </div>
                     </div>
                   ))}
 
-                  {/* Load More Button */}
                   {visibleCount < sortedReviews.length && (
                     <div className="flex justify-center mt-4">
                       <button
@@ -300,6 +222,20 @@ const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
                 </div>
               </div>
             </Motion.div>
+          ) : (
+            <Motion.div
+              key="no-reviews"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-[#F3E7DC]">
+                <p className="text-gray-500 text-sm text-center py-8">
+                  No reviews yet
+                </p>
+              </div>
+            </Motion.div>
           )}
         </AnimatePresence>
       </div>
@@ -307,4 +243,4 @@ const ProductTabs = ({ productDescription, specRef, reviews = [] }) => {
   );
 };
 
-export default ProductTabs;
+export default ProductReviews;
