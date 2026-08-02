@@ -80,29 +80,13 @@ const DealDetailPage = () => {
   }
 
   const handleShare = async () => {
-    const shareData = {
-      title: deal?.title,
-      text: `Check out ${deal?.title} - Rs. ${deal?.dealPrice?.toLocaleString()}`,
-      url: window.location.href,
-    };
     try {
-      if (navigator.share && navigator.canShare) {
-        const imageUrl = deal?.images?.[0]?.url;
-        if (imageUrl) {
-          try {
-            const res = await fetch(imageUrl);
-            const blob = await res.blob();
-            const file = new File([blob], "deal.webp", { type: blob.type });
-            const shareWithImage = { ...shareData, files: [file] };
-            if (navigator.canShare(shareWithImage)) {
-              await navigator.share(shareWithImage);
-              return;
-            }
-          } catch {
-            // Image fetch failed, share without image
-          }
-        }
-        await navigator.share(shareData);
+      if (navigator.share) {
+        await navigator.share({
+          title: deal?.title,
+          text: `Check out ${deal?.title} - Rs. ${deal?.dealPrice?.toLocaleString()}`,
+          url: window.location.href,
+        });
       } else {
         await navigator.clipboard.writeText(window.location.href);
         toast.success("Link copied to clipboard!");

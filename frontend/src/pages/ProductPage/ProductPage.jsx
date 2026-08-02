@@ -103,29 +103,13 @@ const ProductPage = () => {
       ? `Check out ${product?.title} - PKR ${salePrice.toLocaleString()} only at Jemzy!`
       : `Check out ${product?.title} at Jemzy!`;
     const shareUrl = `${window.location.origin}/p/${slug}`;
-    const shareData = {
-      title: product?.title,
-      text: shareText,
-      url: shareUrl,
-    };
     try {
-      if (navigator.share && navigator.canShare) {
-        const imageUrl = product?.productImages?.[0]?.url;
-        if (imageUrl) {
-          try {
-            const res = await fetch(imageUrl);
-            const blob = await res.blob();
-            const file = new File([blob], "product.webp", { type: blob.type });
-            const shareWithImage = { ...shareData, files: [file] };
-            if (navigator.canShare(shareWithImage)) {
-              await navigator.share(shareWithImage);
-              return;
-            }
-          } catch {
-            // Image fetch failed, share without image
-          }
-        }
-        await navigator.share(shareData);
+      if (navigator.share) {
+        await navigator.share({
+          title: product?.title,
+          text: shareText,
+          url: shareUrl,
+        });
       } else {
         await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
         toast.success("Link copied to clipboard!");
