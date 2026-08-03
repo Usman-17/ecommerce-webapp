@@ -1,6 +1,7 @@
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { HelmetProvider } from "react-helmet-async";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
 import {
@@ -26,6 +27,7 @@ import useGetAuth from "./hooks/useGetAuth";
 import useTrackPage from "./hooks/useTrackPage";
 
 import HomePage from "./pages/HomePage/HomePage";
+import ProfileLayout from "./pages/ProfilePage/components/desktop/ProfileLayout";
 const ShopPage = lazy(() => import("./pages/ShopPage/ShopPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage/ProductPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage/CategoryPage"));
@@ -48,7 +50,6 @@ const ShippingPolicyPage = lazy(
   () => import("./pages/ShippingPolicyPage/ShippingPolicyPage"),
 );
 
-const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage"));
 const AboutUsPage = lazy(() => import("./pages/AboutUsPage/AboutUsPage"));
 const ContactUsPage = lazy(() => import("./pages/ContactUsPage/ContactUsPage"));
 const PrivacyPolicyPage = lazy(
@@ -66,7 +67,8 @@ const ForgotPasswordPage = lazy(
   () => import("./pages/Auth/ForgotPasswordPage"),
 );
 const ResetPasswordPage = lazy(() => import("./pages/Auth/ResetPasswordPage"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage"));
+const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage/MyOrdersPage"));
 // imports End----
 
 const ScrollToTop = () => {
@@ -155,16 +157,23 @@ const App = () => {
                   <Route
                     path="/order"
                     element={
-                      authUser ? <MyOrdersPage /> : <Navigate to="/login" />
+                      <ProtectedRoute>
+                        <MyOrdersPage />
+                      </ProtectedRoute>
                     }
                   />
 
                   <Route
                     path="/profile"
                     element={
-                      authUser ? <ProfilePage /> : <Navigate to="/login" />
+                      <ProtectedRoute>
+                        <ProfileLayout />
+                      </ProtectedRoute>
                     }
-                  />
+                  >
+                    <Route index element={<ProfilePage />} />
+                    <Route path="orders" element={<MyOrdersPage />} />
+                  </Route>
 
                   {/* Auth */}
                   <Route
