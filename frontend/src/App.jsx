@@ -4,13 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
@@ -23,7 +17,6 @@ import CartDrawer from "./components/CartDrawer";
 import AnalyticsProvider from "./components/AnalyticsProvider";
 import ScrollToTopButton from "./components/common/ScrollToTopButton";
 
-import useGetAuth from "./hooks/useGetAuth";
 import useTrackPage from "./hooks/useTrackPage";
 
 import HomePage from "./pages/HomePage/HomePage";
@@ -61,12 +54,6 @@ const TermsPage = lazy(() => import("./pages/TermsPage/TermsPage"));
 const TrackOrderPage = lazy(
   () => import("./pages/TrackOrderPage/TrackOrderPage"),
 );
-const LoginPage = lazy(() => import("./pages/Auth/LoginPage"));
-const SignupPage = lazy(() => import("./pages/Auth/SignupPage"));
-const ForgotPasswordPage = lazy(
-  () => import("./pages/Auth/ForgotPasswordPage"),
-);
-const ResetPasswordPage = lazy(() => import("./pages/Auth/ResetPasswordPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage"));
 const ProfileInfoDesktop = lazy(
   () =>
@@ -85,6 +72,9 @@ const ChangePassword = lazy(
   () =>
     import("./pages/ProfilePage/components/mobile/AccountSettings/ChangePassword"),
 );
+const AddressPage = lazy(() => import("./pages/AddressPage/AddressPage"));
+const AddressForm = lazy(() => import("./pages/AddressPage/AddressForm"));
+const AuthPage = lazy(() => import("./pages/AuthPage/AuthPage"));
 // imports End----
 
 const ScrollToTop = () => {
@@ -98,8 +88,6 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  const { data: authUser } = useGetAuth();
-
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -190,6 +178,8 @@ const App = () => {
                     <Route index element={<ProfilePage />} />
                     <Route path="info" element={<ProfileInfoPage />} />
                     <Route path="orders" element={<MyOrdersPage />} />
+                    <Route path="addresses" element={<AddressPage />} />
+                    <Route path="address/edit" element={<AddressForm />} />
                     <Route
                       path="account-settings"
                       element={<AccountSettingsLayout />}
@@ -199,37 +189,11 @@ const App = () => {
                     </Route>
                   </Route>
 
-                  {/* Auth */}
-                  <Route
-                    path="/login"
-                    element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-                  />
-                  <Route
-                    path="/signup"
-                    element={!authUser ? <SignupPage /> : <Navigate to="/" />}
-                  />
-
-                  <Route
-                    path="/forgot-password"
-                    element={
-                      !authUser ? (
-                        <ForgotPasswordPage />
-                      ) : (
-                        <Navigate to="/login" />
-                      )
-                    }
-                  />
-
-                  <Route
-                    path="/reset-password/:token"
-                    element={
-                      !authUser ? (
-                        <ResetPasswordPage />
-                      ) : (
-                        <Navigate to="/login" />
-                      )
-                    }
-                  />
+                  {/* Auth  For Mobile*/}
+                  <Route path="/login" element={<AuthPage />} />
+                  <Route path="/signup" element={<AuthPage />} />
+                  <Route path="/forgot-password" element={<AuthPage />} />
+                  <Route path="/reset-password" element={<AuthPage />} />
                 </Routes>
               </Suspense>
             </div>
