@@ -52,6 +52,22 @@ const userSchema = new mongoose.Schema(
       default: {},
     },
 
+    addresses: [
+      {
+        type: {
+          type: String,
+          enum: ["home", "office", "other"],
+          default: "home",
+        },
+        fullName: { type: String, required: true },
+        phone: { type: String, required: true },
+        email: { type: String },
+        address: { type: String, required: true },
+        city: { type: String, required: true },
+        isDefault: { type: Boolean, default: false },
+      },
+    ],
+
     loginAttempts: {
       type: Number,
       default: 0,

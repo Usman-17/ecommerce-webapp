@@ -415,3 +415,131 @@ export const googleAuth = async (req, res) => {
     res.status(500).json({ error: "Google authentication failed" });
   }
 };
+
+// PATH     : /api/auth/addresses
+// METHOD   : GET
+// ACCESS   : PRIVATE
+// DESC     : Get all addresses
+export const getAddresses = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("addresses");
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.status(200).json({ addresses: user.addresses || [] });
+  } catch (error) {
+    console.error("Error in getAddresses:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// PATH     : /api/auth/addresses
+// METHOD   : POST
+// ACCESS   : PRIVATE
+// DESC     : Add new address
+export const addAddress = async (req, res) => {
+  try {
+    const { type, fullName, phone, email, address, city, isDefault } = req.body;
+    if (!fullName || !phone || !address || !city) {
+      return res
+        .status(400)
+        .json({ error: "All required fields must be filled" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (isDefault) {
+      user.addresses.forEach((addr) => (addr.isDefault = false));
+    }
+
+    user.addresses.push({
+      type,
+      fullName,
+      phone,
+      email,
+      address,
+      city,
+      isDefault,
+    });
+    await user.save();
+
+    res.status(201).json({ addresses: user.addresses });
+  } catch (error) {
+    console.error("Error in addAddress:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// PATH     : /api/auth/addresses/:id
+// METHOD   : PUT
+// ACCESS   : PRIVATE
+// DESC     : Update address
+export const updateAddress = async (req, res) => {
+  try {
+    const { type, fullName, phone, email, address, city, isDefault } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const addr = user.addresses.id(req.params.id);
+    if (!addr) return res.status(404).json({ error: "Address not found" });
+
+    if (isDefault) {
+      user.addresses.forEach((a) => (a.isDefault = false));
+    }
+
+    addr.type = type || addr.type;
+    addr.fullName = fullName || addr.fullName;
+    addr.phone = phone || addr.phone;
+    addr.email = email || addr.email;
+    addr.address = address || addr.address;
+    addr.city = city || addr.city;
+    addr.isDefault = isDefault ?? addr.isDefault;
+
+    await user.save();
+    res.status(200).json({ addresses: user.addresses });
+  } catch (error) {
+    console.error("Error in updateAddress:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// PATH     : /api/auth/addresses/:id
+// METHOD   : DELETE
+// ACCESS   : PRIVATE
+// DESC     : Delete address
+export const deleteAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    user.addresses = user.addresses.filter(
+      (a) => a._id.toString() !== req.params.id,
+    );
+    await user.save();
+
+    res.status(200).json({ addresses: user.addresses });
+  } catch (error) {
+    console.error("Error in deleteAddress:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// PATH     : /api/auth/addresses/:id/default
+// METHOD   : PUT
+// ACCESS   : PRIVATE
+// DESC     : Set default address
+export const setDefaultAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    user.addresses.forEach(
+      (a) => (a.isDefault = a._id.toString() === req.params.id),
+    );
+    await user.save();
+
+    res.status(200).json({ addresses: user.addresses });
+  } catch (error) {
+    console.error("Error in setDefaultAddress:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
