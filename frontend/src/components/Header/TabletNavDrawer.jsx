@@ -190,16 +190,16 @@ const TabletNavDrawer = ({
                   onClick={onClose}
                   className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  {user.logoImageURL ? (
+                  {user.profileImg?.url ? (
                     <img
-                      src={user.logoImageURL}
+                      src={user.profileImg.url}
                       alt="Profile"
                       className="w-4.5 h-4.5 rounded-full object-cover"
                     />
                   ) : (
                     <div className="w-4.5 h-4.5 rounded-full bg-accent/10 flex items-center justify-center">
                       <span className="text-accent font-bold text-[10px]">
-                        {user.partyName?.charAt(0)?.toUpperCase() || "U"}
+                        {user.fullName?.charAt(0)?.toUpperCase() || "U"}
                       </span>
                     </div>
                   )}

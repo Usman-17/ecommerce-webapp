@@ -12,22 +12,22 @@ import {
 
 import CustomInput from "../../../../../components/CustomInput";
 import { useUser, setUser } from "../../../../../hooks/useUser";
-import { uploadFile, apiRequest } from "../../../../../utils/authFetch";
 // Imports End-----
 
 const ProfileInfoDesktop = () => {
   const user = useUser();
 
   const [formData, setFormData] = useState({
-    partyName: user?.partyName || "",
+    fullName: user?.fullName || "",
     email: user?.email || "",
-    phoneNo1: user?.phoneNo1 || "",
+    mobile: user?.mobile || "",
   });
 
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [previewImage, setPreviewImage] = useState(user?.logoImageURL || null);
+  const [previewImage, setPreviewImage] = useState(
+    user?.profileImg?.url || null,
+  );
   const [pendingImageFile, setPendingImageFile] = useState(null);
 
   const handleChange = (e) => {
@@ -40,7 +40,7 @@ const ProfileInfoDesktop = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.partyName.trim()) newErrors.partyName = "Name is required";
+    if (!formData.fullName.trim()) newErrors.fullName = "Name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = "Enter a valid email";
@@ -57,7 +57,6 @@ const ProfileInfoDesktop = () => {
       return;
     }
 
-    // Just preview locally — upload happens on Save Changes
     setPendingImageFile(file);
     setPreviewImage(URL.createObjectURL(file));
   };
@@ -68,63 +67,27 @@ const ProfileInfoDesktop = () => {
 
     setIsSaving(true);
     try {
-      // Upload image first if a new one was selected
-      let logoImageURL = user?.logoImageURL || "";
-      let logoThumbImageURL = user?.logoThumbImageURL || "";
-
+      const body = new FormData();
+      body.append("fullName", formData.fullName);
+      body.append("mobile", formData.mobile);
       if (pendingImageFile) {
-        setIsUploading(true);
-        const formDataUpload = new FormData();
-        formDataUpload.append("File", pendingImageFile);
-        formDataUpload.append("UploadRequestFrom", "profile");
-        const imgRes = await uploadFile(
-          "/api/DBO/File/UploadFileWithThumb",
-          formDataUpload,
-        );
-        setIsUploading(false);
-        logoImageURL =
-          imgRes.data?.webPURL ||
-          imgRes.data?.imageURL ||
-          imgRes.data?.url ||
-          logoImageURL;
-        logoThumbImageURL =
-          imgRes.data?.thumbnailURL ||
-          imgRes.data?.thumbURL ||
-          logoThumbImageURL;
+        body.append("profileImg", pendingImageFile);
       }
 
-      const payload = {
-        partyId: user?.partyId || 0,
-        partyLocationId: user?.partyLocationId || 0,
-        addressId: user?.addressId || 0,
-        loginUserId: user?.loginUserId || user?.partyId || 0,
-        loginId: user?.loginId || user?.email || "",
-        partyName: formData.partyName,
-        phoneNo1: formData.phoneNo1,
-        email: formData.email,
-        logoImageURL,
-        logoThumbImageURL,
-        rowVersionLong: user?.rowVersionLong || 0,
-      };
-
-      await apiRequest("/api/CRM/CustomerWeb/Update", {
-        method: "POST",
-        body: JSON.stringify(payload),
+      const res = await fetch(`/api/auth/profile/update`, {
+        method: "PUT",
+        credentials: "include",
+        body,
       });
 
-      const updatedUser = {
-        ...user,
-        partyName: formData.partyName,
-        phoneNo1: formData.phoneNo1,
-        email: formData.email,
-        logoImageURL,
-        logoThumbImageURL,
-      };
-      setUser(updatedUser);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update profile");
+
+      setUser(data.user);
       setPendingImageFile(null);
+      setPreviewImage(data.user.profileImg?.url || previewImage);
       toast.success("Profile updated successfully!");
     } catch (err) {
-      setIsUploading(false);
       toast.error(err.message || "Failed to update profile");
     } finally {
       setIsSaving(false);
@@ -158,12 +121,12 @@ const ProfileInfoDesktop = () => {
               {previewImage ? (
                 <img
                   src={previewImage}
-                  alt={user.partyName}
+                  alt={user.fullName}
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <span className="text-2xl font-black text-[#CC0D39]">
-                  {user.partyName.charAt(0).toUpperCase()}
+                  {user.fullName?.charAt(0).toUpperCase()}
                 </span>
               )}
             </div>
@@ -171,11 +134,7 @@ const ProfileInfoDesktop = () => {
               htmlFor="profile-image-desktop"
               className="absolute bottom-0 right-0 w-7 h-7 bg-[#CC0D39] text-white rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-[#B00C31] transition-colors"
             >
-              {isUploading ? (
-                <Loader size={12} className="animate-spin" />
-              ) : (
-                <Camera size={12} />
-              )}
+              <Camera size={12} />
             </label>
             <input
               id="profile-image-desktop"
@@ -193,12 +152,12 @@ const ProfileInfoDesktop = () => {
         <form onSubmit={handleSubmit} className="flex-1 space-y-4">
           <CustomInput
             label="Full Name"
-            name="partyName"
-            value={formData.partyName}
+            name="fullName"
+            value={formData.fullName}
             onChange={handleChange}
             placeholder="Enter your name"
             icon={User}
-            error={errors.partyName}
+            error={errors.fullName}
             required
           />
 
@@ -218,13 +177,13 @@ const ProfileInfoDesktop = () => {
 
           <CustomInput
             label="Phone Number"
-            name="phoneNo1"
+            name="mobile"
             type="tel"
-            value={formData.phoneNo1}
+            value={formData.mobile}
             onChange={handleChange}
             placeholder="Enter your phone number"
             icon={Phone}
-            error={errors.phoneNo1}
+            error={errors.mobile}
           />
 
           <div className="flex items-center gap-3 p-4 bg-[#FFF0F0] rounded-lg border border-[#CC0D39]/10 mt-6">
@@ -240,10 +199,10 @@ const ProfileInfoDesktop = () => {
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              disabled={isSaving || isUploading}
+              disabled={isSaving}
               className="py-3 px-8 bg-[#CC0D39] text-white rounded-md text-sm font-bold hover:bg-[#B00C31] transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {isSaving || isUploading ? (
+              {isSaving ? (
                 <>
                   <Loader size={16} className="animate-spin" />
                   Saving...

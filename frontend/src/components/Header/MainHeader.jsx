@@ -210,16 +210,16 @@ const MainHeader = ({ isSearchOpen, setIsSearchOpen, setIsAuthOpen }) => {
               className="hidden lg:flex items-center justify-center rounded-full overflow-hidden w-9 h-9 hover:opacity-80 transition-opacity duration-200 ml-2"
               aria-label="Your profile"
             >
-              {user.logoImageURL ? (
+              {user.profileImg?.url ? (
                 <img
-                  src={user.logoImageURL}
+                  src={user.profileImg.url}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />
               ) : (
                 <div className="w-full h-full bg-accent/10 flex items-center justify-center">
                   <span className="text-accent font-bold text-sm">
-                    {user.partyName?.charAt(0)?.toUpperCase() || "U"}
+                    {user.fullName?.charAt(0)?.toUpperCase() || "U"}
                   </span>
                 </div>
               )}

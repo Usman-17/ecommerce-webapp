@@ -19,7 +19,7 @@ const ProfileHeader = () => {
         <div className="flex justify-between items-center">
           <div className="flex-1">
             <span className="text-[14px] font-black text-[#E14A5C] flex items-center gap-2">
-              Hi {user ? user.partyName?.split(" ")[0] : "there"}!{" "}
+              Hi {user ? user.fullName?.split(" ")[0] : "there"}!{" "}
               <span className="text-lg">👋</span>
             </span>
 

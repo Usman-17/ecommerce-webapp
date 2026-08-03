@@ -3,8 +3,6 @@ import { useState, useMemo } from "react";
 import { Lock, Loader, Save } from "lucide-react";
 
 import { useUser } from "../../../../../hooks/useUser";
-import { apiRequest } from "../../../../../utils/authFetch";
-
 import CustomInput from "../../../../../components/CustomInput";
 // Imports End-----
 
@@ -73,14 +71,18 @@ const ChangePassword = () => {
 
     setIsSaving(true);
     try {
-      await apiRequest("/api/CRM/CustomerWeb/ChangePassword", {
-        method: "POST",
+      const res = await fetch(`/api/auth/profile/update`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: user?.partyId,
-          ...(isGoogleUser ? {} : { oldPassword: formData.currentPassword }),
+          currentPassword: formData.currentPassword,
           newPassword: formData.newPassword,
         }),
       });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to change password");
 
       toast.success("Password changed successfully!");
     } catch (err) {

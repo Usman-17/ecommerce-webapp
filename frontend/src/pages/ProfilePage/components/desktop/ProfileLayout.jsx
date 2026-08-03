@@ -76,22 +76,22 @@ const ProfileLayout = () => {
             {/* User Info */}
             <div className="text-center mb-6">
               <div className="w-20 h-20 mx-auto mb-3 rounded-full bg-linear-to-br from-[#FFE8D6] to-[#FFD6BA] flex items-center justify-center overflow-hidden">
-                {user?.logoImageURL ? (
+                {user?.profileImg?.url ? (
                   <img
-                    src={user.logoImageURL}
-                    alt={user.partyName}
+                    src={user.profileImg.url}
+                    alt={user.fullName}
                     className="w-full h-full object-cover"
                   />
-                ) : user?.partyName ? (
+                ) : user?.fullName ? (
                   <span className="text-3xl font-black text-[#CC0D39]">
-                    {user.partyName.charAt(0).toUpperCase()}
+                    {user.fullName.charAt(0).toUpperCase()}
                   </span>
                 ) : (
                   <User size={32} className="text-[#CC0D39]" />
                 )}
               </div>
               <h3 className="text-base font-black text-gray-900">
-                {user?.partyName}
+                {user?.fullName}
               </h3>
               <p className="text-xs text-gray-400 font-medium mt-0.5">
                 {user?.email}

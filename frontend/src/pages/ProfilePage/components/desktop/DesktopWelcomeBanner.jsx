@@ -6,7 +6,7 @@ const DesktopWelcomeBanner = ({ user }) => {
 
       <div className="relative z-10">
         <span className="text-sm font-bold text-[#CC0D39]">
-          Hi, {user?.partyName?.split(" ")[0] || "there"} 👋
+          Hi, {user?.fullName?.split(" ")[0] || "there"} 👋
         </span>
 
         <h1 className="text-3xl font-black text-gray-900 mt-1">

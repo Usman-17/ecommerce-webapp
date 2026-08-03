@@ -68,7 +68,23 @@ const ForgotPasswordPage = lazy(
 );
 const ResetPasswordPage = lazy(() => import("./pages/Auth/ResetPasswordPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage"));
+const ProfileInfoDesktop = lazy(
+  () =>
+    import("./pages/ProfilePage/components/desktop/AccountSettings/ProfileInfoDesktop"),
+);
+const ProfileInfoPage = lazy(
+  () =>
+    import("./pages/ProfilePage/components/mobile/AccountSettings/ProfileInfo"),
+);
 const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage/MyOrdersPage"));
+const AccountSettingsLayout = lazy(
+  () =>
+    import("./pages/ProfilePage/components/desktop/AccountSettings/AccountSettingsLayout"),
+);
+const ChangePassword = lazy(
+  () =>
+    import("./pages/ProfilePage/components/mobile/AccountSettings/ChangePassword"),
+);
 // imports End----
 
 const ScrollToTop = () => {
@@ -172,7 +188,15 @@ const App = () => {
                     }
                   >
                     <Route index element={<ProfilePage />} />
+                    <Route path="info" element={<ProfileInfoPage />} />
                     <Route path="orders" element={<MyOrdersPage />} />
+                    <Route
+                      path="account-settings"
+                      element={<AccountSettingsLayout />}
+                    >
+                      <Route index element={<ProfileInfoDesktop />} />
+                      <Route path="security" element={<ChangePassword />} />
+                    </Route>
                   </Route>
 
                   {/* Auth */}
