@@ -2,8 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Loader } from "lucide-react";
-
-import { apiRequest } from "../../../utils/authFetch";
+import { useQueryClient } from "@tanstack/react-query";
 
 import CustomInput from "../../../components/CustomInput";
 import GoogleButton from "../../../components/GoogleButton";
@@ -11,6 +10,8 @@ import GoogleButton from "../../../components/GoogleButton";
 
 const LoginForm = ({ onSwitchToSignup, onForgotPassword }) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -42,18 +43,22 @@ const LoginForm = ({ onSwitchToSignup, onForgotPassword }) => {
 
     setIsLoading(true);
     try {
-      const res = await apiRequest("/api/CRM/CustomerWeb/SignIn", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          loginId: formData.email,
-          loginPassword: formData.password,
+          email: formData.email,
+          password: formData.password,
         }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Login failed");
       localStorage.setItem(
         "user",
-        JSON.stringify({ ...res.data, loginProvider: "email" }),
+        JSON.stringify({ ...data, loginProvider: "email" }),
       );
       window.dispatchEvent(new Event("userUpdated"));
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
       navigate("/profile");
     } catch (error) {
       toast.error(error.message || "Something went wrong", { id: "auth" });
@@ -65,15 +70,19 @@ const LoginForm = ({ onSwitchToSignup, onForgotPassword }) => {
   const handleGoogleSuccess = async (credentialResponse) => {
     setIsLoading(true);
     try {
-      const res = await apiRequest("/api/CRM/CustomerWeb/GoogleSignUp", {
+      const res = await fetch("/api/auth/google", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken: credentialResponse.credential }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Google sign-in failed");
       localStorage.setItem(
         "user",
-        JSON.stringify({ ...res.data, loginProvider: "google" }),
+        JSON.stringify({ ...data, loginProvider: "google" }),
       );
       window.dispatchEvent(new Event("userUpdated"));
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
       toast.success("Signed in successfully!", { id: "auth" });
       navigate("/profile");
     } catch (error) {
@@ -165,7 +174,7 @@ const LoginForm = ({ onSwitchToSignup, onForgotPassword }) => {
 
       {/* Switch to Signup */}
       <p className="text-center text-sm text-gray-500 font-medium mt-6">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <button
           onClick={onSwitchToSignup}
           className="text-accent font-bold hover:text-accent/80 transition-colors"

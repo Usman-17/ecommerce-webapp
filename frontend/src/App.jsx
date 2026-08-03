@@ -169,11 +169,7 @@ const App = () => {
 
                   <Route
                     path="/profile"
-                    element={
-                      <ProtectedRoute>
-                        <ProfileLayout />
-                      </ProtectedRoute>
-                    }
+                    element={<ProfileLayout />}
                   >
                     <Route index element={<ProfilePage />} />
                     <Route path="info" element={<ProfileInfoPage />} />

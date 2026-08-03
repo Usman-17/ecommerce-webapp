@@ -1,22 +1,17 @@
 import toast from "react-hot-toast";
 import { useState, useRef, useEffect } from "react";
-import {
-  Loader,
-  Mail,
-  CheckCircle,
-  ArrowRight,
-  Inbox,
-} from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Loader, Mail, CheckCircle, ArrowRight, Inbox } from "lucide-react";
 
 import CustomInput from "./CustomInput";
 import GoogleButton from "./GoogleButton";
-
 
 import logo from "../assets/logo.webp";
 import { useAnalytics } from "../hooks/useAnalytics";
 // Imports End-----
 
 const AuthModal = ({ isOpen, onClose }) => {
+  const queryClient = useQueryClient();
   const [view, setView] = useState("login");
   const [formData, setFormData] = useState({
     email: "",
@@ -51,6 +46,7 @@ const AuthModal = ({ isOpen, onClose }) => {
       trackLogin("google");
       toast.success("Signed in successfully!", { id: "auth" });
       onClose();
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     } catch (error) {
       toast.error(error.message || "Something went wrong", { id: "auth" });
     } finally {
@@ -207,6 +203,7 @@ const AuthModal = ({ isOpen, onClose }) => {
         trackLogin("email");
         toast.success("Signed in successfully!", { id: "auth" });
         onClose();
+        queryClient.invalidateQueries({ queryKey: ["authUser"] });
         window.dispatchEvent(new Event("userUpdated"));
       } else if (view === "signup") {
         const res = await fetch("/api/auth/signup", {
@@ -346,7 +343,7 @@ const AuthModal = ({ isOpen, onClose }) => {
               </form>
 
               <p className="text-center text-sm text-gray-500 font-medium mt-6">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <button
                   onClick={() => switchView("signup")}
                   className="text-accent font-bold hover:text-accent/80 transition-colors"
@@ -474,8 +471,8 @@ const AuthModal = ({ isOpen, onClose }) => {
                 </h1>
 
                 <p className="text-xs text-gray-500 font-medium max-w-xs mx-auto leading-relaxed">
-                  No worries! Enter your email and we'll send you a secure link
-                  to reset your password.
+                  No worries! Enter your email and we&apos;ll send you a secure
+                  link to reset your password.
                 </p>
               </div>
 
@@ -491,7 +488,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                         Reset link sent!
                       </p>
                       <p className="text-xs text-green-600 mt-1">
-                        We've sent a password reset link to{" "}
+                        We&apos;ve sent a password reset link to{" "}
                         <span className="font-semibold">{formData.email}</span>.
                         Check your inbox.
                       </p>
@@ -537,8 +534,8 @@ const AuthModal = ({ isOpen, onClose }) => {
                       className="text-green-500 shrink-0"
                     />
                     <p className="text-[11px] text-gray-400 font-medium">
-                      We'll only use your email to send you a password reset
-                      link.
+                      We&apos;ll only use your email to send you a password
+                      reset link.
                     </p>
                   </div>
 

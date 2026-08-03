@@ -1,9 +1,7 @@
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, User, Phone, Loader, Camera } from "lucide-react";
-
-import { apiRequest, uploadFile } from "../../../utils/authFetch";
+import { Mail, Lock, User, Phone, Loader } from "lucide-react";
 
 import CustomInput from "../../../components/CustomInput";
 // Imports End-----
@@ -20,29 +18,12 @@ const SignupForm = ({ onSwitchToLogin }) => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
-  const [profilePreview, setProfilePreview] = useState(null);
-  const fileInputRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Image size must be less than 2MB");
-        return;
-      }
-      setProfileImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setProfilePreview(reader.result);
-      reader.readAsDataURL(file);
     }
   };
 
@@ -71,32 +52,18 @@ const SignupForm = ({ onSwitchToLogin }) => {
     if (!validate()) return;
     setIsLoading(true);
     try {
-      let logoImageURL = "";
-      let logoThumbImageURL = "";
-      if (profileImage) {
-        const imageForm = new FormData();
-        imageForm.append("File", profileImage);
-        imageForm.append("UploadRequestFrom", "signup");
-        const imgRes = await uploadFile(
-          "/api/DBO/File/UploadFileWithThumb",
-          imageForm,
-        );
-        logoImageURL = imgRes.data.fileURL || "";
-        logoThumbImageURL = imgRes.data.thumbnailURL || "";
-      }
-      await apiRequest("/api/CRM/Customer/SignUp", {
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          partyName: formData.name,
-          phoneNo1: formData.phone,
+          fullName: formData.name,
           email: formData.email,
-          logoImageURL,
-          logoThumbImageURL,
-          loginId: formData.email,
-          loginPassword: formData.password,
-          rowVersionLong: 0,
+          password: formData.password,
+          mobile: formData.phone,
         }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Signup failed");
       toast.success("Account created successfully! Please sign in.", {
         id: "auth",
       });
@@ -122,40 +89,6 @@ const SignupForm = ({ onSwitchToLogin }) => {
 
       {/* Signup Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Profile Image Upload */}
-        <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current.click()}
-            className="relative w-18 h-18 rounded-full bg-linear-to-br from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 hover:border-accent hover:bg-accent/5 transition-all duration-300 overflow-hidden group"
-          >
-            {profilePreview ? (
-              <img
-                src={profilePreview}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full">
-                <Camera
-                  size={20}
-                  className="text-gray-400 group-hover:text-accent transition-colors duration-300"
-                />
-              </div>
-            )}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-full">
-              <Camera size={18} className="text-white" />
-            </div>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="hidden"
-          />
-        </div>
-
         <CustomInput
           label="Full Name"
           name="name"

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Mail, Loader, ArrowRight, CheckCircle, Inbox } from "lucide-react";
 
 import CustomInput from "../../../components/CustomInput";
-import { apiRequest } from "../../../utils/authFetch";
 import inboxImage from "../../../assets/inbox.webp";
 // Imports End-----
 
@@ -24,10 +23,13 @@ const ForgotPassword = ({ onBackToLogin }) => {
     }
     setIsLoading(true);
     try {
-      await apiRequest(
-        `/api/CRM/CustomerWeb/ForgetPassword?LoginId=${encodeURIComponent(email)}`,
-        { method: "GET" },
-      );
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
       setIsSent(true);
     } catch (err) {
       setError(err.message || "Something went wrong");
@@ -51,7 +53,7 @@ const ForgotPassword = ({ onBackToLogin }) => {
               Reset link sent!
             </h1>
             <p className="text-sm text-gray-500 font-medium mb-6 max-w-xs mx-auto">
-              We've sent a password reset link to{" "}
+              We&apos;ve sent a password reset link to{" "}
               <span className="font-semibold text-gray-900">{email}</span>.
               Check your inbox.
             </p>
@@ -85,8 +87,8 @@ const ForgotPassword = ({ onBackToLogin }) => {
                 Forgot Password?
               </h1>
               <p className="text-xs text-gray-500 font-medium max-w-xs mx-auto leading-relaxed">
-                No worries! Enter your email and we'll send you a secure link to
-                reset your password.
+                No worries! Enter your email and we&apos;ll send you a secure
+                link to reset your password.
               </p>
             </div>
 
@@ -109,7 +111,8 @@ const ForgotPassword = ({ onBackToLogin }) => {
               <div className="flex items-center gap-2 ml-1">
                 <CheckCircle size={14} className="text-green-500 shrink-0" />
                 <p className="text-[10px] text-gray-400 font-medium">
-                  We'll only use your email to send you a password reset link.
+                  We&apos;ll only use your email to send you a password reset
+                  link.
                 </p>
               </div>
 
