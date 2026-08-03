@@ -2,9 +2,12 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { v2 as cloudinary } from "cloudinary";
+import { OAuth2Client } from "google-auth-library";
 
 import { generateToken } from "../utils/generateToken.js";
 import { sendEmail } from "../utils/sendEmail.js";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const MAX_LOGIN_ATTEMPTS = parseInt(process.env.MAX_LOGIN_ATTEMPTS || "5");
 const LOCK_TIME = parseInt(process.env.LOCK_TIME || "900000");
@@ -88,7 +91,7 @@ export const userLogin = async (req, res) => {
     if (!email || !password)
       return res.status(400).json({ error: "Email and Password are required" });
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user)
       return res.status(400).json({ error: "Invalid email or password" });
@@ -172,7 +175,9 @@ export const updateProfile = async (req, res) => {
   try {
     const { fullName, mobile, currentPassword, newPassword } = req.body;
 
-    const user = await User.findById(req.user.id).select("-role -cart");
+    const user = await User.findById(req.user.id).select(
+      "-role -cart +password",
+    );
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -352,5 +357,61 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Error in resetPassword:", error.message);
     res.status(500).json({ error: error.message });
+  }
+};
+
+// PATH     : /api/auth/google
+// METHOD   : POST
+// ACCESS   : PUBLIC
+// DESC     : Google OAuth Login/Signup
+export const googleAuth = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ error: "Google ID token is required" });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture } = payload;
+
+    let user = await User.findOne({ email }).select("+password");
+
+    if (user) {
+      if (user.loginProvider !== "google") {
+        user.loginProvider = "google";
+        user.profileImg = user.profileImg?.url
+          ? user.profileImg
+          : picture
+            ? { url: picture }
+            : user.profileImg;
+        await user.save();
+      }
+    } else {
+      user = await User.create({
+        fullName: name,
+        email,
+        loginProvider: "google",
+        profileImg: picture ? { url: picture } : undefined,
+      });
+    }
+
+    generateToken(user._id, res);
+
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      mobile: user.mobile,
+      profileImg: user.profileImg,
+    });
+  } catch (error) {
+    console.error("Error in googleAuth controller:", error.message);
+    res.status(500).json({ error: "Google authentication failed" });
   }
 };

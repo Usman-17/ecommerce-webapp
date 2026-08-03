@@ -4,6 +4,7 @@ const router = express.Router();
 import {
   forgotPassword,
   getUser,
+  googleAuth,
   logout,
   resetPassword,
   signup,
@@ -15,6 +16,7 @@ import { protectRoute } from "../middlewares/authMiddleware.js";
 // Auth routes
 router.post("/signup", signup);
 router.post("/login", userLogin);
+router.post("/google", googleAuth);
 router.post("/logout", logout);
 router.post("/forgot-password", forgotPassword);
 router.put("/reset-password/:token", resetPassword);

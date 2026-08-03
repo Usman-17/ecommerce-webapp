@@ -16,16 +16,20 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: true,
+      select: false,
       minLength: 6,
     },
 
     mobile: {
       type: String,
-      required: [true, "Mobile number is required."],
       unique: true,
-      minlength: 11,
-      maxlength: 11,
+      sparse: true,
+    },
+
+    loginProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
     },
 
     role: {
