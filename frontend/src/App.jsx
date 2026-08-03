@@ -53,6 +53,7 @@ const PrivacyPolicyPage = lazy(
   () => import("./pages/PrivacyPolicyPage/PrivacyPolicyPage"),
 );
 const FAQsPage = lazy(() => import("./pages/FAQsPage/FAQsPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage/TermsPage"));
 
 const TrackOrderPage = lazy(
   () => import("./pages/TrackOrderPage/TrackOrderPage"),
@@ -135,6 +136,7 @@ const App = () => {
                 <Route path="/about-us" element={<AboutUsPage />} />
                 <Route path="/contact-us" element={<ContactUsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
                 <Route path="/track-order" element={<TrackOrderPage />} />
 
                 <Route

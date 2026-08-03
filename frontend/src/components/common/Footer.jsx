@@ -97,7 +97,7 @@ const Footer = () => {
                   { name: "Track Order", path: "/track-order" },
                   { name: "Shipping Policy", path: "/shipping-policy" },
                   { name: "Returns & FAQ", path: "/faqs" },
-                  { name: "Contact Us", path: "/contact-us" },
+                  { name: "Terms & Conditions", path: "/terms" },
                 ].map((item) => (
                   <li key={item.name}>
                     <Link
