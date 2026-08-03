@@ -27,6 +27,7 @@ import useTrackPage from "./hooks/useTrackPage";
 import HomePage from "./pages/HomePage/HomePage";
 const ShopPage = lazy(() => import("./pages/ShopPage/ShopPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage/ProductPage"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage/CategoryPage"));
 const NewArrivalPage = lazy(
   () => import("./pages/NewArrivalPage/NewArrivalPage"),
 );
@@ -124,6 +125,7 @@ const App = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/shop" element={<ShopPage />} />
                 <Route path="/product/:slug" element={<ProductPage />} />
+                <Route path="/category" element={<CategoryPage />} />
                 <Route path="/new-arrivals" element={<NewArrivalPage />} />
                 <Route path="/best-sellers" element={<BestSellerPage />} />
                 <Route path="/deals" element={<DealsPage />} />
