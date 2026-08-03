@@ -1,6 +1,7 @@
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { HelmetProvider } from "react-helmet-async";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
 import {
   BrowserRouter,
@@ -106,112 +107,121 @@ const App = () => {
 
   return (
     <HelmetProvider>
-      <BrowserRouter>
-        <AnalyticsProvider>
-          <PageViewTracker />
-          <ScrollToTop />
-          <ScrollToTopButton />
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <BrowserRouter>
+          <AnalyticsProvider>
+            <PageViewTracker />
+            <ScrollToTop />
+            <ScrollToTopButton />
 
-          <div className="px-3">
-            <Header />
-            <Suspense
-              fallback={
-                <div className="flex items-center justify-center h-screen bg-[#fffaf5]">
-                  <Loader className="size-10 animate-spin text-primary" />
-                </div>
-              }
-            >
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/shop" element={<ShopPage />} />
-                <Route path="/product/:slug" element={<ProductPage />} />
-                <Route path="/category" element={<CategoryPage />} />
-                <Route path="/new-arrivals" element={<NewArrivalPage />} />
-                <Route path="/best-sellers" element={<BestSellerPage />} />
-                <Route path="/deals" element={<DealsPage />} />
-                <Route path="/deals/:slug" element={<DealDetailPage />} />
-                <Route path="/scoop" element={<ScoopPage />} />
-                <Route path="/wishlist" element={<WishlistPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/place-order" element={<PlaceOrderPage />} />
+            <div className="px-3">
+              <Header />
+              <Suspense
+                fallback={
+                  <div className="flex items-center justify-center h-screen bg-[#fffaf5]">
+                    <Loader className="size-10 animate-spin text-primary" />
+                  </div>
+                }
+              >
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/shop" element={<ShopPage />} />
+                  <Route path="/product/:slug" element={<ProductPage />} />
+                  <Route path="/category" element={<CategoryPage />} />
+                  <Route path="/new-arrivals" element={<NewArrivalPage />} />
+                  <Route path="/best-sellers" element={<BestSellerPage />} />
+                  <Route path="/deals" element={<DealsPage />} />
+                  <Route path="/deals/:slug" element={<DealDetailPage />} />
+                  <Route path="/scoop" element={<ScoopPage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/place-order" element={<PlaceOrderPage />} />
 
-                <Route path="/about-us" element={<AboutUsPage />} />
-                <Route path="/contact-us" element={<ContactUsPage />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-                <Route path="/terms" element={<TermsPage />} />
-                <Route path="/track-order" element={<TrackOrderPage />} />
+                  <Route path="/about-us" element={<AboutUsPage />} />
+                  <Route path="/contact-us" element={<ContactUsPage />} />
+                  <Route
+                    path="/privacy-policy"
+                    element={<PrivacyPolicyPage />}
+                  />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/track-order" element={<TrackOrderPage />} />
 
-                <Route
-                  path="/shipping-policy"
-                  element={<ShippingPolicyPage />}
-                />
-                <Route path="/faqs" element={<FAQsPage />} />
+                  <Route
+                    path="/shipping-policy"
+                    element={<ShippingPolicyPage />}
+                  />
+                  <Route path="/faqs" element={<FAQsPage />} />
 
-                <Route
-                  path="/order"
-                  element={
-                    authUser ? <MyOrdersPage /> : <Navigate to="/login" />
-                  }
-                />
+                  <Route
+                    path="/order"
+                    element={
+                      authUser ? <MyOrdersPage /> : <Navigate to="/login" />
+                    }
+                  />
 
-                <Route
-                  path="/profile"
-                  element={
-                    authUser ? <ProfilePage /> : <Navigate to="/login" />
-                  }
-                />
+                  <Route
+                    path="/profile"
+                    element={
+                      authUser ? <ProfilePage /> : <Navigate to="/login" />
+                    }
+                  />
 
-                {/* Auth */}
-                <Route
-                  path="/login"
-                  element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-                />
-                <Route
-                  path="/signup"
-                  element={!authUser ? <SignupPage /> : <Navigate to="/" />}
-                />
+                  {/* Auth */}
+                  <Route
+                    path="/login"
+                    element={!authUser ? <LoginPage /> : <Navigate to="/" />}
+                  />
+                  <Route
+                    path="/signup"
+                    element={!authUser ? <SignupPage /> : <Navigate to="/" />}
+                  />
 
-                <Route
-                  path="/forgot-password"
-                  element={
-                    !authUser ? (
-                      <ForgotPasswordPage />
-                    ) : (
-                      <Navigate to="/login" />
-                    )
-                  }
-                />
+                  <Route
+                    path="/forgot-password"
+                    element={
+                      !authUser ? (
+                        <ForgotPasswordPage />
+                      ) : (
+                        <Navigate to="/login" />
+                      )
+                    }
+                  />
 
-                <Route
-                  path="/reset-password/:token"
-                  element={
-                    !authUser ? <ResetPasswordPage /> : <Navigate to="/login" />
-                  }
-                />
-              </Routes>
-            </Suspense>
-          </div>
-          <Footer />
+                  <Route
+                    path="/reset-password/:token"
+                    element={
+                      !authUser ? (
+                        <ResetPasswordPage />
+                      ) : (
+                        <Navigate to="/login" />
+                      )
+                    }
+                  />
+                </Routes>
+              </Suspense>
+            </div>
+            <Footer />
 
-          <CartDrawer
-            isOpen={cartDrawerOpen}
-            onClose={() => setCartDrawerOpen(false)}
-          />
+            <CartDrawer
+              isOpen={cartDrawerOpen}
+              onClose={() => setCartDrawerOpen(false)}
+            />
 
-          <Toaster
-            position="bottom-center"
-            toastOptions={{
-              style: {
-                background: "#363636",
-                color: "#fffbfb",
-                fontFamily: "outfit",
-                fontSize: "13px",
-                padding: "8px 16px",
-              },
-            }}
-          />
-        </AnalyticsProvider>
-      </BrowserRouter>
+            <Toaster
+              position="bottom-center"
+              toastOptions={{
+                style: {
+                  background: "#363636",
+                  color: "#fffbfb",
+                  fontFamily: "outfit",
+                  fontSize: "13px",
+                  padding: "8px 16px",
+                },
+              }}
+            />
+          </AnalyticsProvider>
+        </BrowserRouter>
+      </GoogleOAuthProvider>
     </HelmetProvider>
   );
 };

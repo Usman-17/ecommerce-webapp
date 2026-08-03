@@ -101,7 +101,7 @@ const ShopPage = () => {
   })();
 
   return (
-    <div className="min-h-screen -mt-1.5 sm:mt-0 pb-10 sm:pb-4 sm:py-3 px-0 sm:px-[4vw] md:px-[2vw]">
+    <div className="min-h-screen -mt-1.5 sm:mt-0 pb-10 sm:pb-4 sm:py-3 px-0 sm:px-[4vw]">
       <SEO
         title="Shop - Jewelry, Makeup & Beauty, Hair Accessories"
         description="Browse our complete collection of jewelry, makeup & beauty products, and hair accessories. Find trending necklaces, bracelets, earrings, cosmetics and more at affordable prices."
