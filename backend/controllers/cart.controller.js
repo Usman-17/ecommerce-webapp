@@ -36,6 +36,12 @@ export const addToCart = async (req, res) => {
         return res.status(400).json({ error: "Invalid variant ID" });
       }
 
+      if (variant.isActive === false) {
+        return res
+          .status(400)
+          .json({ error: "This variant is no longer available" });
+      }
+
       if (!cartData[itemId]) {
         cartData[itemId] = {};
       }
@@ -90,6 +96,12 @@ export const updateCart = async (req, res) => {
       const variant = product.variants.id(variantId);
       if (!variant) {
         return res.status(400).json({ error: "Invalid variant ID" });
+      }
+
+      if (variant.isActive === false) {
+        return res
+          .status(400)
+          .json({ error: "This variant is no longer available" });
       }
 
       if (quantity === 0) {

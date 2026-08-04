@@ -23,6 +23,10 @@ const variantSchema = new mongoose.Schema(
       public_id: { type: String },
       url: { type: String },
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { _id: true },
 );
