@@ -25,6 +25,24 @@ export const protectRoute = async (req, res, next) => {
   }
 };
 
+export const optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies.jwt;
+
+    if (!token) return next();
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded) {
+      const user = await User.findById(decoded.userId).select("-password");
+      if (user) req.user = user;
+    }
+  } catch {
+    // Token invalid or expired — continue without user
+  }
+  next();
+};
+
 // Check User Is Admin
 export const isAdmin = (req, res, next) => {
   if (req.user?.role !== "admin") {

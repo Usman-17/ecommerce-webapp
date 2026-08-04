@@ -17,7 +17,8 @@ const generateTrackingNo = () => {
 export const placeOrder = async (req, res) => {
   try {
     const userId = req.user?._id || null;
-    const { cart, totalAmount, deliveryInfo, scoop, deal } = req.body;
+    const { cart, totalAmount, deliveryInfo, scoop, deal, shippingCharge } =
+      req.body;
 
     if (!cart || Object.keys(cart).length === 0) {
       return res
@@ -181,12 +182,17 @@ export const placeOrder = async (req, res) => {
       }
     }
 
-    // Save order
+    // Save order — for normal orders, compute amount server-side to stay consistent with item prices
+    const isNormalOrder = !scoop && !deal;
+    const computedAmount = isNormalOrder
+      ? orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+      : totalAmount;
     const orderData = {
       userId,
       trackingNo: generateTrackingNo(),
       items: orderItems,
-      amount: totalAmount,
+      amount: computedAmount,
+      shippingCharge: Number(shippingCharge) || 0,
       address: {
         firstName: deliveryInfo.firstName,
         lastName: deliveryInfo.lastName,
@@ -248,12 +254,7 @@ export const userOrders = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Find all orders associated with the user
     const orders = await Order.find({ userId }).sort({ createdAt: -1 });
-
-    if (!orders || orders.length === 0) {
-      return res.status(404).json({ error: "No orders found for this user" });
-    }
 
     res.json({ success: true, orders });
   } catch (error) {

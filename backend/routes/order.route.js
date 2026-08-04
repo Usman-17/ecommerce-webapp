@@ -1,5 +1,9 @@
 import express from "express";
-import { isAdmin, protectRoute } from "../middlewares/authMiddleware.js";
+import {
+  isAdmin,
+  protectRoute,
+  optionalAuth,
+} from "../middlewares/authMiddleware.js";
 import {
   allOrders,
   cancelWebOrder,
@@ -11,7 +15,7 @@ import {
 
 const router = express.Router();
 
-router.post("/place", placeOrder);
+router.post("/place", optionalAuth, placeOrder);
 router.get("/userorders", protectRoute, userOrders);
 router.put("/status/:id", protectRoute, updateOrderStatus);
 router.get("/track", trackOrder);

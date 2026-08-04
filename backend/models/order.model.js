@@ -43,6 +43,11 @@ const orderSchema = new mongoose.Schema(
       min: [0, "Amount cannot be negative"],
     },
 
+    shippingCharge: {
+      type: Number,
+      default: 0,
+    },
+
     address: {
       type: Object,
       required: true,
