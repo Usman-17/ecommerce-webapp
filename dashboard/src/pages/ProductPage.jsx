@@ -37,6 +37,7 @@ const tabs = [
 const emptyVariant = () => ({
   name: "",
   price: "",
+  isActive: true,
   images: [],
   imagePreviews: [],
   existingImages: [],
@@ -225,6 +226,7 @@ const ProductPage = () => {
               _id: v._id,
               name: v.name || "",
               price: v.price ?? "",
+              isActive: v.isActive !== false,
               images: [],
               imagePreviews: variantImages.map((img) => img.url),
               existingImages: variantImages,
@@ -305,6 +307,7 @@ const ProductPage = () => {
       const cleaned = {
         name: v.name,
         price: v.price !== "" ? Number(v.price) : undefined,
+        isActive: v.isActive !== false,
       };
       if (v._id) cleaned._id = v._id;
       if (v.existingImages.length > 0) {
@@ -454,7 +457,7 @@ const ProductPage = () => {
       key: "title",
       width: 300,
       render: (text) => (
-        <span className="block max-w-[300px] truncate" title={text}>
+        <span className="block max-w-[250px] truncate" title={text}>
           {text}
         </span>
       ),
@@ -814,15 +817,35 @@ const ProductPage = () => {
                       <span className="text-sm font-medium text-gray-700">
                         Variant {vi + 1}
                       </span>
-                      {variants.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeVariant(vi)}
-                          className="text-red-500 hover:text-red-400 cursor-pointer"
-                        >
-                          <X size={16} />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <span className="text-xs text-gray-500">Active</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleVariantChange(vi, "isActive", !variant.isActive)
+                            }
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                              variant.isActive ? "bg-green-500" : "bg-gray-300"
+                            }`}
+                          >
+                            <span
+                              className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+                                variant.isActive ? "translate-x-4.5" : "translate-x-0.5"
+                              }`}
+                            />
+                          </button>
+                        </label>
+                        {variants.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeVariant(vi)}
+                            className="text-red-500 hover:text-red-400 cursor-pointer"
+                          >
+                            <X size={16} />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
