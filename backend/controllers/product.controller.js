@@ -377,7 +377,9 @@ export const updateProduct = async (req, res) => {
 // DESC     : Get all products
 export const getAllproducts = async (req, res) => {
   try {
-    const products = await Product.find()
+    const products = await Product.find({
+      webLinks: { $exists: true, $not: { $size: 0 } },
+    })
       .populate("brand")
       .populate("category")
       .populate("subCategory")
