@@ -18,7 +18,6 @@ import ProductPrice from "./components/ProductPrice";
 import ProductImages from "./components/ProductImages";
 import ProductActions from "./components/ProductActions";
 import ProductOptions from "./components/ProductOptions";
-import ProductFeatures from "./components/ProductFeatures";
 import RelatedProducts from "./components/RelatedProducts";
 import ProductSkeleton from "./components/ProductSkeleton";
 import MobileActionBar from "./components/MobileActionBar";
@@ -415,15 +414,14 @@ const ProductPage = () => {
                   setTimeout(() => setShakeOptions(false), 500);
                 }}
               />
-
-              {/*  Features */}
-              <ProductFeatures />
             </div>
           </div>
         </div>
 
         {/* Tabs Section */}
-        <ProductReviews reviews={reviews} reviewsLoading={reviewsLoading} />
+        {reviews?.length > 0 && (
+          <ProductReviews reviews={reviews} reviewsLoading={reviewsLoading} />
+        )}
 
         {/* Related Products Section */}
         {relatedProductsCount > 0 && (
