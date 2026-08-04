@@ -107,8 +107,11 @@ const ScoopPage = () => {
     // Auto-select first variant for each product
     const initialVariants = {};
     productsWithIds.forEach((p) => {
-      if (p.variants?.length > 0) {
-        initialVariants[p._instanceId] = p.variants[0];
+      const activeVariants = (p.variants || []).filter(
+        (v) => v.isActive !== false,
+      );
+      if (activeVariants.length > 0) {
+        initialVariants[p._instanceId] = activeVariants[0];
       }
     });
     setSelectedVariants(initialVariants);

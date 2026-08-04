@@ -14,7 +14,7 @@ const ScoopProductCard = ({
 
   const instanceId = product._instanceId || product._id;
 
-  const variants = product.variants || [];
+  const variants = (product.variants || []).filter((v) => v.isActive !== false);
   const hasVariants = variants.length > 0;
 
   const allSelected = hasVariants ? !!selectedVariants?.[instanceId] : true;
@@ -69,7 +69,10 @@ const ScoopProductCard = ({
       >
         {allImages.length > 0 ? (
           <img
-            src={selectedVariants?.[instanceId]?.image?.url || allImages[currentImageIndex]}
+            src={
+              selectedVariants?.[instanceId]?.image?.url ||
+              allImages[currentImageIndex]
+            }
             alt={`${product.title} - Image ${currentImageIndex + 1}`}
             className="w-full h-full object-cover"
             loading="lazy"

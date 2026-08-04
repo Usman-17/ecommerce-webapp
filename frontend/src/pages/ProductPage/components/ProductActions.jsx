@@ -30,7 +30,8 @@ const ProductActions = ({
 
   const total = currentPrice * quantity;
 
-  const hasVariants = (product?.variants?.length || 0) > 0;
+  const hasVariants =
+    (product?.variants?.filter((v) => v.isActive !== false)?.length || 0) > 0;
 
   const handleAddToCart = () => {
     if (currentPrice <= 0) {

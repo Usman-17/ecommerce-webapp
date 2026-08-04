@@ -50,7 +50,8 @@ const MobileActionBar = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const hasVariants = (product?.variants?.length || 0) > 0;
+  const hasVariants =
+    (product?.variants?.filter((v) => v.isActive !== false)?.length || 0) > 0;
 
   const addToCartInternal = (qty, opts, pk) => {
     if (currentPrice <= 0) {

@@ -8,7 +8,10 @@ const ProductOptions = ({
   shakeOptions,
   setShakeOptions,
 }) => {
-  const variants = useMemo(() => product?.variants || [], [product]);
+  const variants = useMemo(
+    () => (product?.variants || []).filter((v) => v.isActive !== false),
+    [product],
+  );
 
   if (variants.length === 0) return null;
 

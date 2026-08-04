@@ -139,7 +139,9 @@ const ProductPage = () => {
   const matchedVariant = useMemo(() => {
     const selectedName = selectedOptions["variant"];
     if (!selectedName || !product?.variants) return null;
-    return product.variants.find((v) => v.name === selectedName);
+    return product.variants
+      .filter((v) => v.isActive !== false)
+      .find((v) => v.name === selectedName);
   }, [product, selectedOptions]);
 
   const activeVariantImage = matchedVariant?.image?.url || null;
@@ -252,7 +254,9 @@ const ProductPage = () => {
           images: images.map((img) => img.url).filter(Boolean),
           price: matchedVariant?.price || product.price,
           currency: "PKR",
-          inStock: (product.variants?.length || 0) > 0,
+          inStock:
+            (product.variants?.filter((v) => v.isActive !== false)?.length ||
+              0) > 0,
           brand: "Jemzy",
         }}
       />

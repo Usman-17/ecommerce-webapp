@@ -20,7 +20,7 @@ const ScoopSummary = ({
   const totalProducts = scoopProducts.length;
   const readyCount = scoopProducts.filter((p) => {
     const instanceId = p._instanceId || p.productId;
-    const variants = p.variants || [];
+    const variants = (p.variants || []).filter((v) => v.isActive !== false);
     if (variants.length === 0) return true;
     return !!selectedVariants?.[instanceId];
   }).length;

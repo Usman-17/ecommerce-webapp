@@ -49,8 +49,11 @@ const DealDetailPage = () => {
     if (deal?.products) {
       const initial = {};
       deal.products.forEach((product) => {
-        if (product.variants?.length > 0) {
-          initial[product._id] = product.variants[0];
+        const activeVariants = (product.variants || []).filter(
+          (v) => v.isActive !== false,
+        );
+        if (activeVariants.length > 0) {
+          initial[product._id] = activeVariants[0];
         }
       });
       setSelectedVariants(initial);
@@ -107,7 +110,9 @@ const DealDetailPage = () => {
   };
 
   const allVariantsSelected = deal.products?.every(
-    (p) => !p.variants?.length || selectedVariants[p._id],
+    (p) =>
+      !(p.variants || []).filter((v) => v.isActive !== false).length ||
+      selectedVariants[p._id],
   );
 
   const handleBuyNow = () => {
@@ -355,7 +360,7 @@ const DealDetailPage = () => {
         deal.products.length > 0 &&
         (() => {
           const productsWithVariants = deal.products.filter(
-            (p) => p.variants?.length > 0,
+            (p) => (p.variants || []).filter((v) => v.isActive !== false).length > 0,
           );
           const selectedCount = productsWithVariants.filter(
             (p) => selectedVariants[p._id],
@@ -391,7 +396,10 @@ const DealDetailPage = () => {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
                 {deal.products.map((product) => {
-                  const hasVariants = product.variants?.length > 0;
+                  const activeVariants = (product.variants || []).filter(
+                    (v) => v.isActive !== false,
+                  );
+                  const hasVariants = activeVariants.length > 0;
                   const isSelected = !!selectedVariants[product._id];
                   return (
                     <div
@@ -433,7 +441,7 @@ const DealDetailPage = () => {
 
                         {hasVariants ? (
                           <div className="flex flex-wrap gap-1">
-                            {product.variants.map((variant) => {
+                            {activeVariants.map((variant) => {
                               const isVarSelected =
                                 selectedVariants[product._id]?._id ===
                                 variant._id;

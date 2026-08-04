@@ -205,26 +205,30 @@ const QuickViewContent = ({
         )}
 
         {/* Variants */}
-        {displayProduct.variants && displayProduct.variants.length > 0 && (
-          <div className="space-y-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-              Variants
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {displayProduct.variants.map((variant, idx) => (
-                <div
-                  key={idx}
-                  className="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-700 bg-gray-50"
-                >
-                  {variant.name}
-                  {variant.price
-                    ? ` — Rs ${variant.price.toLocaleString()}`
-                    : ""}
-                </div>
-              ))}
+        {displayProduct.variants &&
+          displayProduct.variants.filter((v) => v.isActive !== false).length >
+            0 && (
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                Variants
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {displayProduct.variants
+                  .filter((v) => v.isActive !== false)
+                  .map((variant, idx) => (
+                    <div
+                      key={idx}
+                      className="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-700 bg-gray-50"
+                    >
+                      {variant.name}
+                      {variant.price
+                        ? ` — Rs ${variant.price.toLocaleString()}`
+                        : ""}
+                    </div>
+                  ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </>
   );
