@@ -166,6 +166,7 @@ const App = () => {
 
                     <Route path="addresses" element={<AddressPage />} />
                     <Route path="address/edit" element={<AddressForm />} />
+                    <Route path="security" element={<ChangePassword />} />
                     <Route
                       path="account-settings"
                       element={<AccountSettingsLayout />}
