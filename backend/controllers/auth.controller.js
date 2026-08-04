@@ -386,19 +386,18 @@ export const googleAuth = async (req, res) => {
     if (user) {
       if (user.loginProvider !== "google") {
         user.loginProvider = "google";
-        user.profileImg = user.profileImg?.url
-          ? user.profileImg
-          : picture
-            ? { url: picture }
-            : user.profileImg;
-        await user.save();
       }
+      if (picture) {
+        user.profileImg = { url: picture };
+        user.markModified("profileImg");
+      }
+      await user.save();
     } else {
       user = await User.create({
         fullName: name,
         email,
         loginProvider: "google",
-        profileImg: picture ? { url: picture } : undefined,
+        profileImg: { url: picture || "" },
       });
     }
 
@@ -409,7 +408,9 @@ export const googleAuth = async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       mobile: user.mobile,
-      profileImg: user.profileImg,
+      profileImg: user.profileImg?.url
+        ? user.profileImg
+        : { url: picture || "" },
     });
   } catch (error) {
     console.error("Error in googleAuth controller:", error.message);
