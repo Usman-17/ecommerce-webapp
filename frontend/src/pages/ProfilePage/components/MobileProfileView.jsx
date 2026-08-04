@@ -55,11 +55,13 @@ const MobileProfileView = () => {
           </div>
         ) : (
           <div className="columns-2 sm:columns-2 gap-1.5 space-y-3">
-            {products?.map((product) => (
-              <div key={product.productId} className="break-inside-avoid">
-                <ProductCard product={product} />
-              </div>
-            ))}
+            {products
+              ?.filter((p) => p.webLinks?.length > 0)
+              ?.map((product) => (
+                <div key={product._id} className="break-inside-avoid">
+                  <ProductCard product={product} />
+                </div>
+              ))}
           </div>
         )}
       </div>
