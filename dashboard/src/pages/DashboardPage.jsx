@@ -16,19 +16,19 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="flex flex-col gap-4">
           <Card
-            title="Customers"
-            value={users.length.toString()}
-            icon={Users}
-            badgeIcon={TrendingUp}
-            percentage="11.01"
-          />
-
-          <Card
             title="Orders"
             value={orders.length.toString()}
             icon={Package}
             badgeIcon={TrendingUp}
             percentage="9.05"
+          />
+
+          <Card
+            title="Customers"
+            value={users.length.toString()}
+            icon={Users}
+            badgeIcon={TrendingUp}
+            percentage="11.01"
           />
         </div>
 

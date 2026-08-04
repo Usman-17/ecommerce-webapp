@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import moment from "moment";
+
 const RecentOrders = ({ orders }) => {
   return (
     <div className="overflow-x-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 sm:px-6">
@@ -23,6 +25,7 @@ const RecentOrders = ({ orders }) => {
               <th className="px-6 py-3">Amount</th>
               <th className="px-6 py-3">Payment</th>
               <th className="px-6 py-3">Status</th>
+              <th className="px-6 py-3">Date</th>
             </tr>
           </thead>
           <tbody>
@@ -58,6 +61,9 @@ const RecentOrders = ({ orders }) => {
                   >
                     {order.status}
                   </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {moment(order.date).format("DD MMM YYYY, hh:mm A")}
                 </td>
               </tr>
             ))}
