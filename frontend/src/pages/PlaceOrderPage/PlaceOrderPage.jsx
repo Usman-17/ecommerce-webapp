@@ -19,6 +19,7 @@ import {
 } from "../../services/storageService";
 
 import useEcommerce from "../../hooks/useEcommerce";
+import { useUser } from "../../hooks/useUser";
 
 import DeliveryInfo from "./components/DeliveryInfo";
 import OrderSummary from "./components/OrderSummary";
@@ -34,6 +35,7 @@ import DeliveryTypeSelector from "./components/DeliveryTypeSelector";
 const PlaceOrderPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const authUser = useUser();
 
   const { trackBeginCheckout, trackPurchase } = useEcommerce();
 
@@ -166,6 +168,7 @@ const PlaceOrderPage = () => {
       const payload = {
         cart,
         totalAmount: total,
+        shippingCharge: shippingFee,
         deliveryInfo: {
           firstName: values.userName?.split(" ")[0] || values.userName,
           lastName: values.userName?.split(" ").slice(1).join(" ") || "",
@@ -396,6 +399,18 @@ const PlaceOrderPage = () => {
         addresses.find((addr) => addr.isDefault) || addresses[0];
       const id = setTimeout(() => setSelectedAddress(defaultAddr), 0);
       return () => clearTimeout(id);
+    }
+
+    // No saved addresses — auto-fill from logged-in user profile
+    if (authUser) {
+      formik.setValues({
+        userName: authUser.fullName || "",
+        contactEmail: authUser.email || "",
+        contactAddress: "",
+        city: "",
+        contactNo: authUser.mobile || "",
+        saleRemarks: "",
+      });
     }
   }, []);
 

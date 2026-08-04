@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState, useRef, useCallback } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 
@@ -8,16 +9,15 @@ import EmptyOrders from "./EmptyOrders";
 const TABS = ["All", "Processing", "Shipped", "Delivered", "Cancelled"];
 
 const DesktopOrders = () => {
-  const [orders] = useState(() => {
-    const storedOrders = localStorage.getItem("orders");
-    if (storedOrders) {
-      try {
-        return JSON.parse(storedOrders);
-      } catch {
-        return [];
-      }
-    }
-    return [];
+  const { data: orders = [] } = useQuery({
+    queryKey: ["userOrders"],
+    queryFn: async () => {
+      const res = await fetch("/api/order/userorders", {
+        credentials: "include",
+      });
+      if (!res.ok) return [];
+      return (await res.json())?.orders || [];
+    },
   });
 
   const [activeTab, setActiveTab] = useState("All");
@@ -44,16 +44,23 @@ const DesktopOrders = () => {
     [activeTab],
   );
 
+  const matchesTab = (status, tab) => {
+    const s = status?.toLowerCase() || "";
+    const t = tab.toLowerCase();
+    if (t === "processing")
+      return s === "processing" || s === "packing" || s === "order placed";
+    if (t === "shipped") return s === "shipped" || s === "out for delivery";
+    return s === t;
+  };
+
   const getCount = (tab) => {
     if (tab === "All") return orders.length;
-    return orders.filter(
-      (order) => order.status?.toLowerCase() === tab.toLowerCase(),
-    ).length;
+    return orders.filter((order) => matchesTab(order.status, tab)).length;
   };
 
   const filteredOrders = orders.filter((order) => {
     if (activeTab === "All") return true;
-    return order.status?.toLowerCase() === activeTab.toLowerCase();
+    return matchesTab(order.status, activeTab);
   });
 
   return (
@@ -86,31 +93,32 @@ const DesktopOrders = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex flex-col px-6 pb-6 min-h-0">
-          {filteredOrders.length === 0 ? (
-            <EmptyOrders />
-          ) : (
+        <div className="flex-1 flex flex-col px-6 pb-6 min-h-0 overflow-hidden">
+          <AnimatePresence mode="wait">
             <Motion.div
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              key={activeTab}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
-              <AnimatePresence mode="popLayout">
-                {filteredOrders.map((order, index) => (
+              {filteredOrders.length === 0 ? (
+                <EmptyOrders />
+              ) : (
+                filteredOrders.map((order, index) => (
                   <Motion.div
-                    key={order.orderId || order.orderNo || index}
-                    initial={{ opacity: 0, y: 20 }}
+                    key={order.trackingNo || index}
+                    initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * 0.04, duration: 0.25 }}
                   >
                     <OrderItem order={order} />
                   </Motion.div>
-                ))}
-              </AnimatePresence>
+                ))
+              )}
             </Motion.div>
-          )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

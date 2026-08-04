@@ -74,7 +74,8 @@ const TrackingResultMobile = ({
                 Total
               </p>
               <p className="text-[11px] text-primary font-black truncate">
-                Rs. {order.amount?.toLocaleString()}
+                Rs.{" "}
+                {(order.amount + (order.shippingCharge || 0))?.toLocaleString()}
               </p>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Package,
   Heart,
@@ -27,13 +27,23 @@ const DesktopProfileView = () => {
   const { wishlist } = useWishlist();
   const { recentlyViewed } = useRecentlyViewed();
 
-  const [orders] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("orders")) || [];
-    } catch {
-      return [];
-    }
-  });
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setOrdersLoading(true);
+    fetch("/api/order/userorders", { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then((data) => {
+        setOrders(data?.orders || []);
+      })
+      .catch(() => setOrders([]))
+      .finally(() => setOrdersLoading(false));
+  }, [user]);
 
   const [reviews] = useState(() => {
     try {

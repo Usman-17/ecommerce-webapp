@@ -54,26 +54,18 @@ const TermsPage = lazy(() => import("./pages/TermsPage/TermsPage"));
 const TrackOrderPage = lazy(
   () => import("./pages/TrackOrderPage/TrackOrderPage"),
 );
-const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage"));
-const ProfileInfoDesktop = lazy(
-  () =>
-    import("./pages/ProfilePage/components/desktop/AccountSettings/ProfileInfoDesktop"),
-);
-const ProfileInfoPage = lazy(
-  () =>
-    import("./pages/ProfilePage/components/mobile/AccountSettings/ProfileInfo"),
-);
-const MyOrdersPage = lazy(() => import("./pages/MyOrdersPage/MyOrdersPage"));
-const AccountSettingsLayout = lazy(
-  () =>
-    import("./pages/ProfilePage/components/desktop/AccountSettings/AccountSettingsLayout"),
-);
-const ChangePassword = lazy(
-  () =>
-    import("./pages/ProfilePage/components/mobile/AccountSettings/ChangePassword"),
-);
-const AddressPage = lazy(() => import("./pages/AddressPage/AddressPage"));
-const AddressForm = lazy(() => import("./pages/AddressPage/AddressForm"));
+
+// Profile Pages
+import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import ProfileInfoDesktop from "./pages/ProfilePage/components/desktop/AccountSettings/ProfileInfoDesktop";
+import ProfileInfoPage from "./pages/ProfilePage/components/mobile/AccountSettings/ProfileInfo";
+import MyOrdersPage from "./pages/MyOrdersPage/MyOrdersPage";
+import OrderDetailsPage from "./pages/OrderDetailsPage/OrderDetailsPage";
+import AccountSettingsLayout from "./pages/ProfilePage/components/desktop/AccountSettings/AccountSettingsLayout";
+import ChangePassword from "./pages/ProfilePage/components/mobile/AccountSettings/ChangePassword";
+import AddressPage from "./pages/AddressPage/AddressPage";
+import AddressForm from "./pages/AddressPage/AddressForm";
+
 const AuthPage = lazy(() => import("./pages/AuthPage/AuthPage"));
 // imports End----
 
@@ -167,13 +159,11 @@ const App = () => {
                     }
                   />
 
-                  <Route
-                    path="/profile"
-                    element={<ProfileLayout />}
-                  >
+                  <Route path="/profile" element={<ProfileLayout />}>
                     <Route index element={<ProfilePage />} />
                     <Route path="info" element={<ProfileInfoPage />} />
                     <Route path="orders" element={<MyOrdersPage />} />
+
                     <Route path="addresses" element={<AddressPage />} />
                     <Route path="address/edit" element={<AddressForm />} />
                     <Route
@@ -184,6 +174,8 @@ const App = () => {
                       <Route path="security" element={<ChangePassword />} />
                     </Route>
                   </Route>
+
+                  <Route path="/order-details" element={<OrderDetailsPage />} />
 
                   {/* Auth  For Mobile*/}
                   <Route path="/login" element={<AuthPage />} />

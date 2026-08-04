@@ -9,7 +9,7 @@ const OrderItemMobile = ({ order, getStatusColor }) => {
       {/* Top Section: Order# and Status */}
       <div className="flex items-center justify-between mb-0.5">
         <h3 className="text-[15px] font-black text-primary tracking-tight">
-          Order #{order.orderNo}
+          Order #{order.trackingNo}
         </h3>
 
         <span
@@ -40,8 +40,8 @@ const OrderItemMobile = ({ order, getStatusColor }) => {
               className="w-14 h-14 rounded-xl bg-white overflow-hidden shrink-0"
             >
               <img
-                src={item.image}
-                alt={item.name}
+                src={item.productImages?.[0]?.url}
+                alt={item.title}
                 className="w-full h-full object-contain"
               />
             </div>
@@ -57,14 +57,14 @@ const OrderItemMobile = ({ order, getStatusColor }) => {
         <div className="text-right">
           <p className="text-xl font-black text-primary leading-none">
             <span className="text-xs mr-0.5 tracking-normal">Rs.</span>
-            {Math.floor(order.total).toLocaleString()}
+            {Math.floor(order.amount).toLocaleString()}
           </p>
         </div>
       </div>
 
       <div className="mt-3 flex justify-end pt-4 border-t border-gray-100">
         <Link
-          to={`/order-details?id=${order.orderNo}`}
+          to={`/order-details?id=${order.trackingNo}`}
           className="flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-accent transition-colors uppercase active:scale-[0.96] active:opacity-70 touch-manipulation"
         >
           <span>View Details</span>

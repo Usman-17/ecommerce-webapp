@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Clock,
@@ -14,13 +14,18 @@ import { useUser } from "../../../../hooks/useUser";
 const OrderTracker = () => {
   const navigate = useNavigate();
   const user = useUser();
-  const [orders] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("orders")) || [];
-    } catch {
-      return [];
-    }
-  });
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/order/userorders", { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then((data) => setOrders(data?.orders || []))
+      .catch(() => setOrders([]));
+  }, [user]);
 
   const counts = {
     Processing: orders.filter((o) => o.status?.toLowerCase() === "processing")

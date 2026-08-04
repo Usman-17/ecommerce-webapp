@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart, ReceiptText, Star, History } from "lucide-react";
 
@@ -15,13 +15,18 @@ const QuickLinks = () => {
   const { recentlyViewed } = useRecentlyViewed();
 
   // Orders
-  const [orders] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("orders")) || [];
-    } catch {
-      return [];
-    }
-  });
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/order/userorders", { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then((data) => setOrders(data?.orders || []))
+      .catch(() => setOrders([]));
+  }, [user]);
 
   // Reviews
   const [reviews] = useState(() => {

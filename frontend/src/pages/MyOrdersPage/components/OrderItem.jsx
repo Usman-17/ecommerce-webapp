@@ -6,10 +6,13 @@ const OrderItem = ({ order }) => {
     switch (status?.toLowerCase()) {
       case "pending":
       case "processing":
+      case "order placed":
+      case "packing":
         return "bg-amber-50 text-amber-600 border-amber-100";
       case "confirmed":
         return "bg-blue-50 text-blue-600 border-blue-100";
       case "shipped":
+      case "out for delivery":
         return "bg-indigo-50 text-indigo-600 border-indigo-100";
       case "delivered":
         return "bg-emerald-50 text-emerald-600 border-emerald-100";

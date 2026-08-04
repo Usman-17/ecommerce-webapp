@@ -239,7 +239,7 @@ const TrackingResultDesktop = ({
                   Total Amount
                 </span>
                 <span className="text-accent font-black text-lg">
-                  Rs. {order.amount?.toLocaleString()}
+                  Rs. {(order.amount + (order.shippingCharge || 0))?.toLocaleString()}
                 </span>
               </div>
             </div>
