@@ -5,7 +5,7 @@ const SalesCard = ({ orders }) => {
 
   const totalSales = orders.reduce((acc, order) => {
     if (order.status === "Delivered") {
-      return acc + (order.amount || 0);
+      return acc + (order.amount || 0) + (order.shippingCharge || 0);
     }
     return acc;
   }, 0);

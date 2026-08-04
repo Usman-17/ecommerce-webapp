@@ -28,7 +28,7 @@ const useGetAllOrders = () => {
         customerName:
           `${item.address?.firstName || ""} ${item.address?.lastName || ""}`.trim(),
         customerPhone: item.address?.phone || "",
-        amountStr: `Rs. ${item.amount.toLocaleString()} ${item.amount}`,
+        amountStr: `Rs. ${(item.amount + (item.shippingCharge || 0)).toLocaleString()} ${item.amount + (item.shippingCharge || 0)}`,
         itemsCount: item.items?.length || 0,
         orderType: item.orderType || "normal",
         orderTypeLabel:

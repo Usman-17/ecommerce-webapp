@@ -35,7 +35,10 @@ const RecentOrders = ({ orders }) => {
                 <td className="px-6 py-4">{order.address?.phone}</td>
                 <td className="px-6 py-4 text-center">{order.items?.length}</td>
                 <td className="px-6 py-4">
-                  Rs. {order.amount.toLocaleString()}
+                  Rs.{" "}
+                  {(
+                    order.amount + (order.shippingCharge || 0)
+                  ).toLocaleString()}
                 </td>
 
                 <td className="px-6 py-4">
@@ -49,8 +52,8 @@ const RecentOrders = ({ orders }) => {
                       order.status === "Delivered"
                         ? "bg-green-100 text-green-800"
                         : order.status === "Order Placed"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
                     }`}
                   >
                     {order.status}

@@ -242,10 +242,13 @@ const OrdersPage = () => {
       title: "Total",
       dataIndex: "amount",
       key: "amount",
-      sorter: (a, b) => a.amount - b.amount,
+      sorter: (a, b) =>
+        a.amount +
+        (a.shippingCharge || 0) -
+        (b.amount + (b.shippingCharge || 0)),
       render: (_, record) => (
         <span className="font-semibold text-right block">
-          Rs. {record.amount.toLocaleString()}
+          Rs. {(record.amount + (record.shippingCharge || 0)).toLocaleString()}
         </span>
       ),
     },
@@ -462,7 +465,10 @@ const OrdersPage = () => {
               </span>
               <div className="h-5 w-px bg-gray-200" />
               <span className="text-2xl font-bold text-gray-900">
-                Rs. {viewOrder.amount.toLocaleString()}
+                Rs.{" "}
+                {(
+                  viewOrder.amount + (viewOrder.shippingCharge || 0)
+                ).toLocaleString()}
               </span>
             </div>
 
@@ -516,7 +522,9 @@ const OrdersPage = () => {
                       <p className="text-xs text-purple-400 mt-1">
                         Fixed price: Rs.{" "}
                         {viewOrder.dealDetails?.fixedPrice?.toLocaleString() ||
-                          viewOrder.amount?.toLocaleString()}
+                          (
+                            viewOrder.amount + (viewOrder.shippingCharge || 0)
+                          )?.toLocaleString()}
                       </p>
                     </div>
                   ) : (
@@ -622,7 +630,10 @@ const OrdersPage = () => {
                         Total
                       </span>
                       <span className="text-lg font-bold text-gray-900">
-                        Rs. {viewOrder.amount.toLocaleString()}
+                        Rs.{" "}
+                        {(
+                          viewOrder.amount + (viewOrder.shippingCharge || 0)
+                        ).toLocaleString()}
                       </span>
                     </div>
                     {viewOrder.items.some((i) => i.purchasePrice > 0) && (
@@ -651,7 +662,8 @@ const OrdersPage = () => {
                             Rs.{" "}
                             {(
                               viewOrder.profit ??
-                              viewOrder.amount -
+                              viewOrder.amount +
+                                (viewOrder.shippingCharge || 0) -
                                 viewOrder.items.reduce(
                                   (sum, i) =>
                                     sum + (i.purchasePrice || 0) * i.quantity,
