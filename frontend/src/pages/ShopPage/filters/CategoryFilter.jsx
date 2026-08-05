@@ -38,13 +38,7 @@ const CategoryFilter = ({
   if (!categories || categories.length === 0) return null;
 
   const filteredCategories = categories.filter((cat) => {
-    const count = getCategoryProductCount
-      ? getCategoryProductCount(cat.name)
-      : 0;
-    return (
-      count > 0 &&
-      (cat.name || "").toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return (cat.name || "").toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   const itemLimit = typeof initialItemCount === "number" ? initialItemCount : 0;
