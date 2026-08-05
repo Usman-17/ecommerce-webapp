@@ -194,6 +194,32 @@ export const deleteProductReview = async (req, res) => {
   }
 };
 
+// PATH     : /api/product-review/bulk-delete
+// METHOD   : POST
+// ACCESS   : Admin
+// DESC     : Bulk delete product reviews
+export const bulkDeleteProductReviews = async (req, res) => {
+  const { ids } = req.body;
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: "No review IDs provided" });
+  }
+  try {
+    const reviews = await ProductReview.find({ _id: { $in: ids } });
+    for (const review of reviews) {
+      if (review.userImage?.public_id) {
+        await cloudinary.uploader.destroy(review.userImage.public_id);
+      }
+    }
+    const result = await ProductReview.deleteMany({ _id: { $in: ids } });
+    res.json({
+      message: `${result.deletedCount} reviews deleted successfully`,
+    });
+  } catch (error) {
+    console.error("Error in bulkDeleteProductReviews:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // PATH     : /api/product-review/bulk-upload
 // METHOD   : POST
 // ACCESS   : Admin
@@ -236,7 +262,22 @@ export const bulkUploadProductReviews = async (req, res) => {
           row["Comment"] ||
           row["comment"] ||
           "";
-        const dateVal = row["Date"] || row["date"] || new Date();
+        const dateVal = row["Date"] || row["date"] || null;
+
+        const parseExcelDate = (val) => {
+          if (!val) return new Date();
+          if (val instanceof Date) return val;
+          if (typeof val === "number") {
+            const excelEpoch = new Date(1899, 11, 30);
+            const result = new Date(excelEpoch.getTime() + val * 86400000);
+            return isNaN(result.getTime()) ? new Date() : result;
+          }
+          const str = String(val).trim();
+          const parsed = new Date(str);
+          return isNaN(parsed.getTime()) ? new Date() : parsed;
+        };
+
+        const date = parseExcelDate(dateVal);
 
         if (!productTitle) {
           results.failed++;
@@ -278,11 +319,6 @@ export const bulkUploadProductReviews = async (req, res) => {
           );
           continue;
         }
-
-        const date =
-          dateVal && !isNaN(new Date(dateVal).getTime())
-            ? new Date(dateVal)
-            : new Date();
 
         await ProductReview.create({
           product: product._id,
