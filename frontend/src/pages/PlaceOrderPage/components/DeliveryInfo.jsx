@@ -4,7 +4,6 @@ import {
   Mail,
   Phone,
   ChevronRight,
-  Navigation,
   SquarePen,
   MapPin,
 } from "lucide-react";
@@ -12,10 +11,7 @@ import {
 import EmptyDeliveryAddress from "./EmptyDeliveryAddress";
 
 import { errorVibrate } from "../../../utils/vibrate";
-import useCurrentLocation from "../../../hooks/useCurrentLocation";
-
 import CustomInput from "../../../components/CustomInput";
-import LoadingSpinner from "../../../components/common/LoadingSpinner";
 // Imports End---
 
 const DeliveryInfo = ({
@@ -29,13 +25,6 @@ const DeliveryInfo = ({
   shakeSignal,
 }) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const {
-    loading: locating,
-    error: locError,
-    errorType,
-    location,
-    detect,
-  } = useCurrentLocation();
 
   const handleAddressSelect = (addr) => {
     setSelectedAddress(addr);
@@ -240,26 +229,6 @@ const DeliveryInfo = ({
                   <label className="block text-xs font-semibold text-gray-700">
                     Complete Address <span className="text-red-500">*</span>
                   </label>
-                  <button
-                    type="button"
-                    onClick={detect}
-                    disabled={locating}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-gray-600 hover:text-accent transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-                  >
-                    {locating ? (
-                      <LoadingSpinner
-                        content="Detecting..."
-                        width="w-auto"
-                        iconColor="text-accent"
-                        textColor="text-gray-600"
-                      />
-                    ) : (
-                      <>
-                        <Navigation size={12} />
-                        Detect Location
-                      </>
-                    )}
-                  </button>
                 </div>
                 <textarea
                   name="contactAddress"
@@ -271,53 +240,6 @@ const DeliveryInfo = ({
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all resize-none"
                 />
-                {locError && (
-                  <div
-                    className={`flex items-start gap-2.5 p-3 rounded-lg mt-1 ${
-                      errorType === "position_unavailable" ||
-                      errorType === "permission_denied"
-                        ? "bg-amber-50 border border-amber-200"
-                        : "bg-red-50 border border-red-200"
-                    }`}
-                  >
-                    <Navigation
-                      size={14}
-                      className={`mt-0.5 shrink-0 ${
-                        errorType === "position_unavailable" ||
-                        errorType === "permission_denied"
-                          ? "text-amber-500"
-                          : "text-red-500"
-                      }`}
-                    />
-                    <div className="flex-1">
-                      <p
-                        className={`text-xs font-medium ${
-                          errorType === "position_unavailable" ||
-                          errorType === "permission_denied"
-                            ? "text-amber-700"
-                            : "text-red-700"
-                        }`}
-                      >
-                        {locError}
-                      </p>
-                      {(errorType === "position_unavailable" ||
-                        errorType === "permission_denied") && (
-                        <button
-                          type="button"
-                          onClick={detect}
-                          className="mt-1.5 text-xs font-bold text-amber-600 hover:text-amber-800 underline transition-colors"
-                        >
-                          Try Again
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {location && !locError && (
-                  <p className="text-xs text-green-600 mt-1">
-                    ✓ Location detected successfully.
-                  </p>
-                )}
                 {formik.touched.contactAddress &&
                   formik.errors.contactAddress && (
                     <p className="text-xs text-red-500 mt-1">

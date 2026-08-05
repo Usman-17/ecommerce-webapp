@@ -14,7 +14,7 @@ const SuggestedProducts = ({ currentItems = [] }) => {
   );
 
   const suggestions = (allProducts || [])
-    .filter((p) => !currentIds.has(p.productId))
+    .filter((p) => !currentIds.has(p._id))
     .slice(0, 4);
 
   if (productIsLoading || suggestions.length === 0) return null;
@@ -41,7 +41,7 @@ const SuggestedProducts = ({ currentItems = [] }) => {
               >
                 <div className="w-14 h-14 bg-gray-50 rounded-lg overflow-hidden shrink-0 border border-gray-100">
                   <img
-                    src={product.productImageURL}
+                    src={product.productImages?.[0]?.url}
                     alt={product.productName}
                     className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
                   />

@@ -159,7 +159,7 @@ const ProductActions = ({
   };
 
   return (
-    <div className="hidden sm:block pt-0 space-y-6">
+    <div className="hidden sm:block pt-4 space-y-6">
       <div className="flex items-center justify-between gap-6">
         {/* Quantity Selector */}
         <div className="space-y-2">

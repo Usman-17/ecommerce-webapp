@@ -57,43 +57,51 @@ const ProductOptions = ({
                 const isDark = r * 0.299 + g * 0.587 + b * 0.114 < 140;
 
                 return (
-                  <button
+                  <Tippy
                     key={variant._id}
-                    onClick={() => handleSelect(optionKey, variant.name)}
-                    className="flex flex-col items-center gap-1.5 group cursor-pointer"
+                    content={<span className="font-bold">{variant.name}</span>}
+                    animation="shift-away"
+                    arrow={false}
+                    offset={[0, 8]}
+                    className="text-[10px]! font-bold! bg-gray-900! rounded-lg! text-white!"
                   >
-                    <div
-                      className={`w-8 h-8 rounded-full transition-all duration-200 flex items-center justify-center ${
-                        isSelected
-                          ? "scale-110"
-                          : "ring-1 ring-gray-200 hover:scale-105"
-                      }`}
-                      style={{ backgroundColor: hex }}
+                    <button
+                      onClick={() => handleSelect(optionKey, variant.name)}
+                      className="flex flex-col items-center gap-1.5 group cursor-pointer"
                     >
-                      {isSelected && (
-                        <svg
-                          className="w-3.5 h-3.5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke={isDark ? "#fff" : "#000"}
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </div>
-                    <span
-                      className={`text-[10px] font-semibold transition-colors ${
-                        isSelected
-                          ? "text-gray-900"
-                          : "text-gray-400 group-hover:text-gray-600"
-                      }`}
-                    >
-                      {variant.name}
-                    </span>
-                  </button>
+                      <div
+                        className={`w-8 h-8 rounded-full transition-all duration-200 flex items-center justify-center ${
+                          isSelected
+                            ? "scale-110"
+                            : "ring-1 ring-gray-200 hover:scale-105"
+                        }`}
+                        style={{ backgroundColor: hex }}
+                      >
+                        {isSelected && (
+                          <svg
+                            className="w-3.5 h-3.5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke={isDark ? "#fff" : "#000"}
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                      </div>
+                      <span
+                        className={`text-[10px] font-semibold transition-colors ${
+                          isSelected
+                            ? "text-gray-900"
+                            : "text-gray-400 group-hover:text-gray-600"
+                        }`}
+                      >
+                        {variant.name}
+                      </span>
+                    </button>
+                  </Tippy>
                 );
               })}
             </div>
