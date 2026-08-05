@@ -93,11 +93,11 @@ const ShopHeader = ({
         <div className="mb-4">
           <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
             {areaCategories.map((cat) => {
-              const isActive = categoryParam === cat.productCategoryName;
+              const isActive = categoryParam === cat.name;
               return (
                 <Link
-                  key={cat.productCategoryId}
-                  to={`/shop?area=${encodeURIComponent(areaParam)}&category=${encodeURIComponent(cat.productCategoryName)}`}
+                  key={cat._id}
+                  to={`/shop?area=${encodeURIComponent(areaParam)}&category=${encodeURIComponent(cat.name)}`}
                   className="flex flex-col items-center gap-2 shrink-0 group"
                 >
                   <div
@@ -108,8 +108,8 @@ const ShopHeader = ({
                     }`}
                   >
                     <img
-                      src={cat.categoryImageURL || "/category.png"}
-                      alt={cat.productCategoryName}
+                      src={cat.imageUrl || "/category.png"}
+                      alt={cat.name}
                       onError={(e) => {
                         e.currentTarget.src = "/category.png";
                       }}
@@ -123,7 +123,7 @@ const ShopHeader = ({
                         : "text-gray-600 group-hover:text-[#CC0D39]"
                     }`}
                   >
-                    {cat.productCategoryName}
+                    {cat.name}
                   </span>
                 </Link>
               );
@@ -137,14 +137,14 @@ const ShopHeader = ({
         <div className="mb-4">
           <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
             {categorySubCategories.map((sub) => {
-              const isActive = subcategoryParam === sub.productSubCategoryName;
+              const isActive = subcategoryParam === sub.name;
               const areaParamStr = areaParam
                 ? `&area=${encodeURIComponent(areaParam)}`
                 : "";
               return (
                 <Link
-                  key={sub.productSubCategoryId}
-                  to={`/shop?category=${encodeURIComponent(categoryParam)}${areaParamStr}${isActive ? "" : `&subcategory=${encodeURIComponent(sub.productSubCategoryName)}`}`}
+                  key={sub._id}
+                  to={`/shop?category=${encodeURIComponent(categoryParam)}${areaParamStr}${isActive ? "" : `&subcategory=${encodeURIComponent(sub.name)}`}`}
                   className="flex flex-col items-center gap-2 shrink-0 group"
                 >
                   <div
@@ -155,8 +155,8 @@ const ShopHeader = ({
                     }`}
                   >
                     <img
-                      src={sub.subCategoryImageURL || "/category.png"}
-                      alt={sub.productSubCategoryName}
+                      src={sub.imageUrl || "/category.png"}
+                      alt={sub.name}
                       onError={(e) => {
                         e.currentTarget.src = "/category.png";
                       }}
@@ -170,7 +170,7 @@ const ShopHeader = ({
                         : "text-gray-600 group-hover:text-[#CC0D39]"
                     }`}
                   >
-                    {sub.productSubCategoryName}
+                    {sub.name}
                   </span>
                 </Link>
               );

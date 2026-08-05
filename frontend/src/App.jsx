@@ -81,6 +81,13 @@ const ScrollToTop = () => {
 
 const App = () => {
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const handleOpenDrawer = () => setCartDrawerOpen(true);
@@ -194,7 +201,7 @@ const App = () => {
             />
 
             <Toaster
-              position="bottom-center"
+              position={isMobile ? "top-center" : "bottom-center"}
               toastOptions={{
                 style: {
                   background: "#363636",
