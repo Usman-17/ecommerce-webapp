@@ -28,9 +28,9 @@ import { useGetSubCategoriesByCategory } from "../hooks/useGetSubCategoriesByCat
 
 const tabs = [
   "Basic Info",
+  "Variants",
   "Tags & Links",
   "Description",
-  "Variants",
   "Images",
 ];
 
@@ -818,104 +818,50 @@ const ProductPage = () => {
                 {variants.map((variant, vi) => (
                   <div
                     key={vi}
-                    className="border border-gray-200 rounded-lg p-4 space-y-3"
+                    className="border border-gray-200 rounded-lg p-3"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">
-                        Variant {vi + 1}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-medium text-gray-500 shrink-0">
+                        {vi + 1}.
                       </span>
-                      <div className="flex items-center gap-3">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <span className="text-xs text-gray-500">Active</span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleVariantChange(
-                                vi,
-                                "isActive",
-                                !variant.isActive,
-                              )
-                            }
-                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                              variant.isActive ? "bg-green-500" : "bg-gray-300"
-                            }`}
-                          >
-                            <span
-                              className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
-                                variant.isActive
-                                  ? "translate-x-4.5"
-                                  : "translate-x-0.5"
-                              }`}
-                            />
-                          </button>
-                        </label>
-                        {variants.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeVariant(vi)}
-                            className="text-red-500 hover:text-red-400 cursor-pointer"
-                          >
-                            <X size={16} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label className="block mb-1 text-xs text-gray-500">
-                          Type
-                        </label>
-                        <select
-                          value={variant.type}
-                          onChange={(e) =>
-                            handleVariantChange(vi, "type", e.target.value)
-                          }
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
-                        >
-                          {variantTypes.map((t) => (
-                            <option key={t} value={t}>
-                              {t}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <CustomInput
-                        id={`variantName-${vi}`}
-                        label="Name"
+                      <select
+                        value={variant.type}
+                        onChange={(e) =>
+                          handleVariantChange(vi, "type", e.target.value)
+                        }
+                        className="border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white w-24"
+                      >
+                        {variantTypes.map((t) => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
+                      </select>
+
+                      <input
+                        type="text"
                         required
                         value={variant.name}
                         onChange={(e) =>
                           handleVariantChange(vi, "name", e.target.value)
                         }
-                        placeholder={
-                          variant.type === "Color"
-                            ? "e.g. Red / Navy"
-                            : variant.type === "Size"
-                              ? "e.g. Small / Large"
-                              : variant.type === "Shade"
-                                ? "e.g. Rose Gold"
-                                : "e.g. Value"
-                        }
+                        placeholder="Name"
+                        className="border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400 w-32"
                       />
-                      <CustomInput
-                        id={`variantPrice-${vi}`}
-                        label="Price"
+
+                      <input
                         type="number"
                         value={variant.price}
                         onChange={(e) =>
                           handleVariantChange(vi, "price", e.target.value)
                         }
-                        placeholder="Variant price"
+                        placeholder="Price"
+                        className="border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400 w-20"
                       />
-                    </div>
 
-                    {variant.type === "Color" && (
-                      <div className="flex items-center gap-3">
-                        <label className="block text-xs text-gray-500">
-                          Color
-                        </label>
-                        <div className="flex items-center gap-2">
+                      {variant.type === "Color" && (
+                        <div className="flex items-center gap-1.5">
                           <input
                             type="color"
                             value={variant.hexColor || "#000000"}
@@ -926,7 +872,7 @@ const ProductPage = () => {
                                 e.target.value,
                               )
                             }
-                            className="w-8 h-8 rounded border border-gray-200 cursor-pointer p-0"
+                            className="w-7 h-7 rounded border border-gray-200 cursor-pointer p-0"
                           />
                           <input
                             type="text"
@@ -939,18 +885,13 @@ const ProductPage = () => {
                               )
                             }
                             placeholder="#000000"
-                            className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            className="w-20 border border-gray-200 rounded-lg px-2 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
                           />
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    <div>
-                      <label className="block mb-1 text-xs text-gray-500">
-                        Variant Images
-                      </label>
-                      <label className="flex items-center gap-2 text-xs bg-black text-white px-3 py-1.5 rounded hover:bg-neutral-800 cursor-pointer w-fit">
-                        <Upload size={14} /> Upload Images
+                      <label className="flex items-center gap-1.5 text-xs bg-black text-white px-2.5 py-2 rounded hover:bg-neutral-800 cursor-pointer shrink-0">
+                        <Upload size={12} /> Images
                         <input
                           type="file"
                           multiple
@@ -959,19 +900,20 @@ const ProductPage = () => {
                           onChange={(e) => handleVariantImageChange(vi, e)}
                         />
                       </label>
+
                       {variant.imagePreviews.length > 0 && (
-                        <div className="flex flex-wrap mt-2 gap-2">
+                        <div className="flex gap-1">
                           {variant.imagePreviews.map((img, ii) => (
                             <div key={ii} className="relative group">
                               <img
                                 src={img}
                                 alt=""
-                                className="w-16 h-16 object-cover rounded"
+                                className="w-12 h-12 object-cover rounded"
                               />
                               <button
                                 type="button"
                                 onClick={() => handleRemoveVariantImage(vi, ii)}
-                                className="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] hover:bg-red-700 cursor-pointer"
+                                className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] hover:bg-red-700 cursor-pointer"
                               >
                                 ✕
                               </button>
@@ -979,6 +921,44 @@ const ProductPage = () => {
                           ))}
                         </div>
                       )}
+
+                      <div className="flex items-center gap-2 ml-auto shrink-0">
+                        <label className="flex items-center gap-1 cursor-pointer">
+                          <span className="text-[10px] text-gray-400">
+                            Active
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleVariantChange(
+                                vi,
+                                "isActive",
+                                !variant.isActive,
+                              )
+                            }
+                            className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ${
+                              variant.isActive ? "bg-green-500" : "bg-gray-300"
+                            }`}
+                          >
+                            <span
+                              className={`inline-block h-3 w-3 rounded-full bg-white transition-transform ${
+                                variant.isActive
+                                  ? "translate-x-3.5"
+                                  : "translate-x-0.5"
+                              }`}
+                            />
+                          </button>
+                        </label>
+                        {variants.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeVariant(vi)}
+                            className="text-red-500 hover:text-red-400 cursor-pointer"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
