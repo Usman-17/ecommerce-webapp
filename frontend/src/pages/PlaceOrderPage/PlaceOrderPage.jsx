@@ -281,17 +281,25 @@ const PlaceOrderPage = () => {
       : "normal";
 
   const itemsToShow = scoopData
-    ? scoopData.scoopProducts.map((p) => ({
-        productId: p._id,
-        variantId: null,
-        name: p.title,
-        price: 0,
-        quantity: 1,
-        total: 0,
-        image: p.productImages?.[0]?.url || "",
-        selectedVariants: [],
-        _scoopInstanceId: p._instanceId,
-      }))
+    ? scoopData.scoopProducts.map((p) => {
+        const instanceId = p._instanceId || p._id;
+        const selectedVariant =
+          scoopData.selectedVariants?.[instanceId] || null;
+        return {
+          productId: p._id,
+          variantId: selectedVariant?._id || null,
+          name: p.title,
+          price: 0,
+          quantity: 1,
+          total: 0,
+          image: p.productImages?.[0]?.url || "",
+          variantImage: selectedVariant?.image?.url || "",
+          selectedVariants: selectedVariant
+            ? [{ detailName: selectedVariant.name }]
+            : [],
+          _scoopInstanceId: instanceId,
+        };
+      })
     : dealData
       ? [
           {

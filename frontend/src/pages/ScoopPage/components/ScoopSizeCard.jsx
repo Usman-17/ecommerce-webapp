@@ -87,6 +87,7 @@ const ScoopSizeCard = ({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
+                    onSelect(config.id);
                     if (quantity > 1) onSelectQuantity(quantity - 1);
                   }}
                   disabled={quantity <= 1}
@@ -101,6 +102,7 @@ const ScoopSizeCard = ({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
+                    onSelect(config.id);
                     if (quantity < 3) onSelectQuantity(quantity + 1);
                   }}
                   disabled={quantity >= 3}
