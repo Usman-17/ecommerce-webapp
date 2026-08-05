@@ -34,8 +34,12 @@ const tabs = [
   "Images",
 ];
 
+const variantTypes = ["Color", "Shade", "Size", "Material", "Weight", "Other"];
+
 const emptyVariant = () => ({
   name: "",
+  type: "Other",
+  hexColor: "",
   price: "",
   isActive: true,
   images: [],
@@ -225,6 +229,8 @@ const ProductPage = () => {
             return {
               _id: v._id,
               name: v.name || "",
+              type: v.type || "Other",
+              hexColor: v.hexColor || "",
               price: v.price ?? "",
               isActive: v.isActive !== false,
               images: [],
@@ -278,9 +284,6 @@ const ProductPage = () => {
     const missingFields = [];
     if (!formData.title.trim()) missingFields.push("Title");
     if (!formData.price) missingFields.push("Price");
-    if (!formData.description.trim()) missingFields.push("Description");
-    if (!formData.tags || formData.tags.length === 0)
-      missingFields.push("Tags");
 
     if (missingFields.length > 0) {
       toast.error(
@@ -306,6 +309,8 @@ const ProductPage = () => {
     const variantsForApi = variants.map((v) => {
       const cleaned = {
         name: v.name,
+        type: v.type || "Other",
+        hexColor: v.type === "Color" ? v.hexColor || undefined : undefined,
         price: v.price !== "" ? Number(v.price) : undefined,
         isActive: v.isActive !== false,
       };
@@ -763,7 +768,6 @@ const ProductPage = () => {
               <div className="space-y-4">
                 <TagsInput
                   label="Tags"
-                  required
                   value={formData.tags}
                   onChange={(val) => handleSelectChange(val, "tags")}
                 />
@@ -780,7 +784,10 @@ const ProductPage = () => {
             {activeTab === "Description" && (
               <div>
                 <label className="block mb-2 text-sm font-medium">
-                  Product Description*
+                  Product Description{" "}
+                  <span className="text-xs font-normal text-gray-400">
+                    (Optional)
+                  </span>
                 </label>
                 <TipTapEditor
                   value={formData.description}
@@ -823,7 +830,11 @@ const ProductPage = () => {
                           <button
                             type="button"
                             onClick={() =>
-                              handleVariantChange(vi, "isActive", !variant.isActive)
+                              handleVariantChange(
+                                vi,
+                                "isActive",
+                                !variant.isActive,
+                              )
                             }
                             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                               variant.isActive ? "bg-green-500" : "bg-gray-300"
@@ -831,7 +842,9 @@ const ProductPage = () => {
                           >
                             <span
                               className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
-                                variant.isActive ? "translate-x-4.5" : "translate-x-0.5"
+                                variant.isActive
+                                  ? "translate-x-4.5"
+                                  : "translate-x-0.5"
                               }`}
                             />
                           </button>
@@ -848,7 +861,25 @@ const ProductPage = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block mb-1 text-xs text-gray-500">
+                          Type
+                        </label>
+                        <select
+                          value={variant.type}
+                          onChange={(e) =>
+                            handleVariantChange(vi, "type", e.target.value)
+                          }
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 bg-white"
+                        >
+                          {variantTypes.map((t) => (
+                            <option key={t} value={t}>
+                              {t}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                       <CustomInput
                         id={`variantName-${vi}`}
                         label="Name"
@@ -857,7 +888,15 @@ const ProductPage = () => {
                         onChange={(e) =>
                           handleVariantChange(vi, "name", e.target.value)
                         }
-                        placeholder="e.g. Large / Red"
+                        placeholder={
+                          variant.type === "Color"
+                            ? "e.g. Red / Navy"
+                            : variant.type === "Size"
+                              ? "e.g. Small / Large"
+                              : variant.type === "Shade"
+                                ? "e.g. Rose Gold"
+                                : "e.g. Value"
+                        }
                       />
                       <CustomInput
                         id={`variantPrice-${vi}`}
@@ -870,6 +909,41 @@ const ProductPage = () => {
                         placeholder="Variant price"
                       />
                     </div>
+
+                    {variant.type === "Color" && (
+                      <div className="flex items-center gap-3">
+                        <label className="block text-xs text-gray-500">
+                          Color
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={variant.hexColor || "#000000"}
+                            onChange={(e) =>
+                              handleVariantChange(
+                                vi,
+                                "hexColor",
+                                e.target.value,
+                              )
+                            }
+                            className="w-8 h-8 rounded border border-gray-200 cursor-pointer p-0"
+                          />
+                          <input
+                            type="text"
+                            value={variant.hexColor || ""}
+                            onChange={(e) =>
+                              handleVariantChange(
+                                vi,
+                                "hexColor",
+                                e.target.value,
+                              )
+                            }
+                            placeholder="#000000"
+                            className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-purple-400"
+                          />
+                        </div>
+                      </div>
+                    )}
 
                     <div>
                       <label className="block mb-1 text-xs text-gray-500">
@@ -964,13 +1038,7 @@ const ProductPage = () => {
             onSubmit={() => handleSave(false)}
             submitText="Save"
             saveAndCloseText={editItem ? "Update & Close" : "Save & Close"}
-            isDisabled={
-              !formData.title.trim() ||
-              !formData.price ||
-              !formData.description.trim() ||
-              !formData.tags ||
-              formData.tags.length === 0
-            }
+            isDisabled={!formData.title.trim() || !formData.price}
             isSubmitting={isSaving && !isSavingAndClose}
             isSavingAndClosing={isSaving && isSavingAndClose}
           />

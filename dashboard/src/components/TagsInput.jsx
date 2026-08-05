@@ -145,12 +145,12 @@ const TagsInput = ({
 
   const availableOptions = options
     .filter((opt) => {
-      const tagValue = typeof opt === "string" ? opt : opt.value;
+      const tagValue = typeof opt === "string" ? opt : opt.label;
       return !value.includes(tagValue);
     })
     .map((opt) => {
       if (typeof opt === "string") return { label: opt, value: opt };
-      return opt;
+      return { label: opt.label, value: opt.label };
     });
 
   return (
