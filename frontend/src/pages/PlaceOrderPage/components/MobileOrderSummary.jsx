@@ -16,6 +16,7 @@ const MobileOrderSummary = ({
   itemsToShow,
   subtotal,
   shippingFee,
+  hasAddress,
   total,
   isBelowMinimum,
   minOrderAmount,
@@ -193,9 +194,13 @@ const MobileOrderSummary = ({
                 </span>
                 <Info size={10} className="text-gray-300" />
               </div>
-              {shippingFee === 0 ? (
+              {shippingFee === 0 && hasAddress !== false ? (
                 <span className="font-black text-green-600 bg-green-50 px-2 py-0.5 rounded text-[9px] uppercase tracking-widest">
                   Free
+                </span>
+              ) : !hasAddress ? (
+                <span className="font-medium text-gray-400 text-[10px] italic">
+                  Add address
                 </span>
               ) : (
                 <span className="font-black text-gray-900">

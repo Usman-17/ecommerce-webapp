@@ -93,6 +93,12 @@ const CartSummary = ({
               )}
             </div>
 
+            {shippingFee > 0 && (
+              <p className="text-[10px] text-gray-400 font-medium mt-1 ml-12">
+                Lahore: Rs 250 | Other cities: Rs 300
+              </p>
+            )}
+
             {/* Free Shipping Progress Bar */}
             {remaining > 0 && (
               <div className="mt-8 flex items-center gap-3">

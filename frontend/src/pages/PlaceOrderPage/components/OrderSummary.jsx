@@ -18,6 +18,7 @@ const OrderSummary = ({
   itemsToShow,
   subtotal,
   shippingFee,
+  hasAddress,
   total,
   isPending,
   isDisabled,
@@ -212,9 +213,13 @@ const OrderSummary = ({
               Shipping Charges
             </span>
 
-            {shippingFee === 0 ? (
+            {shippingFee === 0 && hasAddress !== false ? (
               <span className="font-bold text-green-600 bg-green-100/50 px-2 py-0.5 rounded text-xs uppercase tracking-wide">
                 Free
+              </span>
+            ) : !hasAddress ? (
+              <span className="font-medium text-gray-400 text-xs italic">
+                Add address to see shipping
               </span>
             ) : (
               <span className="font-bold text-gray-900">

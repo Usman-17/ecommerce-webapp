@@ -458,13 +458,20 @@ const PlaceOrderPage = () => {
   const FREE_SHIPPING_THRESHOLD = 5000;
   const MIN_ORDER_AMOUNT = 500;
 
+  const deliveryCity = (selectedAddress?.city || formik.values.city || "")
+    .trim()
+    .toLowerCase();
+  const isLahore = deliveryCity.includes("lahore");
+  const hasAddress = !!(selectedAddress || formik.values.city?.trim());
+  const baseShippingFee = !hasAddress ? null : isLahore ? 250 : 300;
+
   const shippingFee =
     isPickUp ||
     subtotal >= FREE_SHIPPING_THRESHOLD ||
     (appliedCoupon?.type === "free_shipping" &&
       subtotal >= appliedCoupon.minSubtotal)
       ? 0
-      : 250;
+      : (baseShippingFee ?? 0);
   const total = subtotal + shippingFee;
 
   const isBelowMinimum = subtotal < MIN_ORDER_AMOUNT;
@@ -542,6 +549,7 @@ const PlaceOrderPage = () => {
               itemsToShow={itemsToShow}
               subtotal={subtotal}
               shippingFee={shippingFee}
+              hasAddress={hasAddress}
               total={total}
               isBelowMinimum={isBelowMinimum}
               minOrderAmount={MIN_ORDER_AMOUNT}
@@ -563,6 +571,7 @@ const PlaceOrderPage = () => {
               itemsToShow={itemsToShow}
               subtotal={subtotal}
               shippingFee={shippingFee}
+              hasAddress={hasAddress}
               total={total}
               isPending={isPending}
               isDisabled={isBelowMinimum}
