@@ -7,6 +7,15 @@ const variantSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    type: {
+      type: String,
+      enum: ["Color", "Shade", "Size", "Material", "Weight", "Other"],
+      default: "Other",
+    },
+    hexColor: {
+      type: String,
+      trim: true,
+    },
     attributes: {
       type: Map,
       of: String,

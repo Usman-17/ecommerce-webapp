@@ -90,15 +90,24 @@ export const createProduct = async (req, res) => {
       sold,
       secondaryPrice,
       webLinks,
+      isActive,
       variants: variantsJson,
     } = req.body;
 
+    const normalizedTags = Array.isArray(tags)
+      ? tags.filter(Boolean)
+      : tags
+        ? [tags]
+        : [];
+    const normalizedWebLinks = Array.isArray(webLinks)
+      ? webLinks.filter(Boolean)
+      : webLinks
+        ? [webLinks]
+        : [];
+
     const missingFields = [];
     if (!title || !title.trim()) missingFields.push("Title");
-    if (!description || !description.trim()) missingFields.push("Description");
     if (!price) missingFields.push("Price");
-    if (!tags || (Array.isArray(tags) && tags.length === 0))
-      missingFields.push("Tags");
 
     if (missingFields.length > 0) {
       return res.status(400).json({
@@ -166,8 +175,9 @@ export const createProduct = async (req, res) => {
           "VARIANT_IMAGES",
         );
       } else {
-        variant.image = null;
+        delete variant.image;
       }
+      delete variant.images;
     }
 
     const newProduct = new Product({
@@ -182,8 +192,8 @@ export const createProduct = async (req, res) => {
       area: area || undefined,
       brand: brand || undefined,
       sold: sold || "0",
-      tags,
-      webLinks: webLinks || [],
+      tags: normalizedTags,
+      webLinks: normalizedWebLinks,
       isActive:
         isActive !== undefined
           ? isActive === "true" || isActive === true
@@ -231,6 +241,17 @@ export const updateProduct = async (req, res) => {
     const product = await Product.findById(id);
     if (!product) return res.status(404).json({ error: "Product not found" });
 
+    const normalizedTags = Array.isArray(tags)
+      ? tags.filter(Boolean)
+      : tags
+        ? [tags]
+        : product.tags || [];
+    const normalizedWebLinks = Array.isArray(webLinks)
+      ? webLinks.filter(Boolean)
+      : webLinks !== undefined
+        ? [webLinks]
+        : product.webLinks || [];
+
     let foundCategory = null;
     if (category) {
       foundCategory = await Category.findById(category).catch(() => null);
@@ -270,8 +291,8 @@ export const updateProduct = async (req, res) => {
     }
 
     if (description) product.description = description;
-    if (tags) product.tags = tags;
-    if (webLinks !== undefined) product.webLinks = webLinks;
+    product.tags = normalizedTags;
+    if (webLinks !== undefined) product.webLinks = normalizedWebLinks;
     if (isActive !== undefined)
       product.isActive = isActive === "true" || isActive === true;
     if (price) product.price = Number(price) || product.price;
@@ -328,13 +349,21 @@ export const updateProduct = async (req, res) => {
           const existingVariant = product.variants.id(variant._id);
           if (existingVariant) {
             if (req.files && req.files[imageKey]) {
-              await deleteImage(existingVariant.image);
+              if (existingVariant.image && existingVariant.image.public_id) {
+                await deleteImage(existingVariant.image);
+              }
               variant.image = await uploadSingleImage(
                 req.files[imageKey],
                 "VARIANT_IMAGES",
               );
-            } else {
+            } else if (
+              existingVariant.image &&
+              existingVariant.image.public_id &&
+              existingVariant.image.url
+            ) {
               variant.image = existingVariant.image;
+            } else {
+              delete variant.image;
             }
           }
         } else {
@@ -344,7 +373,7 @@ export const updateProduct = async (req, res) => {
               "VARIANT_IMAGES",
             );
           } else {
-            variant.image = null;
+            delete variant.image;
           }
         }
       }
@@ -357,6 +386,13 @@ export const updateProduct = async (req, res) => {
         if (!incomingIds.includes(oldVariant._id.toString())) {
           await deleteImage(oldVariant.image);
         }
+      }
+
+      for (const v of parsedVariants) {
+        if (v.image === null || v.image === undefined || v.image === "null") {
+          delete v.image;
+        }
+        delete v.images;
       }
 
       product.variants = parsedVariants.filter((v) => v.name && v.name.trim());
