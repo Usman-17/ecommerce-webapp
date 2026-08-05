@@ -1,5 +1,5 @@
-import { useState } from "react";
 import toast from "react-hot-toast";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart, Zap } from "lucide-react";
 
@@ -19,6 +19,7 @@ const ProductActions = ({
   activeVariantImage,
   selectedOptions,
   matchedVariant,
+  selectedVariants,
   currentPrice,
   onShakeOptions,
 }) => {
@@ -33,15 +34,37 @@ const ProductActions = ({
   const hasVariants =
     (product?.variants?.filter((v) => v.isActive !== false)?.length || 0) > 0;
 
+  const missingVariantTypes = useMemo(() => {
+    if (!hasVariants || !product?.variants) return [];
+    const types = [
+      ...new Set(
+        product.variants
+          .filter((v) => v.isActive !== false)
+          .map((v) => v.type || "Other"),
+      ),
+    ];
+    return types.filter((type) => !selectedOptions[`variant_${type}`]);
+  }, [product, selectedOptions, hasVariants]);
+
+  const allVariantTypesSelected = missingVariantTypes.length === 0;
+
+  const variantErrorMessage = useMemo(() => {
+    if (missingVariantTypes.length === 0) return "";
+    if (missingVariantTypes.length === 1) {
+      return `Please select ${missingVariantTypes[0]}`;
+    }
+    return `Please select ${missingVariantTypes.join(" and ")}`;
+  }, [missingVariantTypes]);
+
   const handleAddToCart = () => {
     if (currentPrice <= 0) {
       toast.error("Product price is not available.", { id: "price-error" });
       return;
     }
 
-    if (hasVariants && !selectedOptions["variant"]) {
+    if (hasVariants && !allVariantTypesSelected) {
       onShakeOptions?.();
-      toast.error("Please select a variant", { id: "variant-error" });
+      toast.error(variantErrorMessage, { id: "variant-error" });
       return;
     }
 
@@ -62,9 +85,10 @@ const ProductActions = ({
       total: total,
       selectedOptions,
       variantId: matchedVariant?._id || null,
-      selectedVariants: matchedVariant
-        ? [{ detailName: matchedVariant.name }]
-        : [],
+      selectedVariants: selectedVariants.map((v) => ({
+        detailName: v.name,
+        variantId: v._id,
+      })),
     };
 
     const existingCart = getCart();
@@ -103,9 +127,9 @@ const ProductActions = ({
       return;
     }
 
-    if (hasVariants && !selectedOptions["variant"]) {
+    if (hasVariants && !allVariantTypesSelected) {
       onShakeOptions?.();
-      toast.error("Please select a variant", { id: "variant-error" });
+      toast.error(variantErrorMessage, { id: "variant-error" });
       return;
     }
 
@@ -124,9 +148,10 @@ const ProductActions = ({
       total: total,
       selectedOptions,
       variantId: matchedVariant?._id || null,
-      selectedVariants: matchedVariant
-        ? [{ detailName: matchedVariant.name }]
-        : [],
+      selectedVariants: selectedVariants.map((v) => ({
+        detailName: v.name,
+        variantId: v._id,
+      })),
     };
 
     setInMemoryData("buyNowItem", buyNowItem);

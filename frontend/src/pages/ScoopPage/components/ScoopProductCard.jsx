@@ -143,6 +143,12 @@ const ScoopProductCard = ({
                         : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                     }`}
                   >
+                    {variant.type === "Color" && variant.hexColor && (
+                      <span
+                        className="inline-block w-2 h-2 rounded-full border border-gray-300 mr-1"
+                        style={{ backgroundColor: variant.hexColor }}
+                      />
+                    )}
                     {variant.name}
                   </button>
                 );

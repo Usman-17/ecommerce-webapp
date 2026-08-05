@@ -218,8 +218,14 @@ const QuickViewContent = ({
                   .map((variant, idx) => (
                     <div
                       key={idx}
-                      className="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-700 bg-gray-50"
+                      className="px-3 py-1.5 rounded-full border border-gray-200 text-xs font-medium text-gray-700 bg-gray-50 flex items-center gap-1.5"
                     >
+                      {variant.type === "Color" && variant.hexColor && (
+                        <span
+                          className="w-3 h-3 rounded-full border border-gray-300 shrink-0"
+                          style={{ backgroundColor: variant.hexColor }}
+                        />
+                      )}
                       {variant.name}
                       {variant.price
                         ? ` — Rs ${variant.price.toLocaleString()}`

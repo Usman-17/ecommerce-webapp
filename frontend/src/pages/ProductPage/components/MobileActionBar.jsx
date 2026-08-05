@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Share2, ShoppingCart } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import VariantSelectorModal from "./VariantSelectorModal";
 
@@ -15,6 +15,7 @@ const MobileActionBar = ({
   selectedPack,
   selectedOptions,
   matchedVariant,
+  selectedVariants,
   currentPrice,
   mainImage,
   activeVariantImage,
@@ -53,15 +54,39 @@ const MobileActionBar = ({
   const hasVariants =
     (product?.variants?.filter((v) => v.isActive !== false)?.length || 0) > 0;
 
+  const missingVariantTypes = useMemo(() => {
+    if (!hasVariants || !product?.variants) return [];
+    const types = [
+      ...new Set(
+        product.variants
+          .filter((v) => v.isActive !== false)
+          .map((v) => v.type || "Other"),
+      ),
+    ];
+    return types.filter((type) => !selectedOptions[`variant_${type}`]);
+  }, [product, selectedOptions, hasVariants]);
+
+  const allVariantTypesSelected = missingVariantTypes.length === 0;
+
+  const variantErrorMessage = useMemo(() => {
+    if (missingVariantTypes.length === 0) return "";
+    if (missingVariantTypes.length === 1) {
+      return `Please select ${missingVariantTypes[0]}`;
+    }
+    return `Please select ${missingVariantTypes.join(" and ")}`;
+  }, [missingVariantTypes]);
+
   const addToCartInternal = (qty, opts, pk) => {
     if (currentPrice <= 0) {
       toast.error("Product price is not available.", { id: "price-error" });
       return false;
     }
-    if (hasVariants && !opts["variant"]) {
+    if (hasVariants && !allVariantTypesSelected) {
       setShakeOptions(true);
       setTimeout(() => setShakeOptions(false), 500);
-      toast.error("Please select a variant", { id: "variant-error" });
+      toast.error(variantErrorMessage, {
+        id: "variant-error",
+      });
       return false;
     }
 
@@ -80,9 +105,10 @@ const MobileActionBar = ({
       total: currentPrice * qty,
       selectedOptions: opts,
       variantId: matchedVariant?._id || null,
-      selectedVariants: matchedVariant
-        ? [{ detailName: matchedVariant.name }]
-        : [],
+      selectedVariants: (selectedVariants || []).map((v) => ({
+        detailName: v.name,
+        variantId: v._id,
+      })),
     };
 
     const existingCart = getCart();

@@ -360,7 +360,8 @@ const DealDetailPage = () => {
         deal.products.length > 0 &&
         (() => {
           const productsWithVariants = deal.products.filter(
-            (p) => (p.variants || []).filter((v) => v.isActive !== false).length > 0,
+            (p) =>
+              (p.variants || []).filter((v) => v.isActive !== false).length > 0,
           );
           const selectedCount = productsWithVariants.filter(
             (p) => selectedVariants[p._id],
@@ -457,6 +458,15 @@ const DealDetailPage = () => {
                                       : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                                   }`}
                                 >
+                                  {variant.type === "Color" &&
+                                    variant.hexColor && (
+                                      <span
+                                        className="inline-block w-2 h-2 rounded-full border border-gray-300 mr-0.5"
+                                        style={{
+                                          backgroundColor: variant.hexColor,
+                                        }}
+                                      />
+                                    )}
                                   {variant.name}
                                 </button>
                               );

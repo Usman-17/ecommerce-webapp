@@ -136,13 +136,20 @@ const ProductPage = () => {
 
   const mainImage = images[0]?.url || "";
 
-  const matchedVariant = useMemo(() => {
-    const selectedName = selectedOptions["variant"];
-    if (!selectedName || !product?.variants) return null;
-    return product.variants
-      .filter((v) => v.isActive !== false)
-      .find((v) => v.name === selectedName);
+  const selectedVariants = useMemo(() => {
+    if (!product?.variants) return [];
+    const activeVariants = product.variants.filter((v) => v.isActive !== false);
+    return Object.entries(selectedOptions)
+      .filter(([key]) => key.startsWith("variant_"))
+      .filter(([, val]) => val)
+      .map(([, name]) => activeVariants.find((v) => v.name === name))
+      .filter(Boolean);
   }, [product, selectedOptions]);
+
+  const matchedVariant =
+    selectedVariants.length > 0
+      ? selectedVariants[selectedVariants.length - 1]
+      : null;
 
   const activeVariantImage = matchedVariant?.image?.url || null;
 
@@ -265,20 +272,20 @@ const ProductPage = () => {
         <div className="hidden sm:block px-2">
           <Breadcrumbs
             items={[
-              {
+              product.areaName && {
                 label: product.areaName,
                 path: `/shop?area=${encodeURIComponent(product.areaName)}`,
               },
-              {
+              product.categoryName && {
                 label: product.categoryName,
                 path: `/shop?area=${encodeURIComponent(product.areaName)}&category=${encodeURIComponent(product.categoryName)}`,
               },
-              {
+              product.subCategoryName && {
                 label: product.subCategoryName,
                 path: `/shop?area=${encodeURIComponent(product.areaName)}&category=${encodeURIComponent(product.categoryName)}&subcategory=${encodeURIComponent(product.subCategoryName)}`,
               },
               { label: product.title },
-            ]}
+            ].filter(Boolean)}
           />
         </div>
 
@@ -412,6 +419,7 @@ const ProductPage = () => {
                 activeVariantImage={activeVariantImage}
                 selectedOptions={selectedOptions}
                 matchedVariant={matchedVariant}
+                selectedVariants={selectedVariants}
                 currentPrice={currentPrice}
                 onShakeOptions={() => {
                   setShakeOptions(true);
@@ -461,6 +469,7 @@ const ProductPage = () => {
         selectedPack={null}
         selectedOptions={selectedOptions}
         matchedVariant={matchedVariant}
+        selectedVariants={selectedVariants}
         currentPrice={currentPrice}
         mainImage={mainImage}
         activeVariantImage={activeVariantImage}
