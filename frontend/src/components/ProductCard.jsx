@@ -1,13 +1,37 @@
-import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
+import {
+  Star,
+  Tag,
+  TrendingUp,
+  Flame,
+  Zap,
+  Award,
+  Sparkles,
+  ShoppingBag,
+} from "lucide-react";
 
 import WishlistButton from "./WishlistButton";
 import { useWishlist } from "../hooks/useWishlist";
 
 import { calculateProductPrice } from "../utils/productPriceUtils";
 // Imports End----
+
+const TAG_ICONS = {
+  sale: Tag,
+  trending: TrendingUp,
+  hot: Flame,
+  new: Zap,
+  popular: Award,
+  bestseller: ShoppingBag,
+  recommended: Sparkles,
+};
+
+const getTagIcon = (tag) => {
+  const key = (tag || "").toLowerCase();
+  return TAG_ICONS[key] || Tag;
+};
 
 const ProductCard = ({ product, index = 0 }) => {
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -61,7 +85,11 @@ const ProductCard = ({ product, index = 0 }) => {
   useEffect(() => {
     const hasSoldCount = product.sold > 0;
     const hasSaleInfo = isSale && oldPrice && displayPrice;
-    const itemCount = (hasSaleInfo ? 1 : 0) + (hasSoldCount ? 1 : 0);
+    const hasTags = product.tags?.length > 0;
+    const itemCount =
+      (hasSaleInfo ? 1 : 0) +
+      (hasSoldCount ? 1 : 0) +
+      (hasTags ? Math.min(product.tags.length, 3) : 0);
     if (itemCount <= 1) return;
 
     let intervalId;
@@ -210,8 +238,9 @@ const ProductCard = ({ product, index = 0 }) => {
             {(() => {
               const hasSoldCount = product.sold > 0;
               const hasSaleInfo = isSale && oldPrice && displayPrice;
+              const hasTags = product.tags?.length > 0;
 
-              if (!hasSoldCount && !hasSaleInfo) return null;
+              if (!hasSoldCount && !hasSaleInfo && !hasTags) return null;
 
               const items = [];
               if (hasSaleInfo) {
@@ -226,6 +255,17 @@ const ProductCard = ({ product, index = 0 }) => {
               }
               if (hasSoldCount) {
                 items.push(<>Sold {product.sold}+</>);
+              }
+              if (hasTags) {
+                product.tags.slice(0, 3).forEach((tag) => {
+                  const Icon = getTagIcon(tag);
+                  items.push(
+                    <span className="inline-flex items-center gap-1">
+                      <Icon size={10} />
+                      {tag}
+                    </span>,
+                  );
+                });
               }
 
               if (items.length === 0) return null;
