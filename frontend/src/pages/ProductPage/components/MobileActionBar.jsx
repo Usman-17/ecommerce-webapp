@@ -161,10 +161,14 @@ const MobileActionBar = ({
   };
 
   const handleBuyNowInternal = (qty) => {
-    if (hasVariants && !selectedOptions["variant"]) {
+    if (currentPrice <= 0) {
+      toast.error("Product price is not available.", { id: "price-error" });
+      return false;
+    }
+    if (hasVariants && !allVariantTypesSelected) {
       setShakeOptions(true);
       setTimeout(() => setShakeOptions(false), 500);
-      toast.error("Please select a variant", { id: "variant-error" });
+      toast.error(variantErrorMessage, { id: "variant-error" });
       return false;
     }
 

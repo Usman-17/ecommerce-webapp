@@ -48,8 +48,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
     setPrevVariantImage(activeVariantImage);
     if (activeVariantImage) {
       const idx = images.findIndex(
-        (img) =>
-          (img.url || img) === activeVariantImage,
+        (img) => (img.url || img) === activeVariantImage,
       );
       setSelectedImageIndex(idx !== -1 ? idx : -1);
       setIsAutoPlay(false);
@@ -152,7 +151,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
   return (
     <>
       <div
-        className="flex flex-col md:flex-row gap-1 md:gap-0 w-full"
+        className="flex flex-col md:flex-row gap-1.5 md:gap-0 w-full"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         ref={imageWrapperRef}
@@ -285,9 +284,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
               {selectedImageIndex === -1 &&
                 activeVariantImage &&
                 !images.some(
-                  (img) =>
-                    (img.url || img) ===
-                    activeVariantImage,
+                  (img) => (img.url || img) === activeVariantImage,
                 ) && (
                   <img
                     src={activeVariantImage}

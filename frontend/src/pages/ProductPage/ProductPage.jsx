@@ -289,7 +289,7 @@ const ProductPage = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-10 -mt-2 sm:mt-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-10 -mt-4 sm:mt-0">
           {/* Images Section */}
           <div className="lg:col-span-6 xl:col-span-6">
             <div className="space-y-12">

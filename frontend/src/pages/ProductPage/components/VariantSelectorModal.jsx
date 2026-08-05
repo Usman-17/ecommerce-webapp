@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Check, ShoppingCart } from "lucide-react";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 
+import ProductOptions from "./ProductOptions";
 import { vibrate } from "../../../utils/vibrate";
 // Imports End------
 
@@ -11,6 +12,8 @@ const VariantSelectorModal = ({
   product,
   currentPrice,
   mainImage,
+  selectedOptions,
+  handleSelect,
   onConfirm,
   actionType,
   isAdding,
@@ -19,6 +22,8 @@ const VariantSelectorModal = ({
   setShakeOptions,
 }) => {
   const [localQuantity, setLocalQuantity] = useState(1);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (isOpen) {
@@ -26,7 +31,7 @@ const VariantSelectorModal = ({
       window.history.pushState({ modal: "variant-selector" }, "");
 
       const handlePopState = () => {
-        onClose();
+        onCloseRef.current();
       };
 
       window.addEventListener("popstate", handlePopState);
@@ -39,7 +44,7 @@ const VariantSelectorModal = ({
         }
       };
     }
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   return (
     <AnimatePresence>
@@ -126,6 +131,15 @@ const VariantSelectorModal = ({
                   </div>
                 </div>
               </div>
+
+              {/* Variant Selection */}
+              <ProductOptions
+                product={product}
+                selectedOptions={selectedOptions}
+                handleSelect={handleSelect}
+                shakeOptions={shakeOptions}
+                setShakeOptions={setShakeOptions}
+              />
 
               {/* Quantity */}
               <div className="flex items-center justify-between py-2">
