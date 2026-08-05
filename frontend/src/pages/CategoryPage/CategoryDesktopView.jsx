@@ -82,24 +82,23 @@ const CategoryDesktopView = ({
     // 1. Level Filtering (Tree)
     if (
       selectedSubCategoryId &&
-      (p.subCategoryId || p.productSubCategoryId) !== selectedSubCategoryId
+      p.subCategoryId !== selectedSubCategoryId
     ) {
       return false;
     }
     if (
       selectedCategoryId &&
       !selectedSubCategoryId &&
-      (p.categoryId || p.productCategoryId) !== selectedCategoryId
+      p.categoryId !== selectedCategoryId
     ) {
       return false;
     }
     if (selectedAreaId && !selectedCategoryId) {
-      const productCategoryId = p.categoryId || p.productCategoryId;
+      const productCategoryId = p.categoryId;
       const productCategory = categories.find(
-        (c) => (c.productCategoryId || c._id) === productCategoryId,
+        (c) => c._id === productCategoryId,
       );
-      const catAreaId =
-        productCategory?.productAreaId || productCategory?.areaId;
+      const catAreaId = productCategory?.areaId;
       if (catAreaId !== selectedAreaId) return false;
     }
 
@@ -235,11 +234,11 @@ const CategoryDesktopView = ({
                 </div>
               ) : (
                 productAreas.map((area) => {
-                  const areaId = area.productAreaId || area._id;
-                  const areaName = area.productAreaName || area.name;
+                  const areaId = area._id;
+                  const areaName = area.name;
                   const isAreaActive = selectedAreaId === areaId;
                   const areaCategories = categories.filter(
-                    (c) => (c.productAreaId || c.areaId) === areaId,
+                    (c) => c.areaId === areaId,
                   );
 
                   return (
@@ -277,12 +276,11 @@ const CategoryDesktopView = ({
                       {isAreaActive && (
                         <div className="flex flex-col ml-6 border-l border-gray-100">
                           {areaCategories.map((cat) => {
-                            const catId = cat.productCategoryId || cat._id;
-                            const catName = cat.productCategoryName || cat.name;
+                            const catId = cat._id;
+                            const catName = cat.name;
                             const isCatActive = selectedCategoryId === catId;
                             const catSubCategories = subCategories.filter(
-                              (s) =>
-                                (s.productCategoryId || s.categoryId) === catId,
+                              (s) => s.categoryId === catId,
                             );
 
                             return (
@@ -322,10 +320,8 @@ const CategoryDesktopView = ({
                                 {isCatActive && (
                                   <div className="flex flex-col ml-4 mb-2">
                                     {catSubCategories.map((sub) => {
-                                      const subId =
-                                        sub.productSubCategoryId || sub._id;
-                                      const subName =
-                                        sub.productSubCategoryName || sub.name;
+                                      const subId = sub._id;
+                                      const subName = sub.name;
                                       const isSubActive =
                                         selectedSubCategoryId === subId;
                                       return (
@@ -411,29 +407,14 @@ const CategoryDesktopView = ({
               <h1 className="text-3xl font-bold text-gray-700 tracking-tight">
                 {selectedSubCategoryId
                   ? subCategories.find(
-                      (s) =>
-                        (s.productSubCategoryId || s._id) ===
-                        selectedSubCategoryId,
-                    )?.productSubCategoryName ||
-                    subCategories.find(
-                      (s) =>
-                        (s.productSubCategoryId || s._id) ===
-                        selectedSubCategoryId,
+                      (s) => s._id === selectedSubCategoryId,
                     )?.name
                   : selectedCategoryId
                     ? categories.find(
-                        (c) =>
-                          (c.productCategoryId || c._id) === selectedCategoryId,
-                      )?.productCategoryName ||
-                      categories.find(
-                        (c) =>
-                          (c.productCategoryId || c._id) === selectedCategoryId,
+                        (c) => c._id === selectedCategoryId,
                       )?.name
                     : productAreas.find(
-                        (a) => (a.productAreaId || a._id) === selectedAreaId,
-                      )?.productAreaName ||
-                      productAreas.find(
-                        (a) => (a.productAreaId || a._id) === selectedAreaId,
+                        (a) => a._id === selectedAreaId,
                       )?.name}
               </h1>
               <div className="h-1 w-12 bg-[#CC0D39] mt-2 rounded-full" />
@@ -497,9 +478,8 @@ const CategoryDesktopView = ({
                           {filter === "Area" &&
                             (productAreas.length > 0 ? (
                               productAreas.map((area) => {
-                                const areaId = area.productAreaId || area._id;
-                                const areaName =
-                                  area.productAreaName || area.name;
+                                const areaId = area._id;
+                                const areaName = area.name;
                                 const isActive = selectedAreaId === areaId;
                                 return (
                                   <button

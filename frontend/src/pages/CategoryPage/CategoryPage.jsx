@@ -71,21 +71,19 @@ const CategoryPage = () => {
   };
 
   const filteredCategories = selectedAreaId
-    ? categories.filter((c) => c.productAreaId === selectedAreaId)
+    ? categories.filter((c) => c.areaId === selectedAreaId)
     : categories;
 
   const categoryBelongsToArea =
     selectedCategoryId === null ||
-    filteredCategories.some((c) => c.productCategoryId === selectedCategoryId);
+    filteredCategories.some((c) => c._id === selectedCategoryId);
 
   const effectiveCategoryId = categoryBelongsToArea ? selectedCategoryId : null;
 
   const filteredSubCategories = effectiveCategoryId
-    ? subCategories.filter((s) => s.productCategoryId === effectiveCategoryId)
+    ? subCategories.filter((s) => s.categoryId === effectiveCategoryId)
     : subCategories.filter((s) =>
-        filteredCategories.some(
-          (c) => c.productCategoryId === s.productCategoryId,
-        ),
+        filteredCategories.some((c) => c._id === s.categoryId),
       );
 
   const sharedProps = {

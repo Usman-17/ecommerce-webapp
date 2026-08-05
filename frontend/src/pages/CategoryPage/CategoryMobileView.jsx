@@ -21,7 +21,7 @@ const CategoryMobileView = ({
     const idx =
       selectedAreaId === null
         ? 0
-        : productAreas.findIndex((a) => a.productAreaId === selectedAreaId) + 1;
+        : productAreas.findIndex((a) => a._id === selectedAreaId) + 1;
     const btn = container.children[idx];
     if (btn) {
       btn.scrollIntoView({
@@ -46,21 +46,21 @@ const CategoryMobileView = ({
 
       if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
         const currentIndex = productAreas.findIndex(
-          (a) => a.productAreaId === selectedAreaId,
+          (a) => a._id === selectedAreaId,
         );
 
         if (diffX < 0) {
           if (selectedAreaId === null && productAreas.length > 0) {
-            setSelectedAreaId(productAreas[0].productAreaId);
+            setSelectedAreaId(productAreas[0]._id);
           } else if (currentIndex < productAreas.length - 1) {
-            setSelectedAreaId(productAreas[currentIndex + 1].productAreaId);
+            setSelectedAreaId(productAreas[currentIndex + 1]._id);
           }
         } else if (diffX > 0) {
           if (selectedAreaId !== null) {
             if (currentIndex === 0) {
               setSelectedAreaId(null);
             } else if (currentIndex > 0) {
-              setSelectedAreaId(productAreas[currentIndex - 1].productAreaId);
+              setSelectedAreaId(productAreas[currentIndex - 1]._id);
             }
           }
         }
@@ -104,9 +104,9 @@ const CategoryMobileView = ({
 
           {productAreas.map((area) => (
             <button
-              key={area.key}
+              key={area._id}
               onClick={(e) => {
-                setSelectedAreaId(area.productAreaId);
+                setSelectedAreaId(area._id);
                 setSelectedCategoryId(null);
                 e.currentTarget.scrollIntoView({
                   behavior: "smooth",
@@ -115,12 +115,12 @@ const CategoryMobileView = ({
                 });
               }}
               className={`relative py-1.5 px-4 text-[13px] font-bold transition-all whitespace-nowrap rounded-2xl ${
-                selectedAreaId === area.productAreaId
+                selectedAreaId === area._id
                   ? "bg-primary text-white"
                   : "text-gray-500 hover:text-gray-800"
               }`}
             >
-              {area.productAreaName}
+              {area.name}
             </button>
           ))}
         </div>
@@ -151,22 +151,20 @@ const CategoryMobileView = ({
 
             {filteredCategories.map((category) => (
               <button
-                key={category.key}
-                onClick={() =>
-                  setSelectedCategoryId(category.productCategoryId)
-                }
+                key={category._id}
+                onClick={() => setSelectedCategoryId(category._id)}
                 className={`w-full py-3.5 px-3 text-left transition-all relative ${
-                  selectedCategoryId === category.productCategoryId
+                  selectedCategoryId === category._id
                     ? " text-gray-900 font-black"
                     : "text-gray-500 font-medium hover:bg-[#f0e4da]/50"
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  {selectedCategoryId === category.productCategoryId && (
+                  {selectedCategoryId === category._id && (
                     <div className="absolute left-0 w-1 h-5 bg-[#CC0D39] rounded-r-full"></div>
                   )}
                   <span className="text-[13px] leading-[1.3] line-clamp-2">
-                    {category.productCategoryName}
+                    {category.name}
                   </span>
                 </div>
               </button>
@@ -181,21 +179,20 @@ const CategoryMobileView = ({
             <div className="grid grid-cols-3 gap-x-3 gap-y-3">
               {filteredSubCategories.map((sub) => (
                 <Link
-                  key={sub.key}
+                  key={sub._id}
                   to={`/shop?area=${encodeURIComponent(
-                    productAreas.find((a) => a.productAreaId === selectedAreaId)
-                      ?.productAreaName || "",
+                    productAreas.find((a) => a._id === selectedAreaId)?.name ||
+                      "",
                   )}&category=${encodeURIComponent(
-                    categories.find(
-                      (c) => c.productCategoryId === selectedCategoryId,
-                    )?.productCategoryName || "",
-                  )}&subcategory=${encodeURIComponent(sub.productSubCategoryName)}`}
+                    categories.find((c) => c._id === selectedCategoryId)
+                      ?.name || "",
+                  )}&subcategory=${encodeURIComponent(sub.name)}`}
                   className="flex flex-col items-center gap-2 group active:scale-95 transition-transform"
                 >
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden transition-all border border-[#f0e4da]/20">
                     <img
-                      src={sub.subCategoryImageURL || "/category.png"}
-                      alt={sub.productSubCategoryName}
+                      src={sub.imageUrl || "/category.png"}
+                      alt={sub.name}
                       onError={(e) => {
                         e.currentTarget.src = "/category.png";
                       }}
@@ -204,7 +201,7 @@ const CategoryMobileView = ({
                   </div>
 
                   <span className="text-[11px] font-bold text-gray-500 text-center leading-tight line-clamp-2 px-1">
-                    {sub.productSubCategoryName}
+                    {sub.name}
                   </span>
                 </Link>
               ))}
