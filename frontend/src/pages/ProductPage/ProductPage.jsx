@@ -302,7 +302,7 @@ const ProductPage = () => {
 
           {/* Product Details Section */}
           <div className="lg:col-span-6 xl:col-span-6">
-            <div className="space-y-2 sm:space-y-0">
+            <div className="space-y-2 sm:space-y-2">
               <div className="space-y-1">
                 {discountPercent > 0 && (
                   <span className="sm:hidden inline-flex items-center text-[10px] sm:text-xs font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full shrink-0">
