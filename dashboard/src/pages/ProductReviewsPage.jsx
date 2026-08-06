@@ -10,6 +10,7 @@ import {
   Download,
   Camera,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 
 import CustomTable from "../components/CustomTable";
@@ -52,6 +53,9 @@ const ProductReviewsPage = () => {
   const [bulkModal, setBulkModal] = useState(false);
   const [excelFile, setExcelFile] = useState(null);
   const [excelFileName, setExcelFileName] = useState("");
+  const [productFilter, setProductFilter] = useState("");
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [bulkDeleteModal, setBulkDeleteModal] = useState(false);
   const firstInputRef = useAutoFocus(addModal);
   const fileInputRef = useRef(null);
 
@@ -123,6 +127,28 @@ const ProductReviewsPage = () => {
       } else {
         toast.success(`${data.success} reviews created successfully`);
       }
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  const { mutate: bulkDeleteReviews, isPending: isBulkDeleting } = useMutation({
+    mutationFn: async (ids) => {
+      const res = await fetch("/api/product-review/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+      if (!res.ok) {
+        const result = await res.json();
+        throw new Error(result.error || "Failed to delete reviews");
+      }
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(["productReviews"]);
+      setSelectedRowKeys([]);
+      setBulkDeleteModal(false);
+      toast.success(data.message);
     },
     onError: (err) => toast.error(err.message),
   });
@@ -296,7 +322,11 @@ const ProductReviewsPage = () => {
     );
   };
 
-  const filteredData = useGlobalFilter(productReviews, globalSearch, [
+  const filteredByProduct = productFilter
+    ? productReviews.filter((r) => r.productId === productFilter)
+    : productReviews;
+
+  const filteredData = useGlobalFilter(filteredByProduct, globalSearch, [
     "sr",
     "fullName",
     "email",
@@ -415,6 +445,14 @@ const ProductReviewsPage = () => {
           subtitle="Manage customer reviews for products"
         />
         <div className="flex items-center gap-2">
+          {selectedRowKeys.length > 0 && (
+            <button
+              onClick={() => setBulkDeleteModal(true)}
+              className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-full hover:bg-red-100 transition-colors cursor-pointer text-sm font-medium"
+            >
+              <Trash2 size={16} /> Delete ({selectedRowKeys.length})
+            </button>
+          )}
           <button
             onClick={() => setBulkModal(true)}
             className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors cursor-pointer text-sm font-medium"
@@ -430,6 +468,19 @@ const ProductReviewsPage = () => {
         </div>
       </div>
 
+      <div className="flex items-center gap-3">
+        <CustomSelect
+          placeholder="Filter by Product"
+          value={productFilter}
+          onChange={(val) => {
+            setProductFilter(val);
+            setSelectedRowKeys([]);
+          }}
+          options={productOptions}
+          allowClear
+        />
+      </div>
+
       <CustomTable
         loading={isLoading}
         columns={columns}
@@ -438,6 +489,10 @@ const ProductReviewsPage = () => {
         globalSearch={globalSearch}
         onSearchChange={setGlobalSearch}
         searchPlaceholder="Search reviews..."
+        rowSelection={{
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys),
+        }}
       />
 
       {/* Add / Edit Modal */}
@@ -766,6 +821,14 @@ const ProductReviewsPage = () => {
         loading={isDeleting}
         onConfirm={() => deleteReview(confirmModal.id)}
         onCancel={() => setConfirmModal({ open: false, name: "", id: null })}
+      />
+
+      <CustomDeleteModal
+        open={bulkDeleteModal}
+        title={`${selectedRowKeys.length} reviews`}
+        loading={isBulkDeleting}
+        onConfirm={() => bulkDeleteReviews(selectedRowKeys)}
+        onCancel={() => setBulkDeleteModal(false)}
       />
     </>
   );
