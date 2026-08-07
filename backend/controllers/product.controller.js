@@ -32,6 +32,15 @@ const deleteImage = async (image) => {
   }
 };
 
+const deleteImages = async (images) => {
+  if (!Array.isArray(images)) return;
+  for (const img of images) {
+    if (img && img.public_id) {
+      await cloudinary.uploader.destroy(img.public_id);
+    }
+  }
+};
+
 const formatProduct = (prod) => {
   const obj = prod.toObject ? prod.toObject() : prod;
   return {
