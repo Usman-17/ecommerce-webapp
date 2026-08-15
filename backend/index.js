@@ -91,6 +91,10 @@ app.use("/api/review", reviewRoutes);
 app.use("/api/deal", dealRoutes);
 app.use("/api/product-review", productReviewRoutes);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // Running App
 const PORT = process.env.PORT || 9000;
 
