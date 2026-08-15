@@ -151,7 +151,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
   return (
     <>
       <div
-        className="flex flex-col md:flex-row gap-1.5 md:gap-0 w-full"
+        className="flex flex-col md:flex-row gap-1.5 md:gap-0 w-full items-start"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         ref={imageWrapperRef}
@@ -187,11 +187,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
 
             <div
               ref={thumbnailContainerRef}
-              className={`flex md:flex-col w-full overflow-x-auto md:overflow-y-auto no-scrollbar scroll-smooth md:p-1 ${
-                images.length <= 4
-                  ? "md:h-84 lg:h-96 xl:h-122 gap-2 sm:gap-3 md:gap-2"
-                  : "gap-2 sm:gap-3 md:gap-2 md:max-h-[calc(4*6rem+3*0.5rem)] lg:max-h-[calc(4*7rem+3*0.5rem)]"
-              }`}
+              className="flex md:flex-col w-full overflow-x-auto md:overflow-y-auto no-scrollbar scroll-smooth md:p-1 md:h-84 lg:h-96 xl:h-122 gap-2 sm:gap-3 md:gap-2"
             >
               {images.map((img, i) => {
                 const isFourth = i === 3;
@@ -203,7 +199,9 @@ const ProductImages = ({ images, activeVariantImage }) => {
                   <div
                     key={i}
                     className={`relative shrink-0 w-[calc(25%-6px)] sm:w-[calc(25%-8px)] md:w-full md:shrink ${
-                      images.length <= 4 ? "md:h-1/4" : ""
+                      images.length <= 4
+                        ? "md:h-1/4"
+                        : "md:h-[calc((100%-2rem)/4)]"
                     }`}
                   >
                     <img
@@ -214,14 +212,10 @@ const ProductImages = ({ images, activeVariantImage }) => {
                         setSelectedImageIndex(i);
                         pauseAutoplay();
                       }}
-                      className={`w-full ${
-                        images.length <= 4
-                          ? "h-full"
-                          : "h-20 sm:h-20 md:h-24 lg:h-26"
-                      } cursor-pointer rounded-sm transition-all duration-300 object-contain bg-[#fffaf5] ${
+                      className={`w-full h-full cursor-pointer rounded-lg transition-all duration-300 object-cover ${
                         selectedImageIndex === i
-                          ? "ring-1 ring-[#CC0D39] shadow-sm"
-                          : "border-gray-100 hover:scale-102"
+                          ? "ring-1 ring-accent/30 shadow-sm"
+                          : "border border-gray-100 opacity-80 hover:opacity-100"
                       }`}
                     />
                     {showCount && (
@@ -253,7 +247,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
         )}
 
         {/* Main Image */}
-        <div className="flex-1 rounded-lg relative group order-1 md:order-0">
+        <div className="flex-1 w-full rounded-lg relative group order-1 md:order-0">
           <Motion.div
             className="w-full relative"
             drag="x"
@@ -262,7 +256,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
             onDragEnd={handleDragEnd}
             style={{ touchAction: "none" }}
           >
-            <div className="relative w-full h-84 sm:h-80 lg:h-96 xl:h-122 mt-1.5">
+            <div className="relative w-full h-90 sm:h-80 lg:h-96 xl:h-119 mt-1.5">
               {images.map((img, idx) => {
                 const src = img.url || img;
                 const isActive =
@@ -274,7 +268,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
                     src={src}
                     alt={`Product image ${idx + 1}`}
                     onClick={() => setLightboxOpen(true)}
-                    className={`absolute inset-0 w-full h-full rounded-md object-cover cursor-zoom-in transition-opacity duration-300 ${
+                    className={`absolute inset-0 w-full h-full rounded-2xl sm:rounded-lg object-contain bg-[#fffaf5] cursor-zoom-in transition-opacity duration-300 ${
                       isActive ? "opacity-100" : "opacity-0"
                     }`}
                     draggable={false}
@@ -290,7 +284,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
                     src={activeVariantImage}
                     alt="Variant"
                     onClick={() => setLightboxOpen(true)}
-                    className="absolute inset-0 w-full h-full rounded-md object-cover cursor-zoom-in opacity-100"
+                    className="absolute inset-0 w-full h-full rounded-2xl object-contain bg-[#fffaf5] cursor-zoom-in opacity-100"
                     draggable={false}
                   />
                 )}

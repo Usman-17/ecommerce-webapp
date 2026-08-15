@@ -394,7 +394,7 @@ const ProductPage = () => {
 
               {/* Short Description */}
               <div
-                className="text-gray-600 leading-relaxed text-sm max-w-none prose prose-sm mb-3 sm:mb-0"
+                className="text-gray-600 leading-relaxed text-[13px] sm:text-sm max-w-none prose prose-sm mb-3 sm:mb-0"
                 dangerouslySetInnerHTML={{
                   __html: product.description,
                 }}

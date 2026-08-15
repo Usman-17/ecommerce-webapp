@@ -33,7 +33,7 @@ const getTagIcon = (tag) => {
   return TAG_ICONS[key] || Tag;
 };
 
-const ProductCard = ({ product, index = 0 }) => {
+const ProductCard = ({ product }) => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product._id);
 
@@ -79,8 +79,19 @@ const ProductCard = ({ product, index = 0 }) => {
   const { displayPrice, oldPrice, isSale, discountPercentage } =
     calculateProductPrice(product);
 
+  // Unique hash from product ID for per-card stagger
+  const productIdHash = useRef(0);
+  useEffect(() => {
+    const id = product._id || "";
+    let h = 0;
+    for (let i = 0; i < id.length; i++) {
+      h = (h * 31 + id.charCodeAt(i)) | 0;
+    }
+    productIdHash.current = Math.abs(h);
+  }, [product._id]);
+
   // Cycling Logic for Savings/Offers/Social Proof
-  const [cycleIndex, setCycleIndex] = useState(index % 3);
+  const [cycleIndex, setCycleIndex] = useState(0);
 
   useEffect(() => {
     const hasSoldCount = product.sold > 0;
@@ -92,8 +103,11 @@ const ProductCard = ({ product, index = 0 }) => {
       (hasTags ? Math.min(product.tags.length, 3) : 0);
     if (itemCount <= 1) return;
 
+    const hash = productIdHash.current;
+    setCycleIndex(hash % itemCount);
+
     let intervalId;
-    const staggerDelay = (index % 6) * 600;
+    const staggerDelay = (hash % 12) * 350;
 
     const timeoutId = setTimeout(() => {
       intervalId = setInterval(() => {
@@ -105,7 +119,7 @@ const ProductCard = ({ product, index = 0 }) => {
       clearTimeout(timeoutId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [isSale, oldPrice, displayPrice, product, index]);
+  }, [isSale, oldPrice, displayPrice, product]);
 
   return (
     <article className="relative group">
