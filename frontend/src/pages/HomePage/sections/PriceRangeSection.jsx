@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import ProductCard from "../../../components/ProductCard";
@@ -20,6 +20,7 @@ const SCROLL_AMOUNT = 320;
 
 const PriceRangeSection = () => {
   const scrollRef = useRef(null);
+  const initializedRef = useRef(false);
 
   const [activePrice, setActivePrice] = useState(99);
 
@@ -30,13 +31,45 @@ const PriceRangeSection = () => {
     return p.price ?? 0;
   };
 
+  // Only show price ranges that have at least one product
+  const availablePrices = prices.filter((price) =>
+    products.some((p) => {
+      const productPrice = getPrice(p);
+      return productPrice >= getRangeStart(price) && productPrice <= price;
+    }),
+  );
+
+  // If active price has no products, switch to first available
+  const effectiveActivePrice =
+    availablePrices.length > 0
+      ? availablePrices.includes(activePrice)
+        ? activePrice
+        : availablePrices[0]
+      : null;
+
+  // Auto-select first available price on load
+  useEffect(() => {
+    if (
+      !initializedRef.current &&
+      effectiveActivePrice !== null &&
+      effectiveActivePrice !== activePrice
+    ) {
+      setActivePrice(effectiveActivePrice);
+      initializedRef.current = true;
+    }
+  }, [effectiveActivePrice, activePrice]);
+
   // Filter products based on active price range
-  const filteredProducts = products.filter((p) => {
-    const productPrice = getPrice(p);
-    return (
-      productPrice >= getRangeStart(activePrice) && productPrice <= activePrice
-    );
-  });
+  const filteredProducts =
+    effectiveActivePrice !== null
+      ? products.filter((p) => {
+          const productPrice = getPrice(p);
+          return (
+            productPrice >= getRangeStart(effectiveActivePrice) &&
+            productPrice <= effectiveActivePrice
+          );
+        })
+      : [];
 
   // Scroll handlers
   const scrollLeft = () => {
@@ -58,11 +91,13 @@ const PriceRangeSection = () => {
         />
 
         <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-8 mb-12">
-          <span className="hidden sm:inline text-lg font-semibold text-gray-900">
-            Under
-          </span>
-          {prices.map((price, i) => {
-            const isActive = price === activePrice;
+          {effectiveActivePrice !== null && (
+            <span className="hidden sm:inline text-lg font-semibold text-gray-900">
+              Under
+            </span>
+          )}
+          {availablePrices.map((price, i) => {
+            const isActive = price === effectiveActivePrice;
             return (
               <InViewAnimation key={price} delay={0.1 + i * 0.1}>
                 <button

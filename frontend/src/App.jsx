@@ -22,7 +22,7 @@ import useTrackPage from "./hooks/useTrackPage";
 import HomePage from "./pages/HomePage/HomePage";
 import ProfileLayout from "./pages/ProfilePage/components/desktop/ProfileLayout";
 const ShopPage = lazy(() => import("./pages/ShopPage/ShopPage"));
-const ProductPage = lazy(() => import("./pages/ProductPage/ProductPage"));
+import ProductPage from "./pages/ProductPage/ProductPage";
 const CategoryPage = lazy(() => import("./pages/CategoryPage/CategoryPage"));
 const NewArrivalPage = lazy(
   () => import("./pages/NewArrivalPage/NewArrivalPage"),

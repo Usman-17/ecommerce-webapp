@@ -187,7 +187,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
 
             <div
               ref={thumbnailContainerRef}
-              className="flex md:flex-col w-full overflow-x-auto md:overflow-y-auto no-scrollbar scroll-smooth md:p-1 md:h-84 lg:h-96 xl:h-122 gap-2 sm:gap-3 md:gap-2"
+              className="flex md:flex-col w-full overflow-x-auto md:overflow-y-auto no-scrollbar scroll-smooth md:p-1 md:h-84 lg:h-96 xl:h-122 gap-2 sm:gap-3 md:gap-1"
             >
               {images.map((img, i) => {
                 const isFourth = i === 3;
@@ -212,11 +212,7 @@ const ProductImages = ({ images, activeVariantImage }) => {
                         setSelectedImageIndex(i);
                         pauseAutoplay();
                       }}
-                      className={`w-full h-full cursor-pointer rounded-lg transition-all duration-300 object-cover ${
-                        selectedImageIndex === i
-                          ? "ring-1 ring-accent/30 shadow-sm"
-                          : "border border-gray-100 opacity-80 hover:opacity-100"
-                      }`}
+                      className="w-full h-full cursor-pointer rounded-lg transition-all duration-300 object-contain opacity-80 hover:opacity-100"
                     />
                     {showCount && (
                       <div
