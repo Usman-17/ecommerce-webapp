@@ -18,7 +18,7 @@ const navItems = [
     name: "Manage Products",
     icon: <Layers2 size={18} />,
     subItems: [
-      { name: "Add Brand", path: "/brand/create" },
+      { name: "Brands", path: "/brand" },
       { name: "Product Areas", path: "/area" },
       { name: "Category", path: "/category" },
       { name: "Sub Category", path: "/subcategory" },

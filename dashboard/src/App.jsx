@@ -19,8 +19,7 @@ const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage/DashboardPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage"));
-const AddBrandPage = lazy(() => import("./pages/AddBrandPage"));
-const BrandListingPage = lazy(() => import("./pages/BrandListingPage"));
+const BrandPage = lazy(() => import("./pages/BrandPage"));
 const AreaPage = lazy(() => import("./pages/AreaPage"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const SubCategoryPage = lazy(() => import("./pages/SubCategoryPage"));
@@ -79,18 +78,8 @@ const App = () => {
 
             {/* Brand Routes */}
             <Route
-              path="/brand/create"
-              element={authUser ? <AddBrandPage /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="brand/edit/:id"
-              element={authUser ? <AddBrandPage /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="brand/manage"
-              element={
-                authUser ? <BrandListingPage /> : <Navigate to="/login" />
-              }
+              path="brand"
+              element={authUser ? <BrandPage /> : <Navigate to="/login" />}
             />
             <Route
               path="/area"

@@ -24,10 +24,6 @@ const predefinedWebLinks = [
   { label: "Best Sellers", value: "Best Sellers" },
   { label: "New Arrivals", value: "New Arrivals" },
   { label: "Scoop", value: "Scoop" },
-  { label: "Popular", value: "Popular" },
-  { label: "Special", value: "Special" },
-  { label: "Sale", value: "Sale" },
-  { label: "Trending", value: "Trending" },
 ];
 
 const SortableTag = ({ tag, onRemove }) => {
@@ -135,7 +131,7 @@ const WebLinksInput = ({
   return (
     <div className="flex flex-col gap-1 w-full">
       {label && (
-        <label className="block text-sm font-medium mb-1 text-gray-700 flex items-center gap-1.5">
+        <label className="text-sm font-medium mb-1 text-gray-700 flex items-center gap-1.5">
           <Link size={14} className="text-blue-500" />
           {label}{" "}
           {required ? (

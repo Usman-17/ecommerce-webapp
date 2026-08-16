@@ -18,6 +18,14 @@ const useGetAllBrands = () => {
       return response.json();
     },
 
+    select: (data) =>
+      data.map((item, index) => ({
+        ...item,
+        key: item._id,
+        sr: index + 1,
+      })),
+
+    retry: false,
     staleTime: 0,
     refetchOnMount: true,
     refetchOnReconnect: true,
