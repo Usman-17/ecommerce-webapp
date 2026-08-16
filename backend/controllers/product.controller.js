@@ -349,12 +349,26 @@ export const updateProduct = async (req, res) => {
       product.area = area;
     }
 
+    let keptExistingImages = null;
+    if (req.body.existingProductImages) {
+      try {
+        keptExistingImages = JSON.parse(req.body.existingProductImages);
+      } catch {}
+    }
+
     if (req.files && req.files.productImages) {
-      await deleteImages(product.productImages);
-      product.productImages = await uploadImages(
+      const newImages = await uploadImages(
         req.files.productImages,
         "PRODUCT_IMAGES",
       );
+      if (keptExistingImages !== null) {
+        product.productImages = [...keptExistingImages, ...newImages];
+      } else {
+        const oldImages = product.productImages || [];
+        product.productImages = [...oldImages, ...newImages];
+      }
+    } else if (keptExistingImages !== null) {
+      product.productImages = keptExistingImages;
     }
 
     if (variantsJson) {
