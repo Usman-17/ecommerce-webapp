@@ -85,6 +85,7 @@ const ProductPage = () => {
       trackRemoveFromWishlist(product);
     } else {
       addToWishlist({
+        _id: product._id,
         productId: product._id,
         productName: product.title,
         productSlug: product.slug,
