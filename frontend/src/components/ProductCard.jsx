@@ -254,7 +254,7 @@ const ProductCard = ({ product }) => {
               const hasSaleInfo = isSale && oldPrice && displayPrice;
               const hasTags = product.tags?.length > 0;
 
-              if (!hasSoldCount && !hasSaleInfo && !hasTags) return null;
+              if (!hasTags) return null;
 
               const items = [];
               if (hasSaleInfo) {
