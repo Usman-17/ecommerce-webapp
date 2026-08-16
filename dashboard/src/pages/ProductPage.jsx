@@ -1,8 +1,25 @@
 import toast from "react-hot-toast";
 import { useLocation } from "react-router";
 import { useState, useEffect, useRef } from "react";
-import { SquarePen, Plus, Upload, X } from "lucide-react";
+import { SquarePen, Plus, Upload, X, GripVertical } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import TagsInput from "../components/TagsInput";
 import WebLinksInput from "../components/WebLinksInput";
@@ -48,8 +65,63 @@ const emptyVariant = () => ({
   existingImages: [],
 });
 
+const SortableImage = ({ img, index, onDelete }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: img });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative group"
+    >
+      <img
+        src={img}
+        alt=""
+        className="w-24 h-24 object-cover rounded shadow-sm"
+      />
+      <button
+        type="button"
+        className="absolute top-0.5 left-0.5 bg-white/80 text-gray-600 rounded p-0.5 cursor-grab active:cursor-grabbing hover:bg-white"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical size={12} />
+      </button>
+      <button
+        type="button"
+        onClick={onDelete}
+        className="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700 cursor-pointer"
+      >
+        ✕
+      </button>
+      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 bg-black/60 text-white text-[9px] px-1.5 py-0.5 rounded">
+        {index + 1}
+      </span>
+    </div>
+  );
+};
+
 const ProductPage = () => {
   const queryClient = useQueryClient();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const [activeTab, setActiveTab] = useState("Basic Info");
   const [isSavingAndClose, setIsSavingAndClose] = useState(false);
   const isSavingAndCloseRef = useRef(false);
@@ -319,6 +391,13 @@ const ProductPage = () => {
       formDataToSend.append("productImages", file);
     });
 
+    if (formData.productImages.length > 0) {
+      formDataToSend.append(
+        "existingProductImages",
+        JSON.stringify(formData.productImages),
+      );
+    }
+
     const variantsForApi = variants.map((v) => {
       const cleaned = {
         name: v.name,
@@ -400,6 +479,15 @@ const ProductPage = () => {
       productImages: prev.productImages.filter((_, i) => i !== index),
     }));
     setProductImgPreview((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleReorderImages = (oldIndex, newIndex) => {
+    setProductImgPreview((prev) => arrayMove(prev, oldIndex, newIndex));
+    setProductImages((prev) => arrayMove(prev, oldIndex, newIndex));
+    setFormData((prev) => ({
+      ...prev,
+      productImages: arrayMove(prev.productImages, oldIndex, newIndex),
+    }));
   };
 
   const handleVariantChange = (index, field, value) => {
@@ -1108,30 +1196,37 @@ const ProductPage = () => {
                 </label>
 
                 {productImgPreview.length > 0 && (
-                  <div className="flex flex-wrap mt-4 gap-3">
-                    {productImgPreview.map((img, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={img}
-                          alt=""
-                          className="w-24 h-24 object-cover rounded shadow-sm"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (formData.productImages[index]) {
-                              handleDeleteExistingImage(index);
-                            } else {
-                              handleDeleteImage(index);
-                            }
-                          }}
-                          className="absolute top-0.5 right-0.5 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-700 cursor-pointer"
-                        >
-                          ✕
-                        </button>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={(event) => {
+                      const { active, over } = event;
+                      if (active.id !== over?.id) {
+                        const oldIndex = productImgPreview.indexOf(active.id);
+                        const newIndex = productImgPreview.indexOf(over.id);
+                        handleReorderImages(oldIndex, newIndex);
+                      }
+                    }}
+                  >
+                    <SortableContext items={productImgPreview} strategy={rectSortingStrategy}>
+                      <div className="flex flex-wrap mt-4 gap-3">
+                        {productImgPreview.map((img, index) => (
+                          <SortableImage
+                            key={img}
+                            img={img}
+                            index={index}
+                            onDelete={() => {
+                              if (formData.productImages[index]) {
+                                handleDeleteExistingImage(index);
+                              } else {
+                                handleDeleteImage(index);
+                              }
+                            }}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </SortableContext>
+                  </DndContext>
                 )}
               </div>
             )}
