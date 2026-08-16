@@ -168,7 +168,7 @@ const SuccessModal = ({
           {/* Track Order Button & Shop More Button */}
           <div className="flex flex-col sm:flex-row gap-1.5">
             <Link
-              to={`/track-order?id=${savedOrderResponse?.id || ""}`}
+              to={`/track-order?id=${savedOrderResponse?.trackingNo || ""}`}
               className="flex-[1.2] group bg-accent hover:bg-[#c93d4f] text-white py-3.5 rounded-lg font-black uppercase tracking-[0.15em] text-[10px] shadow-lg shadow-pink-100 transition-all duration-300 flex items-center justify-center gap-2"
             >
               <span>Track Order</span>
