@@ -3,9 +3,16 @@ const ProductPrice = ({
   originalPrice,
   discountPercent,
   taxPercent,
+  bulkPricing = [],
+  onTierClick,
+  activeQuantity,
 }) => {
+  const sortedTiers = [...bulkPricing]
+    .filter((t) => t.quantity && t.price)
+    .sort((a, b) => a.quantity - b.quantity);
+
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-2xl font-bold text-red-500">
@@ -42,6 +49,40 @@ const ProductPrice = ({
         <p className="text-[10px] text-gray-400 font-medium tracking-wide">
           Inclusive of {taxPercent}% GST
         </p>
+      )}
+
+      {sortedTiers.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-1">
+          {sortedTiers.map((tier, i) => {
+            const perItem = Math.round(
+              Number(tier.price) / Number(tier.quantity),
+            );
+            const bestTierIdx =
+              sortedTiers.length -
+              1 -
+              [...sortedTiers]
+                .reverse()
+                .findIndex((t) => activeQuantity >= Number(t.quantity));
+            const isActive =
+              sortedTiers.length > 0 &&
+              i === bestTierIdx &&
+              activeQuantity >= Number(tier.quantity);
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onTierClick?.(Number(tier.quantity))}
+                className={`inline-flex items-center gap-1.5 border rounded-full px-3 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-orange-500 border-orange-500 text-white"
+                    : "bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
+                }`}
+              >
+                Buy {tier.quantity} at Rs {perItem.toLocaleString()}/each
+              </button>
+            );
+          })}
+        </div>
       )}
     </div>
   );

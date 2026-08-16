@@ -10,6 +10,18 @@ import { getCart, setCart } from "../../../utils/cartStorage";
 import { setInMemoryData } from "../../../services/storageService";
 // Imports End------
 
+const getBulkTotal = (bulkPricing, unitPrice, qty) => {
+  const tiers = (bulkPricing || [])
+    .filter((t) => t.quantity && t.price)
+    .sort((a, b) => b.quantity - a.quantity);
+  const matched = tiers.find((t) => qty >= t.quantity);
+  if (matched) {
+    const perItem = Number(matched.price) / Number(matched.quantity);
+    return Math.round(perItem * qty);
+  }
+  return unitPrice * qty;
+};
+
 const MobileActionBar = ({
   product,
   selectedPack,
@@ -102,7 +114,7 @@ const MobileActionBar = ({
       packDescription: pk?.productPackDescription || null,
       price: currentPrice,
       quantity: qty,
-      total: currentPrice * qty,
+      total: getBulkTotal(product?.bulkPricing, currentPrice, qty),
       selectedOptions: opts,
       variantId: matchedVariant?._id || null,
       selectedVariants: (selectedVariants || []).map((v) => ({
@@ -184,7 +196,7 @@ const MobileActionBar = ({
       packDescription: selectedPack?.productPackDescription || null,
       price: currentPrice,
       quantity: qty,
-      total: currentPrice * qty,
+      total: getBulkTotal(product?.bulkPricing, currentPrice, qty),
       selectedOptions,
       variantId: matchedVariant?._id || null,
       selectedVariants: matchedVariant

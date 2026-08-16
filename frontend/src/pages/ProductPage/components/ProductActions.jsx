@@ -21,15 +21,33 @@ const ProductActions = ({
   matchedVariant,
   selectedVariants,
   currentPrice,
+  quantity,
+  setQuantity,
   onShakeOptions,
 }) => {
   const navigate = useNavigate();
-  const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
 
   const { trackAddToCart } = useEcommerce();
 
-  const total = currentPrice * quantity;
+  const total = useMemo(() => {
+    const tiers = (product?.bulkPricing || [])
+      .filter((t) => t.quantity && t.price)
+      .sort((a, b) => b.quantity - a.quantity);
+    const matchedTier = tiers.find((t) => quantity >= t.quantity);
+    if (matchedTier) {
+      const perItem = Number(matchedTier.price) / Number(matchedTier.quantity);
+      return Math.round(perItem * quantity);
+    }
+    return currentPrice * quantity;
+  }, [currentPrice, quantity, product?.bulkPricing]);
+
+  const activeTier = useMemo(() => {
+    const tiers = (product?.bulkPricing || [])
+      .filter((t) => t.quantity && t.price)
+      .sort((a, b) => b.quantity - a.quantity);
+    return tiers.find((t) => quantity >= t.quantity) || null;
+  }, [quantity, product?.bulkPricing]);
 
   const hasVariants =
     (product?.variants?.filter((v) => v.isActive !== false)?.length || 0) > 0;
@@ -199,6 +217,16 @@ const ProductActions = ({
           <p className="text-xl font-bold text-primary">
             Rs {total.toLocaleString("en-US", { maximumFractionDigits: 0 })}
           </p>
+
+          {activeTier && (
+            <p className="text-[10px] text-green-600 font-medium">
+              Bulk deal! Rs{" "}
+              {Math.round(
+                Number(activeTier.price) / Number(activeTier.quantity),
+              )}
+              /item
+            </p>
+          )}
         </div>
       </div>
 

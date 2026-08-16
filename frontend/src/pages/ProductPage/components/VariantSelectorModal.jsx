@@ -172,6 +172,48 @@ const VariantSelectorModal = ({
                   </button>
                 </div>
               </div>
+
+              {/* Bulk Pricing Tiers */}
+              {(() => {
+                const tiers = (product?.bulkPricing || [])
+                  .filter((t) => t.quantity && t.price)
+                  .sort((a, b) => a.quantity - b.quantity);
+                if (tiers.length === 0) return null;
+                const bestIdx =
+                  tiers.length -
+                  1 -
+                  [...tiers]
+                    .reverse()
+                    .findIndex((t) => localQuantity >= Number(t.quantity));
+                return (
+                  <div className="flex flex-wrap gap-1.5">
+                    {tiers.map((tier, i) => {
+                      const perItem = Math.round(
+                        Number(tier.price) / Number(tier.quantity),
+                      );
+                      const isActive =
+                        i === bestIdx && localQuantity >= Number(tier.quantity);
+                      return (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() =>
+                            setLocalQuantity(Number(tier.quantity))
+                          }
+                          className={`inline-flex items-center gap-1.5 border rounded-full px-3 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                            isActive
+                              ? "bg-orange-500 border-orange-500 text-white"
+                              : "bg-orange-50 border-orange-200 text-orange-700"
+                          }`}
+                        >
+                          Buy {tier.quantity} at Rs {perItem.toLocaleString()}
+                          /each
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Sticky Footer */}
@@ -181,7 +223,23 @@ const VariantSelectorModal = ({
                   Total Price
                 </p>
                 <p className="text-xl font-black text-accent leading-none tabular-nums">
-                  Rs {(currentPrice * localQuantity).toLocaleString()}
+                  Rs{" "}
+                  {(() => {
+                    const tiers = (product?.bulkPricing || [])
+                      .filter((t) => t.quantity && t.price)
+                      .sort((a, b) => b.quantity - a.quantity);
+                    const matched = tiers.find(
+                      (t) => localQuantity >= t.quantity,
+                    );
+                    if (matched) {
+                      const perItem =
+                        Number(matched.price) / Number(matched.quantity);
+                      return Math.round(
+                        perItem * localQuantity,
+                      ).toLocaleString();
+                    }
+                    return (currentPrice * localQuantity).toLocaleString();
+                  })()}
                 </p>
               </div>
 

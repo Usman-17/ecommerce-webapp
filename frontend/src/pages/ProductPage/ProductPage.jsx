@@ -121,10 +121,12 @@ const ProductPage = () => {
   const [prevProductId, setPrevProductId] = useState(null);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [shakeOptions, setShakeOptions] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   if (product && product._id !== prevProductId) {
     setPrevProductId(product._id);
     setSelectedOptions({});
+    setQuantity(1);
   }
 
   const images = useMemo(() => {
@@ -390,11 +392,14 @@ const ProductPage = () => {
                 currentPrice={currentPrice}
                 originalPrice={originalPrice}
                 discountPercent={discountPercent}
+                bulkPricing={product.bulkPricing || []}
+                onTierClick={(qty) => setQuantity(qty)}
+                activeQuantity={quantity}
               />
 
               {/* Short Description */}
               <div
-                className="text-gray-600 leading-relaxed text-[13px] sm:text-sm max-w-none prose prose-sm mb-3 sm:mb-0"
+                className="text-gray-600 leading-relaxed text-[12px] sm:text-sm max-w-none prose prose-sm mb-3 sm:mb-0"
                 dangerouslySetInnerHTML={{
                   __html: product.description,
                 }}
@@ -421,6 +426,8 @@ const ProductPage = () => {
                 matchedVariant={matchedVariant}
                 selectedVariants={selectedVariants}
                 currentPrice={currentPrice}
+                quantity={quantity}
+                setQuantity={setQuantity}
                 onShakeOptions={() => {
                   setShakeOptions(true);
                   setTimeout(() => setShakeOptions(false), 500);
