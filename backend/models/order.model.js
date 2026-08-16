@@ -77,6 +77,7 @@ const orderSchema = new mongoose.Schema(
     cancelledAt: { type: Date },
     cancelRemarks: { type: String, default: "" },
     deliveredAt: { type: Date },
+    extraExpense: { type: Number, default: 0 },
 
     orderType: {
       type: String,
