@@ -127,6 +127,13 @@ const productSchema = new mongoose.Schema(
     ],
 
     variants: [variantSchema],
+
+    bulkPricing: [
+      {
+        quantity: { type: Number, required: true, min: 1 },
+        price: { type: Number, required: true, min: 0 },
+      },
+    ],
   },
   { timestamps: true },
 );

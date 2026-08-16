@@ -57,6 +57,7 @@ const formatProduct = (prod) => {
     isActive: obj.isActive ?? true,
     productImages: obj.productImages,
     variants: obj.variants,
+    bulkPricing: obj.bulkPricing || [],
     categoryId: obj.category?._id || obj.category || null,
     categoryName: obj.category?.name || null,
     brandId: obj.brand?._id || obj.brand || null,
@@ -101,6 +102,7 @@ export const createProduct = async (req, res) => {
       webLinks,
       isActive,
       variants: variantsJson,
+      bulkPricing: bulkPricingJson,
     } = req.body;
 
     const normalizedTags = Array.isArray(tags)
@@ -171,6 +173,17 @@ export const createProduct = async (req, res) => {
       }
     }
 
+    let parsedBulkPricing = [];
+    if (bulkPricingJson) {
+      try {
+        parsedBulkPricing = JSON.parse(bulkPricingJson);
+      } catch {
+        return res
+          .status(400)
+          .json({ error: "Invalid bulk pricing JSON format" });
+      }
+    }
+
     // Filter out variants with empty names
     parsedVariants = parsedVariants.filter((v) => v.name && v.name.trim());
 
@@ -209,6 +222,7 @@ export const createProduct = async (req, res) => {
           : true,
       productImages: uploadedProductImages,
       variants: parsedVariants.filter((v) => v.name && v.name.trim()),
+      bulkPricing: parsedBulkPricing,
     });
 
     await newProduct.save();
@@ -245,6 +259,7 @@ export const updateProduct = async (req, res) => {
       webLinks,
       isActive,
       variants: variantsJson,
+      bulkPricing: bulkPricingJson,
     } = req.body;
 
     const product = await Product.findById(id);
@@ -405,6 +420,16 @@ export const updateProduct = async (req, res) => {
       }
 
       product.variants = parsedVariants.filter((v) => v.name && v.name.trim());
+    }
+
+    if (bulkPricingJson !== undefined) {
+      try {
+        product.bulkPricing = JSON.parse(bulkPricingJson);
+      } catch {
+        return res
+          .status(400)
+          .json({ error: "Invalid bulk pricing JSON format" });
+      }
     }
 
     await product.save();
