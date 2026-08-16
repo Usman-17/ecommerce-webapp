@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import ProductCard from "../../../components/ProductCard";
 import SectionHeader from "../../../components/SectionHeader";
@@ -16,10 +16,7 @@ const getRangeStart = (price) => {
   return idx === 0 ? 1 : prices[idx - 1] + 1;
 };
 
-const SCROLL_AMOUNT = 320;
-
 const PriceRangeSection = () => {
-  const scrollRef = useRef(null);
   const initializedRef = useRef(false);
 
   const [activePrice, setActivePrice] = useState(99);
@@ -71,15 +68,6 @@ const PriceRangeSection = () => {
         })
       : [];
 
-  // Scroll handlers
-  const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -SCROLL_AMOUNT, behavior: "smooth" });
-  };
-
-  const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: SCROLL_AMOUNT, behavior: "smooth" });
-  };
-
   return (
     <section className="pt-8 pb-16 sm:pt-12 sm:pb-6 lg:px-32">
       <div className="max-w-480 mx-auto">
@@ -126,30 +114,8 @@ const PriceRangeSection = () => {
           ))}
         </div>
 
-        {/* ── Navigation controls ── */}
-        <div className="flex items-center justify-center gap-3 py-8 px-4 sm:px-0">
-          {filteredProducts.length > 6 && (
-            <>
-              <button
-                onClick={scrollLeft}
-                aria-label="Scroll brands left"
-                className="flex w-8 h-8 lg:w-10 lg:h-10 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all duration-200 text-gray-500 hover:text-gray-800 shadow-sm"
-              >
-                <ChevronLeft size={16} strokeWidth={2} />
-              </button>
-
-              <button
-                onClick={scrollRight}
-                aria-label="Scroll brands right"
-                className="flex w-8 h-8 lg:w-10 lg:h-10 items-center justify-center rounded-full bg-primary hover:opacity-90 active:scale-95 transition-all duration-200 text-white shadow-sm"
-              >
-                <ChevronRight size={16} strokeWidth={2} />
-              </button>
-            </>
-          )}
-
-          {/* View All pill */}
-          {filteredProducts.length > 6 && (
+        {filteredProducts.length > 10 && (
+          <div className="flex items-center justify-center py-8">
             <Link
               to="/shop"
               className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 bg-white hover:bg-gray-50 active:scale-95 transition-all duration-200 text-gray-700 hover:text-gray-900 text-xs font-bold uppercase tracking-widest shadow-sm"
@@ -160,8 +126,8 @@ const PriceRangeSection = () => {
                 className="group-hover:translate-x-0.5 transition-transform duration-300"
               />
             </Link>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
