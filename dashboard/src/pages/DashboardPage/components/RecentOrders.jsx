@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import moment from "moment";
+import { Link } from "react-router-dom";
 
 const RecentOrders = ({ orders }) => {
   return (
@@ -23,7 +23,7 @@ const RecentOrders = ({ orders }) => {
               <th className="px-6 py-3">Mobile</th>
               <th className="px-6 py-3">Items</th>
               <th className="px-6 py-3">Amount</th>
-              <th className="px-6 py-3">Payment</th>
+              <th className="px-6 py-3">Type</th>
               <th className="px-6 py-3">Status</th>
               <th className="px-6 py-3">Date</th>
             </tr>
@@ -45,9 +45,21 @@ const RecentOrders = ({ orders }) => {
                 </td>
 
                 <td className="px-6 py-4">
-                  {order.paymentMethod === "COD"
-                    ? "Cash on Delivery"
-                    : order.paymentMethod}
+                  <span
+                    className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
+                      order.orderType === "scoop"
+                        ? "bg-purple-100 text-purple-800"
+                        : order.orderType === "deal"
+                          ? "bg-orange-100 text-orange-800"
+                          : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
+                    {order.orderType === "scoop"
+                      ? order.scoopDetails?.scoopType || "Scoop"
+                      : order.orderType === "deal"
+                        ? "Deal"
+                        : "Normal"}
+                  </span>
                 </td>
                 <td className="px-6 py-4">
                   <span

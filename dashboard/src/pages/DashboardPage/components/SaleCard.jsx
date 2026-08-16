@@ -1,14 +1,17 @@
 import Chart from "react-apexcharts";
 
 const SalesCard = ({ orders }) => {
-  const series = [100];
+  const deliveredOrders = orders.filter((o) => o.status === "Delivered");
+  const totalSales = deliveredOrders.reduce(
+    (acc, order) => acc + (order.amount || 0) + (order.shippingCharge || 0),
+    0,
+  );
+  const totalOrders = orders.length;
+  const deliveredCount = deliveredOrders.length;
+  const deliveryRate =
+    totalOrders > 0 ? Math.round((deliveredCount / totalOrders) * 100) : 0;
 
-  const totalSales = orders.reduce((acc, order) => {
-    if (order.status === "Delivered") {
-      return acc + (order.amount || 0) + (order.shippingCharge || 0);
-    }
-    return acc;
-  }, 0);
+  const series = [deliveryRate];
 
   const options = {
     colors: ["#465FFF"],
@@ -16,27 +19,20 @@ const SalesCard = ({ orders }) => {
       fontFamily: "Outfit, sans-serif",
       type: "radialBar",
       height: 330,
-      sparkline: {
-        enabled: true,
-      },
+      sparkline: { enabled: true },
     },
-
     plotOptions: {
       radialBar: {
         startAngle: -85,
         endAngle: 85,
-        hollow: {
-          size: "80%",
-        },
+        hollow: { size: "80%" },
         track: {
           background: "#E4E7EC",
           strokeWidth: "100%",
           margin: 5,
         },
         dataLabels: {
-          name: {
-            show: false,
-          },
+          name: { show: false },
           value: {
             fontSize: "36px",
             fontWeight: "600",
@@ -46,13 +42,8 @@ const SalesCard = ({ orders }) => {
         },
       },
     },
-    fill: {
-      type: "solid",
-      colors: ["#465FFF"],
-    },
-    stroke: {
-      lineCap: "round",
-    },
+    fill: { type: "solid", colors: ["#465FFF"] },
+    stroke: { lineCap: "round" },
     labels: ["Progress"],
   };
 
@@ -61,11 +52,14 @@ const SalesCard = ({ orders }) => {
       <div className="px-5 pt-5 bg-white shadow rounded-2xl pb-10">
         <div className="flex justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 ">Total Sale</h3>
-            <p className="mt-1 text-gray-500 text-sm ">
+            <h3 className="text-lg font-semibold text-gray-800">Total Sale</h3>
+            <p className="mt-1 text-gray-500 text-sm">
               Your total sales amount
             </p>
           </div>
+          <span className="text-sm text-gray-400">
+            {deliveredCount} of {totalOrders} delivered
+          </span>
         </div>
 
         <div className="relative mt-6">
@@ -75,17 +69,15 @@ const SalesCard = ({ orders }) => {
             type="radialBar"
             height={330}
           />
-
           <span className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[95%] rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-600">
-            +100%
+            {deliveryRate}% delivered
           </span>
         </div>
 
         <div className="mx-auto mt-10 max-w-md text-center">
           <p className="text-sm text-gray-500">
-            Impressive progress — total sales so far.
+            {deliveredCount} of {totalOrders} orders delivered
           </p>
-
           <p className="text-2xl font-bold text-gray-800 mt-1">
             Rs. {totalSales.toLocaleString()}
           </p>

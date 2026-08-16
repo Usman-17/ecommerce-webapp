@@ -166,6 +166,34 @@ const OrdersPage = () => {
     onSuccess: () => toast.success("Order status updated"),
   });
 
+  const { mutate: updateExtraExpense } = useMutation({
+    mutationFn: async ({ orderId, extraExpense }) => {
+      const res = await fetch(`/api/order/status/${orderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ extraExpense }),
+      });
+      if (!res.ok) throw new Error("Failed to update extra expense");
+      return res.json();
+    },
+    onMutate: async ({ orderId, extraExpense }) => {
+      await queryClient.cancelQueries(["orders"]);
+      const previousOrders = queryClient.getQueryData(["orders"]);
+      queryClient.setQueryData(["orders"], (oldOrders) =>
+        oldOrders?.map((order) =>
+          order._id === orderId ? { ...order, extraExpense } : order,
+        ),
+      );
+      return { previousOrders };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(["orders"], context.previousOrders);
+      toast.error("Failed to update extra expense");
+    },
+    onSettled: () => queryClient.invalidateQueries(["orders"]),
+    onSuccess: () => toast.success("Extra expense updated"),
+  });
+
   const filteredData = useGlobalFilter(statusFilteredOrders, globalSearch, [
     "sr",
     "customerName",
@@ -662,46 +690,93 @@ const OrdersPage = () => {
                         ).toLocaleString()}
                       </span>
                     </div>
-                    {viewOrder.items.some((i) => i.purchasePrice > 0) && (
-                      <>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-500">
-                            Cost Price
-                          </span>
-                          <span className="text-sm font-semibold text-red-500">
-                            Rs.{" "}
-                            {(
-                              viewOrder.totalPurchasePrice ||
-                              viewOrder.items.reduce(
-                                (sum, i) =>
-                                  sum + (i.purchasePrice || 0) * i.quantity,
-                                0,
-                              )
-                            ).toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-bold text-green-600">
-                            Profit
-                          </span>
-                          <span className="text-sm font-bold text-green-600">
-                            Rs.{" "}
-                            {(
-                              viewOrder.profit ??
+                  </div>
+                </div>
+
+                {/* Profit Section */}
+                {viewOrder.items.some((i) => i.purchasePrice > 0) && (
+                  <div className="bg-white border border-gray-200 rounded-2xl p-5">
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
+                      Profit Summary
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">Total</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          Rs.{" "}
+                          {(
+                            viewOrder.amount + (viewOrder.shippingCharge || 0)
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">Shipping</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          Rs. {viewOrder.shippingCharge || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">
+                          Cost Price
+                        </span>
+                        <span className="text-sm font-semibold text-red-500">
+                          Rs.{" "}
+                          {(
+                            viewOrder.totalPurchasePrice ||
+                            viewOrder.items.reduce(
+                              (sum, i) =>
+                                sum + (i.purchasePrice || 0) * i.quantity,
+                              0,
+                            )
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-500">
+                          Extra Expense
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={viewOrder.extraExpense || 0}
+                          onChange={(e) => {
+                            const val = Number(e.target.value) || 0;
+                            setViewOrder((prev) => ({
+                              ...prev,
+                              extraExpense: val,
+                            }));
+                          }}
+                          onBlur={() => {
+                            updateExtraExpense({
+                              orderId: viewOrder._id,
+                              extraExpense: viewOrder.extraExpense || 0,
+                            });
+                          }}
+                          className="w-24 text-sm font-semibold text-red-500 border border-gray-200 rounded-lg px-2 py-1 text-right focus:outline-none focus:ring-2 focus:ring-(--secondary-color)"
+                        />
+                      </div>
+                      <div className="border-t border-gray-100 my-1" />
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-bold text-green-600">
+                          Profit
+                        </span>
+                        <span className="text-sm font-bold text-green-600">
+                          Rs.{" "}
+                          {(
+                            (viewOrder.profit ??
                               viewOrder.amount +
                                 (viewOrder.shippingCharge || 0) -
                                 viewOrder.items.reduce(
                                   (sum, i) =>
                                     sum + (i.purchasePrice || 0) * i.quantity,
                                   0,
-                                )
-                            ).toLocaleString()}
-                          </span>
-                        </div>
-                      </>
-                    )}
+                                )) - (viewOrder.extraExpense || 0)
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Scoop Details (only for scoop orders) */}
                 {viewOrder.orderType === "scoop" && viewOrder.scoopDetails && (

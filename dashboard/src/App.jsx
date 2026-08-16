@@ -17,7 +17,7 @@ import useGetAuth from "./hooks/useGetAuth";
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
-const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage/DashboardPage"));
 const ProductPage = lazy(() => import("./pages/ProductPage"));
 const AddBrandPage = lazy(() => import("./pages/AddBrandPage"));
 const BrandListingPage = lazy(() => import("./pages/BrandListingPage"));
