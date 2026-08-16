@@ -8,8 +8,12 @@ var brandSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    image: {
+      public_id: { type: String },
+      url: { type: String },
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Brand = mongoose.model("Brand", brandSchema);
