@@ -182,11 +182,11 @@ export const placeOrder = async (req, res) => {
       }
     }
 
-    // Save order — for normal orders, compute amount server-side to stay consistent with item prices
+    // Save order — compute amount as items-only total for all order types
     const isNormalOrder = !scoop && !deal;
     const computedAmount = isNormalOrder
       ? orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-      : totalAmount;
+      : Number(totalAmount) - (Number(shippingCharge) || 0);
     const orderData = {
       userId,
       trackingNo: generateTrackingNo(),
