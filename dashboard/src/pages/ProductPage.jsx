@@ -29,6 +29,7 @@ import { useGetSubCategoriesByCategory } from "../hooks/useGetSubCategoriesByCat
 const tabs = [
   "Basic Info",
   "Variants",
+  "Bulk Pricing",
   "Tags & Links",
   "Description",
   "Images",
@@ -84,6 +85,7 @@ const ProductPage = () => {
   const [productImages, setProductImages] = useState([]);
   const [productImgPreview, setProductImgPreview] = useState([]);
   const [variants, setVariants] = useState([emptyVariant()]);
+  const [bulkPricing, setBulkPricing] = useState([]);
 
   const { products = [], isLoading } = useGetAllProducts();
   const { brands = [] } = useGetAllBrands();
@@ -184,6 +186,7 @@ const ProductPage = () => {
     setProductImages([]);
     setProductImgPreview([]);
     setVariants([emptyVariant()]);
+    setBulkPricing([]);
     setActiveTab("Basic Info");
     setAddModal(true);
   };
@@ -243,6 +246,15 @@ const ProductPage = () => {
         setVariants([emptyVariant()]);
       }
 
+      setBulkPricing(
+        (data.bulkPricing || []).map((bp) => ({
+          ...bp,
+          perItem:
+            bp.quantity && bp.price
+              ? String(Math.round(bp.price / bp.quantity))
+              : "",
+        })),
+      );
       setEditItem(record);
       setActiveTab("Basic Info");
       setAddModal(true);
@@ -274,6 +286,7 @@ const ProductPage = () => {
     setProductImages([]);
     setProductImgPreview([]);
     setVariants([emptyVariant()]);
+    setBulkPricing([]);
     setActiveTab("Basic Info");
   };
 
@@ -322,6 +335,16 @@ const ProductPage = () => {
     });
 
     formDataToSend.append("variants", JSON.stringify(variantsForApi));
+
+    const filteredBulkPricing = bulkPricing
+      .filter((bp) => bp.quantity && (bp.price || bp.perItem))
+      .map((bp) => ({
+        quantity: Number(bp.quantity),
+        price: bp.perItem
+          ? Number(bp.perItem) * Number(bp.quantity)
+          : Number(bp.price),
+      }));
+    formDataToSend.append("bulkPricing", JSON.stringify(filteredBulkPricing));
 
     variants.forEach((v, i) => {
       v.images.forEach((file) => {
@@ -431,10 +454,10 @@ const ProductPage = () => {
 
   const columns = [
     {
-      title: "Sr No.",
+      title: "Sr.",
       dataIndex: "sr",
       key: "sr",
-      width: 70,
+      width: 60,
       align: "center",
       sorter: (a, b) => a.sr - b.sr,
     },
@@ -442,7 +465,7 @@ const ProductPage = () => {
       title: "Image",
       dataIndex: "productImage",
       key: "productImage",
-      width: 80,
+      width: 70,
       render: (url) =>
         url ? (
           <img
@@ -460,7 +483,7 @@ const ProductPage = () => {
       title: "Title",
       dataIndex: "title",
       key: "title",
-      width: 300,
+      width: 200,
       render: (text) => (
         <span className="block max-w-[250px] truncate" title={text}>
           {text}
@@ -489,7 +512,7 @@ const ProductPage = () => {
         (a.categoryName || "").localeCompare(b.categoryName || ""),
     },
     {
-      title: "Purchase Price",
+      title: "Price",
       dataIndex: "purchasePrice",
       key: "purchasePrice",
       width: 120,
@@ -507,7 +530,7 @@ const ProductPage = () => {
     },
 
     {
-      title: "Secondary Price",
+      title: "S Price",
       dataIndex: "secondaryPrice",
       key: "secondaryPrice",
       width: 130,
@@ -960,6 +983,108 @@ const ProductPage = () => {
                         )}
                       </div>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Bulk Pricing Tab */}
+            {activeTab === "Bulk Pricing" && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm font-semibold">
+                      Bulk Pricing
+                    </label>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Offer special prices for buying multiple items
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setBulkPricing([
+                        ...bulkPricing,
+                        { quantity: "", price: "" },
+                      ])
+                    }
+                    className="flex items-center gap-1 text-xs bg-black text-white px-3 py-1.5 rounded hover:bg-neutral-800 cursor-pointer"
+                  >
+                    <Plus size={14} /> Add Tier
+                  </button>
+                </div>
+
+                {bulkPricing.length === 0 && (
+                  <p className="text-sm text-gray-400 text-center py-8">
+                    No bulk pricing tiers added yet
+                  </p>
+                )}
+
+                {bulkPricing.map((tier, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
+                  >
+                    <div className="flex-1">
+                      <label className="text-[11px] text-gray-500 mb-1 block">
+                        Buy Qty
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={tier.quantity}
+                        onChange={(e) => {
+                          const updated = [...bulkPricing];
+                          updated[i].quantity = e.target.value;
+                          setBulkPricing(updated);
+                        }}
+                        placeholder="e.g. 3"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-[11px] text-gray-500 mb-1 block">
+                        Price (per item)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={tier.perItem || ""}
+                        onChange={(e) => {
+                          const updated = [...bulkPricing];
+                          updated[i].perItem = e.target.value;
+                          if (e.target.value && updated[i].quantity) {
+                            updated[i].price =
+                              Number(e.target.value) *
+                              Number(updated[i].quantity);
+                          }
+                          setBulkPricing(updated);
+                        }}
+                        placeholder="e.g. 183"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-[11px] text-gray-500 mb-1 block">
+                        Total
+                      </label>
+                      <div className="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg">
+                        {tier.quantity && tier.perItem
+                          ? `Rs. ${(Number(tier.perItem) * Number(tier.quantity)).toLocaleString()}`
+                          : "-"}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setBulkPricing(
+                          bulkPricing.filter((_, idx) => idx !== i),
+                        )
+                      }
+                      className="text-red-500 hover:text-red-400 cursor-pointer mt-5"
+                    >
+                      <X size={14} />
+                    </button>
                   </div>
                 ))}
               </div>
