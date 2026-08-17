@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion as Motion } from "framer-motion";
 
 import ProductCard from "./ProductCard";
@@ -7,7 +8,7 @@ import { useGetAllProducts } from "../hooks/useGetAllProducts";
 // Imports End----
 
 const RecommendedProducts = ({
-  limit = 0,
+  limit = 18,
   allProducts: propAllProducts,
   productIsLoading: propProductIsLoading,
 }) => {
@@ -22,7 +23,20 @@ const RecommendedProducts = ({
       ? propProductIsLoading
       : hookProducts.productIsLoading;
 
-  const products = limit ? allProducts.slice(0, limit) : allProducts;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const products = isMobile
+    ? allProducts
+    : limit
+      ? allProducts.slice(0, limit)
+      : allProducts;
 
   return (
     <section className="pb-4 sm:pb-8 sm:py-4">
