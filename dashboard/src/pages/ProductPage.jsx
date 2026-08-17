@@ -668,7 +668,7 @@ const ProductPage = () => {
   ];
 
   const tabBtnClass = (tab) =>
-    `px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+    `px-4 py-2 text-sm font-medium transition-colors cursor-pointer whitespace-nowrap ${
       activeTab === tab
         ? "text-black border-b-2 border-black"
         : "text-gray-500 hover:text-black"
@@ -676,11 +676,11 @@ const ProductPage = () => {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-row justify-between items-center gap-4">
         <SectionHeading title="Products" subtitle="Manage Products below" />
         <button
           onClick={handleOpenAdd}
-          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full hover:bg-neutral-900 transition-colors cursor-pointer text-sm font-medium"
+          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full hover:bg-neutral-900 transition-colors cursor-pointer text-sm font-medium shrink-0"
         >
           <SquarePen size={16} /> Add Product
         </button>
@@ -709,7 +709,7 @@ const ProductPage = () => {
       >
         <div className="flex flex-col flex-1">
           {/* Tabs */}
-          <div className="flex border-b border-gray-200 mb-4">
+          <div className="flex border-b border-gray-200 mb-4 overflow-x-auto no-scrollbar">
             {tabs.map((tab) => (
               <button
                 key={tab}

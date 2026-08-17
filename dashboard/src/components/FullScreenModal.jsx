@@ -50,14 +50,13 @@ const FullScreenModal = ({
           exit={{ opacity: 0 }}
         >
           <Motion.div
-            className="w-full h-full bg-white text-gray-800 overflow-y-auto no-scrollbar pointer-events-auto"
-            style={{
-              marginLeft: !isMobileOpen
+            className={`w-full h-full bg-white text-gray-800 overflow-y-auto no-scrollbar pointer-events-auto ${
+              !isMobileOpen
                 ? isExpanded || isHovered
-                  ? 220
-                  : 56
-                : 0,
-            }}
+                  ? "lg:ml-[220px]"
+                  : "lg:ml-[56px]"
+                : ""
+            }`}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
