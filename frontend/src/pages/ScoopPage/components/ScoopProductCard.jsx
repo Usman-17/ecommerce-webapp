@@ -22,6 +22,7 @@ const ScoopProductCard = ({
   const { displayPrice, oldPrice, isSale } = calculateProductPrice(product);
 
   const allImages = (product.productImages || [])
+    .filter(Boolean)
     .map((img) => img.url)
     .filter(Boolean);
 

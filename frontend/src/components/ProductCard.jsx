@@ -44,6 +44,7 @@ const ProductCard = ({ product }) => {
 
   // Image Array
   const allImages = (product.productImages || [])
+    .filter(Boolean)
     .map((img) => img.url)
     .filter(Boolean);
 

@@ -4,6 +4,7 @@ import { motion as Motion, AnimatePresence } from "framer-motion";
 import SizeFilter from "../filters/SizeFilter";
 import PriceFilter from "../filters/PriceFilter";
 import ColorFilter from "../filters/ColorFilter";
+import AreaFilter from "../filters/AreaFilter";
 import CategoryFilter from "../filters/CategoryFilter";
 
 const MobileFilterDrawer = ({
@@ -17,6 +18,11 @@ const MobileFilterDrawer = ({
   priceRange,
   setPriceRange,
   actualPriceRange,
+  areas,
+  selectedAreas,
+  setSelectedAreas,
+  getAreaProductCount,
+  areasLoading,
   subCategories,
   selectedSubCategories,
   setSelectedSubCategories,
@@ -164,6 +170,20 @@ const MobileFilterDrawer = ({
                   priceRange={priceRange}
                   setPriceRange={setPriceRange}
                   actualPriceRange={actualPriceRange}
+                />
+              </div>
+
+              <div className="border-t border-gray-100" />
+
+              {/* Area Filter */}
+              <div className="py-6">
+                <AreaFilter
+                  areas={areas}
+                  selectedAreas={selectedAreas}
+                  setSelectedAreas={setSelectedAreas}
+                  getAreaProductCount={getAreaProductCount}
+                  initialItemCount={7}
+                  isLoading={areasLoading}
                 />
               </div>
 

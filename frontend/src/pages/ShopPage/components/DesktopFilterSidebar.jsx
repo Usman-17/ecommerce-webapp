@@ -1,6 +1,7 @@
 import SizeFilter from "../filters/SizeFilter";
 import PriceFilter from "../filters/PriceFilter";
 import ColorFilter from "../filters/ColorFilter";
+import AreaFilter from "../filters/AreaFilter";
 import CategoryFilter from "../filters/CategoryFilter";
 
 const DesktopFilterSidebar = ({
@@ -9,6 +10,11 @@ const DesktopFilterSidebar = ({
   priceRange,
   setPriceRange,
   actualPriceRange,
+  areas,
+  selectedAreas,
+  setSelectedAreas,
+  getAreaProductCount,
+  areasLoading,
   subCategories,
   selectedSubCategories,
   setSelectedSubCategories,
@@ -44,6 +50,15 @@ const DesktopFilterSidebar = ({
         priceRange={priceRange}
         setPriceRange={setPriceRange}
         actualPriceRange={actualPriceRange}
+      />
+
+      <AreaFilter
+        areas={areas}
+        selectedAreas={selectedAreas}
+        setSelectedAreas={setSelectedAreas}
+        getAreaProductCount={getAreaProductCount}
+        initialItemCount={7}
+        isLoading={areasLoading}
       />
 
       <CategoryFilter

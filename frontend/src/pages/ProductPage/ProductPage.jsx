@@ -133,6 +133,7 @@ const ProductPage = () => {
   const images = useMemo(() => {
     if (!product?.productImages) return [];
     return product.productImages
+      .filter(Boolean)
       .map((img) => ({ url: img.url || img }))
       .filter((img) => img.url);
   }, [product]);

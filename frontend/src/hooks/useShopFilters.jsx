@@ -64,8 +64,7 @@ const useShopFilters = ({
   areaParam,
   subcategoryParam,
 } = {}) => {
-  const { allProducts, productIsLoading: isLoading } =
-    useGetAllProducts();
+  const { allProducts, productIsLoading: isLoading } = useGetAllProducts();
   const { colors, sizes, variantOptionsLoading } = useGetVariantOptions();
   const { categories, isLoading: categoriesLoading } = useGetAllCategories();
 
@@ -245,6 +244,14 @@ const useShopFilters = ({
     [products],
   );
 
+  // Count products per area
+  const getAreaProductCount = useCallback(
+    (areaName) => {
+      return products.filter((product) => product.areaName === areaName).length;
+    },
+    [products],
+  );
+
   // Check if any filter is active
   const hasActiveFilters =
     selectedColors.length > 0 ||
@@ -300,6 +307,7 @@ const useShopFilters = ({
     getColorProductCount,
     getSizeProductCount,
     getCategoryProductCount,
+    getAreaProductCount,
     hasActiveFilters,
     clearAllFilters,
   };

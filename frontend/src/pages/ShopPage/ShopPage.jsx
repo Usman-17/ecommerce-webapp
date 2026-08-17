@@ -35,6 +35,11 @@ const ShopPage = () => {
     [subcategoryParam],
   );
 
+  const selectedAreasFromUrl = useMemo(
+    () => (areaParam ? [areaParam] : []),
+    [areaParam],
+  );
+
   const {
     allProducts,
     sortedProducts,
@@ -58,6 +63,7 @@ const ShopPage = () => {
     getColorProductCount,
     getSizeProductCount,
     getCategoryProductCount,
+    getAreaProductCount,
     hasActiveFilters,
     clearAllFilters,
     colorsLoading,
@@ -125,6 +131,17 @@ const ShopPage = () => {
           priceRange={priceRange}
           setPriceRange={setPriceRange}
           actualPriceRange={actualPriceRange}
+          areas={productAreas}
+          selectedAreas={selectedAreasFromUrl}
+          setSelectedAreas={(names) => {
+            if (names.length > 0) {
+              setSearchParams({ area: names[names.length - 1] });
+            } else {
+              setSearchParams({});
+            }
+          }}
+          getAreaProductCount={getAreaProductCount}
+          areasLoading={false}
           subCategories={categories}
           selectedSubCategories={selectedSubCategoriesFromUrl}
           setSelectedSubCategories={(names) => {
@@ -189,6 +206,17 @@ const ShopPage = () => {
               priceRange={priceRange}
               setPriceRange={setPriceRange}
               actualPriceRange={actualPriceRange}
+              areas={productAreas}
+              selectedAreas={selectedAreasFromUrl}
+              setSelectedAreas={(names) => {
+                if (names.length > 0) {
+                  setSearchParams({ area: names[names.length - 1] });
+                } else {
+                  setSearchParams({});
+                }
+              }}
+              getAreaProductCount={getAreaProductCount}
+              areasLoading={false}
               subCategories={categories}
               selectedSubCategories={selectedSubCategoriesFromUrl}
               setSelectedSubCategories={(names) => {
