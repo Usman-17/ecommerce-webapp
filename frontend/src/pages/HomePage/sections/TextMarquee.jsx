@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import announcements from "../../../config/announcements";
 
 const StarIcon = () => (
   <svg
@@ -15,24 +15,12 @@ const StarIcon = () => (
 );
 
 const TextMarquee = () => {
-  const { data: announcements = [] } = useQuery({
-    queryKey: ["announcements"],
-    queryFn: async () => {
-      const res = await fetch("/api/WAP/Announcement/GetAll");
-      if (!res.ok) return [];
-      const json = await res.json();
-      return (json.data || []).filter((a) => a.isActive);
-    },
+  const messages = announcements.filter((a) => a.active).map((a) => a.message);
 
-    retry: false,
-  });
-
-  const messages =
-    announcements.length > 0
-      ? announcements.map((a) => a.messageText)
+  const scrollingMessages =
+    messages.length > 0
+      ? [...messages, ...messages]
       : ["We offer the best products & deals!"];
-
-  const scrollingMessages = [...messages, ...messages];
 
   return (
     <>
