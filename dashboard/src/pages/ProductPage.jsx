@@ -397,12 +397,10 @@ const ProductPage = () => {
       formDataToSend.append("productImages", file);
     });
 
-    if (formData.productImages.length > 0) {
-      formDataToSend.append(
-        "existingProductImages",
-        JSON.stringify(formData.productImages),
-      );
-    }
+    formDataToSend.append(
+      "existingProductImages",
+      JSON.stringify(formData.productImages),
+    );
 
     const variantsForApi = variants.map((v) => {
       const cleaned = {
