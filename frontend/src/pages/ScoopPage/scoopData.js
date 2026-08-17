@@ -48,19 +48,42 @@ export const SCOOP_CONFIG = {
   },
 };
 
-export function getRandomProducts(allProducts, count) {
+function getProductRetailPrice(product) {
+  const secondaryPrice = product?.secondaryPrice || 0;
+  const price = product?.price || 0;
+  const isSale = secondaryPrice > 0 && secondaryPrice > price;
+  return isSale ? price : secondaryPrice || price;
+}
+
+function getTotalRetail(products) {
+  return products.reduce((sum, p) => sum + getProductRetailPrice(p), 0);
+}
+
+export function getRandomProducts(allProducts, count, minTotalPrice = 0) {
   if (!allProducts || allProducts.length === 0) return [];
 
   const shuffled = [...allProducts].sort(() => Math.random() - 0.5);
 
-  if (shuffled.length >= count) {
-    return shuffled.slice(0, count);
+  let selected = shuffled.slice(0, Math.min(count, shuffled.length));
+
+  if (shuffled.length < count) {
+    while (selected.length < count) {
+      const randomIndex = Math.floor(Math.random() * shuffled.length);
+      selected.push({ ...shuffled[randomIndex], _duplicate: true });
+    }
   }
 
-  const result = [...shuffled];
-  while (result.length < count) {
-    const randomIndex = Math.floor(Math.random() * shuffled.length);
-    result.push({ ...shuffled[randomIndex], _duplicate: true });
+  if (minTotalPrice > 0 && getTotalRetail(selected) < minTotalPrice) {
+    const remaining = shuffled.slice(count);
+    for (let i = 0; i < remaining.length && getTotalRetail(selected) < minTotalPrice; i++) {
+      const cheapest = selected.reduce((minIdx, p, idx) => {
+        return getProductRetailPrice(p) < getProductRetailPrice(selected[minIdx]) ? idx : minIdx;
+      }, 0);
+      if (getProductRetailPrice(remaining[i]) > getProductRetailPrice(selected[cheapest])) {
+        selected[cheapest] = remaining[i];
+      }
+    }
   }
-  return result;
+
+  return selected;
 }

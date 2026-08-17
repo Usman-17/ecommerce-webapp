@@ -91,7 +91,7 @@ const ScoopPage = () => {
       const count =
         Math.floor(Math.random() * (config.maxItems - config.minItems + 1)) +
         config.minItems;
-      const products = getRandomProducts(scoopProducts, count);
+      const products = getRandomProducts(scoopProducts, count, config.price);
       allProductsList.push(...products);
     }
 
