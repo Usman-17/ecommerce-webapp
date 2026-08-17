@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, GripVertical, Link } from "lucide-react";
+import { X, GripVertical, Link, ListChecks } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -118,6 +118,19 @@ const WebLinksInput = ({
     }
   };
 
+  const handleSelectAll = () => {
+    const allValues = options
+      .filter((opt) => {
+        const val = typeof opt === "string" ? opt : opt.value;
+        return !value.includes(val);
+      })
+      .map((opt) => (typeof opt === "string" ? opt : opt.value));
+    if (allValues.length > 0) {
+      onChange([...value, ...allValues]);
+    }
+    setInputValue("");
+  };
+
   const availableOptions = options
     .filter((opt) => {
       const tagValue = typeof opt === "string" ? opt : opt.value;
@@ -127,6 +140,11 @@ const WebLinksInput = ({
       if (typeof opt === "string") return { label: opt, value: opt };
       return opt;
     });
+
+  const hasUnselected = options.some((opt) => {
+    const val = typeof opt === "string" ? opt : opt.value;
+    return !value.includes(val);
+  });
 
   return (
     <div className="flex flex-col gap-1 w-full">
@@ -169,12 +187,40 @@ const WebLinksInput = ({
         placeholder="Select pages to show product on"
         searchValue={inputValue}
         onSearch={setInputValue}
-        onSelect={handleSelect}
+        onSelect={(val) => {
+          if (val === "__select_all__") {
+            handleSelectAll();
+          } else {
+            handleSelect(val);
+          }
+        }}
         onKeyDown={handleKeyDown}
         filterOption={(input, option) =>
           (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
         }
-        options={availableOptions}
+        options={
+          hasUnselected
+            ? [
+                {
+                  label: "Select All",
+                  value: "__select_all__",
+                  className: "!font-bold !text-blue-600",
+                },
+                ...availableOptions,
+              ]
+            : availableOptions
+        }
+        optionRender={(option) => {
+          if (option.value === "__select_all__") {
+            return (
+              <div className="flex items-center gap-2 font-bold text-blue-600">
+                <ListChecks size={14} />
+                <span>Select All</span>
+              </div>
+            );
+          }
+          return <span>{option.label}</span>;
+        }}
         className="w-full my-custom-select"
         popupClassName="!z-[9999999]"
         dropdownStyle={{ zIndex: 9999 }}

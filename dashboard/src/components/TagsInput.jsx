@@ -9,6 +9,7 @@ import {
   Gem,
   Crown,
   Tag,
+  ListChecks,
 } from "lucide-react";
 import {
   DndContext,
@@ -143,15 +144,35 @@ const TagsInput = ({
     }
   };
 
-  const availableOptions = options
-    .filter((opt) => {
-      const tagValue = typeof opt === "string" ? opt : opt.label;
-      return !value.includes(tagValue);
-    })
-    .map((opt) => {
-      if (typeof opt === "string") return { label: opt, value: opt };
-      return { label: opt.label, value: opt.label };
-    });
+  const handleSelectAll = () => {
+    const allTagValues = options
+      .filter((opt) => {
+        const tagValue = typeof opt === "string" ? opt : opt.label;
+        return !value.includes(tagValue);
+      })
+      .map((opt) => (typeof opt === "string" ? opt : opt.label));
+    if (allTagValues.length > 0) {
+      onChange([...value, ...allTagValues]);
+    }
+    setInputValue("");
+  };
+
+  const availableOptions = [
+    ...options
+      .filter((opt) => {
+        const tagValue = typeof opt === "string" ? opt : opt.label;
+        return !value.includes(tagValue);
+      })
+      .map((opt) => {
+        if (typeof opt === "string") return { label: opt, value: opt };
+        return { label: opt.label, value: opt.label };
+      }),
+  ];
+
+  const hasUnselected = options.some((opt) => {
+    const tagValue = typeof opt === "string" ? opt : opt.label;
+    return !value.includes(tagValue);
+  });
 
   return (
     <div className="flex flex-col gap-1 w-full">
@@ -193,13 +214,38 @@ const TagsInput = ({
         placeholder="Enter or Select Tags"
         searchValue={inputValue}
         onSearch={setInputValue}
-        onSelect={handleSelect}
+        onSelect={(val) => {
+          if (val === "__select_all__") {
+            handleSelectAll();
+          } else {
+            handleSelect(val);
+          }
+        }}
         onKeyDown={handleKeyDown}
         filterOption={(input, option) =>
           (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
         }
-        options={availableOptions}
+        options={
+          hasUnselected
+            ? [
+                {
+                  label: "Select All",
+                  value: "__select_all__",
+                  className: "!font-bold !text-purple-600",
+                },
+                ...availableOptions,
+              ]
+            : availableOptions
+        }
         optionRender={(option) => {
+          if (option.value === "__select_all__") {
+            return (
+              <div className="flex items-center gap-2 font-bold text-purple-600">
+                <ListChecks size={14} />
+                <span>Select All</span>
+              </div>
+            );
+          }
           const Icon = iconMap[option.value];
           return (
             <div className="flex items-center gap-2">
