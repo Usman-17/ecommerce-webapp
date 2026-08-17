@@ -23,6 +23,7 @@ const Lottie = LottieComponent?.default || LottieComponent;
 const BestSellerPage = () => {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const mobileDrawerRef = useRef(null);
+  const [selectedAreas, setSelectedAreas] = useState([]);
 
   const { bestSellerProducts, productIsLoading } = useGetAllProducts();
 
@@ -31,6 +32,7 @@ const BestSellerPage = () => {
     colors,
     sizes,
     categories,
+    areas: productAreas,
     priceRange,
     setPriceRange,
     actualPriceRange,
@@ -48,12 +50,14 @@ const BestSellerPage = () => {
     getColorProductCount,
     getSizeProductCount,
     getCategoryProductCount,
+    getAreaProductCount,
     hasActiveFilters,
     clearAllFilters,
     colorsLoading,
     sizesLoading,
     categoriesLoading,
-  } = useShopFilters({ initialProducts: bestSellerProducts });
+    areasLoading,
+  } = useShopFilters({ initialProducts: bestSellerProducts, selectedAreas });
 
   const toggleMobileFilter = () => setIsMobileFilterOpen((v) => !v);
   const closeMobileFilter = () => setIsMobileFilterOpen(false);
@@ -97,6 +101,11 @@ const BestSellerPage = () => {
             priceRange={priceRange}
             setPriceRange={setPriceRange}
             actualPriceRange={actualPriceRange}
+            areas={productAreas}
+            selectedAreas={selectedAreas}
+            setSelectedAreas={setSelectedAreas}
+            getAreaProductCount={getAreaProductCount}
+            areasLoading={areasLoading}
             subCategories={categories}
             selectedSubCategories={[]}
             setSelectedSubCategories={() => {}}
@@ -121,7 +130,7 @@ const BestSellerPage = () => {
             <img
               src={bestSellerBanner}
               alt="Best Sellers"
-              className="w-full h-55 object-cover"
+              className="w-full h-55 object-cover rounded-md mt-0.5"
             />
           </div>
 
@@ -163,6 +172,11 @@ const BestSellerPage = () => {
               priceRange={priceRange}
               setPriceRange={setPriceRange}
               actualPriceRange={actualPriceRange}
+              areas={productAreas}
+              selectedAreas={selectedAreas}
+              setSelectedAreas={setSelectedAreas}
+              getAreaProductCount={getAreaProductCount}
+              areasLoading={areasLoading}
               subCategories={categories}
               selectedSubCategories={[]}
               setSelectedSubCategories={() => {}}

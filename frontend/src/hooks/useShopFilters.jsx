@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useGetVariantOptions } from "./useGetVariantOptions";
 import { useGetAllProducts } from "./useGetAllProducts";
 import { useGetAllCategories } from "./useGetAllCategories";
+import { useGetAllProductAreas } from "./useGetAllProductAreas";
 
 const isSale = (product) => {
   const secondaryPrice = product?.secondaryPrice || 0;
@@ -63,10 +64,12 @@ const useShopFilters = ({
   categoryParam,
   areaParam,
   subcategoryParam,
+  selectedAreas,
 } = {}) => {
   const { allProducts, productIsLoading: isLoading } = useGetAllProducts();
   const { colors, sizes, variantOptionsLoading } = useGetVariantOptions();
   const { categories, isLoading: categoriesLoading } = useGetAllCategories();
+  const { areas, isLoading: areasLoading } = useGetAllProductAreas();
 
   const products = initialProducts || allProducts;
 
@@ -159,7 +162,11 @@ const useShopFilters = ({
         !categoryParam || product.categoryName === categoryParam;
 
       // Area filter
-      const areaMatch = !areaParam || product.areaName === areaParam;
+      const areaMatch =
+        (!areaParam || product.areaName === areaParam) &&
+        (!selectedAreas ||
+          selectedAreas.length === 0 ||
+          selectedAreas.includes(product.areaName || ""));
 
       return (
         priceMatch &&
@@ -177,6 +184,7 @@ const useShopFilters = ({
     selectedSizes,
     categoryParam,
     areaParam,
+    selectedAreas,
     subcategoryParam,
   ]);
 
@@ -277,6 +285,7 @@ const useShopFilters = ({
     colors,
     sizes,
     categories,
+    areas,
 
     // Filter states
     priceRange,
@@ -297,6 +306,7 @@ const useShopFilters = ({
     colorsLoading: variantOptionsLoading,
     sizesLoading: variantOptionsLoading,
     categoriesLoading,
+    areasLoading,
     filtersLoading: isLoading || variantOptionsLoading || categoriesLoading,
 
     // Helpers

@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 
 import { useShopFilters } from "../../hooks/useShopFilters";
 import { useGetAllSubCategories } from "../../hooks/useGetAllSubCategories";
-import { useGetAllProductAreas } from "../../hooks/useGetAllProductAreas";
 
 import ProductCard from "../../components/ProductCard";
 import ProductCardSkeleton from "../../components/Skeleton/ProductCardSkeleton";
@@ -46,6 +45,7 @@ const ShopPage = () => {
     colors,
     sizes,
     categories,
+    areas: productAreas,
     priceRange,
     setPriceRange,
     actualPriceRange,
@@ -69,6 +69,7 @@ const ShopPage = () => {
     colorsLoading,
     sizesLoading,
     categoriesLoading,
+    areasLoading,
     filtersLoading,
   } = useShopFilters({
     setSearchParams,
@@ -77,7 +78,6 @@ const ShopPage = () => {
     subcategoryParam,
   });
 
-  const { areas: productAreas = [] } = useGetAllProductAreas();
   const { subCategories } = useGetAllSubCategories();
 
   // Filter categories for current area
@@ -141,7 +141,7 @@ const ShopPage = () => {
             }
           }}
           getAreaProductCount={getAreaProductCount}
-          areasLoading={false}
+          areasLoading={areasLoading}
           subCategories={categories}
           selectedSubCategories={selectedSubCategoriesFromUrl}
           setSelectedSubCategories={(names) => {
@@ -216,7 +216,7 @@ const ShopPage = () => {
                 }
               }}
               getAreaProductCount={getAreaProductCount}
-              areasLoading={false}
+              areasLoading={areasLoading}
               subCategories={categories}
               selectedSubCategories={selectedSubCategoriesFromUrl}
               setSelectedSubCategories={(names) => {
