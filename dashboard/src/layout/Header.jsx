@@ -10,7 +10,7 @@ import ChangePasswordModal from "../components/ChangePasswordModal";
 
 const Header = () => {
   const { logoutMutation } = useLogout();
-  const { toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { toggleSidebar, toggleMobileSidebar, isMobileOpen } = useSidebar();
   const { data: authUser } = useGetAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -36,7 +36,9 @@ const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 flex w-full bg-white z-99999">
+      <header
+        className={`sticky top-0 flex w-full bg-white z-99999 ${isMobileOpen ? "hidden" : ""}`}
+      >
         <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
           <div className="flex items-center justify-between w-full gap-2 px-3 py-1.5 border-b border-gray-200 sm:gap-4 lg:border-b-0 lg:px-0 lg:py-2">
             {/* 1 Menu Button */}

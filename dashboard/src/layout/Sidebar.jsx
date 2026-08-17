@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router";
-import { useSidebar } from "../context/SidebarContext";
-import { ChevronDownIcon, Ellipsis } from "lucide-react";
+import { ChevronDownIcon, Ellipsis, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+import { useSidebar } from "../context/SidebarContext";
 
 import logo from "../assets/logo.png";
 import logo_icon from "../assets/s-logo.png";
@@ -10,7 +11,13 @@ import navItems from "./navItems";
 // Imports End----
 
 const Sidebar = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const {
+    isExpanded,
+    isMobileOpen,
+    isHovered,
+    setIsHovered,
+    toggleMobileSidebar,
+  } = useSidebar();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
@@ -80,6 +87,7 @@ const Sidebar = () => {
             nav.path && (
               <Link
                 to={nav.path}
+                onClick={() => isMobileOpen && toggleMobileSidebar()}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
                   isActive(nav.path)
                     ? "bg-gray-100 text-gray-900 font-medium"
@@ -112,6 +120,7 @@ const Sidebar = () => {
                   <li key={subItem.name}>
                     <Link
                       to={subItem.path}
+                      onClick={() => isMobileOpen && toggleMobileSidebar()}
                       className={`flex items-center px-3 py-1.5 rounded-md transition-colors text-[13px] ${
                         isActive(subItem.path)
                           ? "bg-gray-100 text-gray-900 font-medium"
@@ -136,23 +145,32 @@ const Sidebar = () => {
       onMouseLeave={() => setIsHovered(false)}
       className={`fixed top-0 left-0 h-screen pt-6 lg:pt-4 bg-white border-r border-gray-200 text-gray-900 transition-all duration-300 ease-in-out z-50
         ${
-          isExpanded || isMobileOpen
-            ? "w-[220px] px-3"
-            : isHovered
+          isMobileOpen
+            ? "w-full px-4"
+            : isExpanded || isHovered
               ? "w-[220px] px-3"
               : "w-[56px] px-2"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
     >
-      <div className="pb-5 flex justify-center">
-        <Link to="/" className="hidden sm:block">
+      <div className="pb-5 flex items-center justify-between">
+        <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <img src={logo} alt="Logo" width={90} height={36} />
           ) : (
             <img src={logo_icon} alt="Logo" width={28} height={28} />
           )}
         </Link>
+        {isMobileOpen && (
+          <button
+            onClick={toggleMobileSidebar}
+            className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+            aria-label="Close Sidebar"
+          >
+            <X size={20} className="text-gray-500" />
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
