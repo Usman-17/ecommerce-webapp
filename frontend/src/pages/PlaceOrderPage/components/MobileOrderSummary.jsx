@@ -110,9 +110,16 @@ const MobileOrderSummary = ({
                     <div className="flex items-center justify-between">
                       {item.price > 0 ? (
                         <>
-                          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
-                            Rs {Math.floor(item.price || 0).toLocaleString()}
-                          </p>
+                          <div className="flex items-center gap-1.5">
+                            {item.oldPrice && item.oldPrice > item.price && (
+                              <span className="text-[9px] text-gray-400 line-through font-bold">
+                                Rs {Math.floor(item.oldPrice).toLocaleString()}
+                              </span>
+                            )}
+                            <p className="text-[9px] text-accent font-bold uppercase tracking-widest">
+                              Rs {Math.floor(item.price || 0).toLocaleString()}
+                            </p>
+                          </div>
                           <p className="text-xs font-black text-gray-900">
                             Rs {Math.floor(item.total || 0).toLocaleString()}
                           </p>

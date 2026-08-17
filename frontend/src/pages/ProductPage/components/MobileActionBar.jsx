@@ -88,6 +88,20 @@ const MobileActionBar = ({
     return `Please select ${missingVariantTypes.join(" and ")}`;
   }, [missingVariantTypes]);
 
+  const getBulkPrice = (qty) => {
+    const tiers = (product?.bulkPricing || [])
+      .filter((t) => t.quantity && t.price)
+      .sort((a, b) => b.quantity - a.quantity);
+    const matched = tiers.find((t) => qty >= Number(t.quantity));
+    if (matched) {
+      return {
+        perItem: Math.round(Number(matched.price) / Number(matched.quantity)),
+        hasBulk: true,
+      };
+    }
+    return { perItem: currentPrice, hasBulk: false };
+  };
+
   const addToCartInternal = (qty, opts, pk) => {
     if (currentPrice <= 0) {
       toast.error("Product price is not available.", { id: "price-error" });
@@ -102,6 +116,8 @@ const MobileActionBar = ({
       return false;
     }
 
+    const { perItem, hasBulk } = getBulkPrice(qty);
+
     const cartItem = {
       productId: product._id,
       productSlug: product.slug,
@@ -112,7 +128,8 @@ const MobileActionBar = ({
       subCategory: product.subCategoryName,
       packId: pk?.productPackId || null,
       packDescription: pk?.productPackDescription || null,
-      price: currentPrice,
+      price: perItem,
+      oldPrice: hasBulk ? currentPrice : null,
       quantity: qty,
       total: getBulkTotal(product?.bulkPricing, currentPrice, qty),
       selectedOptions: opts,
@@ -184,6 +201,8 @@ const MobileActionBar = ({
       return false;
     }
 
+    const { perItem, hasBulk } = getBulkPrice(qty);
+
     const buyNowItem = {
       productId: product._id,
       productSlug: product.slug,
@@ -194,7 +213,8 @@ const MobileActionBar = ({
       subCategory: product.subCategoryName,
       packId: selectedPack?.productPackId || null,
       packDescription: selectedPack?.productPackDescription || null,
-      price: currentPrice,
+      price: perItem,
+      oldPrice: hasBulk ? currentPrice : null,
       quantity: qty,
       total: getBulkTotal(product?.bulkPricing, currentPrice, qty),
       selectedOptions,
@@ -285,6 +305,7 @@ const MobileActionBar = ({
         handleSelect={handleSelect}
         currentPrice={currentPrice}
         mainImage={mainImage}
+        activeVariantImage={activeVariantImage}
         onConfirm={handleConfirmAction}
         actionType={modalAction}
         isAdding={isAdding}

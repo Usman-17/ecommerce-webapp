@@ -74,6 +74,19 @@ const ProductActions = ({
     return `Please select ${missingVariantTypes.join(" and ")}`;
   }, [missingVariantTypes]);
 
+  const { perItemPrice, hasBulkDiscount } = useMemo(() => {
+    const tiers = (product?.bulkPricing || [])
+      .filter((t) => t.quantity && t.price)
+      .sort((a, b) => b.quantity - a.quantity);
+    const matched = tiers.find((t) => quantity >= t.quantity);
+    return {
+      perItemPrice: matched
+        ? Math.round(Number(matched.price) / Number(matched.quantity))
+        : currentPrice,
+      hasBulkDiscount: !!matched,
+    };
+  }, [quantity, currentPrice, product?.bulkPricing]);
+
   const handleAddToCart = () => {
     if (currentPrice <= 0) {
       toast.error("Product price is not available.", { id: "price-error" });
@@ -98,7 +111,8 @@ const ProductActions = ({
       subCategory: product.subCategoryName,
       packId: selectedPack?.productPackId || null,
       packDescription: selectedPack?.productPackDescription || null,
-      price: currentPrice,
+      price: perItemPrice,
+      oldPrice: hasBulkDiscount ? currentPrice : null,
       quantity: quantity,
       total: total,
       selectedOptions,
@@ -161,15 +175,15 @@ const ProductActions = ({
       subCategory: product.subCategoryName,
       packId: selectedPack?.productPackId || null,
       packDescription: selectedPack?.productPackDescription || null,
-      price: currentPrice,
+      price: perItemPrice,
+      oldPrice: hasBulkDiscount ? currentPrice : null,
       quantity: quantity,
       total: total,
       selectedOptions,
       variantId: matchedVariant?._id || null,
-      selectedVariants: selectedVariants.map((v) => ({
-        detailName: v.name,
-        variantId: v._id,
-      })),
+      selectedVariants: matchedVariant
+        ? [{ detailName: matchedVariant.name }]
+        : [],
     };
 
     setInMemoryData("buyNowItem", buyNowItem);

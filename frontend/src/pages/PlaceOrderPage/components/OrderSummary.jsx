@@ -102,7 +102,18 @@ const OrderSummary = ({
                       {item.price > 0 && (
                         <p className="text-xs text-gray-400 font-medium">
                           {item.quantity} × Rs{" "}
-                          {Math.floor(item.price || 0).toLocaleString("en-US")}
+                          {item.oldPrice && item.oldPrice > item.price && (
+                            <span className="line-through mr-1">
+                              {Math.floor(item.oldPrice).toLocaleString(
+                                "en-US",
+                              )}
+                            </span>
+                          )}
+                          <span className="text-accent font-bold">
+                            {Math.floor(item.price || 0).toLocaleString(
+                              "en-US",
+                            )}
+                          </span>
                         </p>
                       )}
 

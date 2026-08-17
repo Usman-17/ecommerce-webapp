@@ -12,6 +12,7 @@ const VariantSelectorModal = ({
   product,
   currentPrice,
   mainImage,
+  activeVariantImage,
   selectedOptions,
   handleSelect,
   onConfirm,
@@ -113,7 +114,7 @@ const VariantSelectorModal = ({
               <div className="flex gap-4">
                 <div className="w-20 h-20 rounded-xl bg-white overflow-hidden shrink-0 border border-gray-100">
                   <img
-                    src={mainImage}
+                    src={activeVariantImage || mainImage}
                     alt={product?.title}
                     className="w-full h-full object-cover transition-all duration-500"
                   />
