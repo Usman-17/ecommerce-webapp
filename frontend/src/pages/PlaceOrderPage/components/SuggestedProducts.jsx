@@ -30,25 +30,25 @@ const SuggestedProducts = ({ currentItems = [] }) => {
 
           return (
             <Motion.div
-              key={product.productSlug}
+              key={product._id || product.productSlug}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
             >
               <Link
-                to={`/product/${product.productSlug}`}
+                to={`/product/${product.slug || product.productSlug}`}
                 className="flex gap-3 items-center bg-white border border-gray-100 rounded-xl p-2.5 min-w-55 hover:border-accent/30 hover:shadow-sm transition-all group"
               >
                 <div className="w-14 h-14 bg-gray-50 rounded-lg overflow-hidden shrink-0 border border-gray-100">
                   <img
-                    src={product.productImages?.[0]?.url}
-                    alt={product.productName}
+                    src={product.productImages?.filter(Boolean)?.[0]?.url}
+                    alt={product.title || product.productName}
                     className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-gray-900 line-clamp-2 leading-snug mb-1">
-                    {product.productName}
+                    {product.title || product.productName}
                   </p>
                   <div className="flex items-center gap-1.5">
                     {oldPrice && (
