@@ -52,11 +52,11 @@ const tabs = [
   "Images",
 ];
 
-const variantTypes = ["Color", "Shade", "Size", "Material", "Weight", "Other"];
+const variantTypes = ["Color", "Shade", "Size"];
 
 const emptyVariant = () => ({
   name: "",
-  type: "Other",
+  type: "Color",
   hexColor: "",
   price: "",
   isActive: true,
