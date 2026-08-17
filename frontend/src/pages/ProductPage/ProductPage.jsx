@@ -305,7 +305,7 @@ const ProductPage = () => {
 
           {/* Product Details Section */}
           <div className="lg:col-span-6 xl:col-span-6">
-            <div className="space-y-2 sm:space-y-2">
+            <div className="space-y-2 sm:space-y-0">
               <div className="space-y-1">
                 {discountPercent > 0 && (
                   <span className="sm:hidden inline-flex items-center text-[10px] sm:text-xs font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-full shrink-0">
@@ -400,7 +400,7 @@ const ProductPage = () => {
 
               {/* Short Description */}
               <div
-                className="text-gray-600 leading-relaxed text-[12px] sm:text-sm max-w-none prose prose-sm mb-3 sm:mb-0"
+                className="text-gray-600 leading-relaxed text-[12px] sm:text-sm max-w-none prose prose-sm mb-3 sm:mb-0 mt-3"
                 dangerouslySetInnerHTML={{
                   __html: product.description,
                 }}

@@ -173,6 +173,18 @@ const VariantSelectorModal = ({
                 </div>
               </div>
 
+              {/* Buy More Save More */}
+              {(product?.bulkPricing || []).filter((t) => t.quantity && t.price)
+                .length > 0 && (
+                <div className="flex items-center gap-3 my-1">
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-accent/30 to-accent/30" />
+                  <span className="text-[11px] font-bold text-accent tracking-wide whitespace-nowrap">
+                    ✨ Buy More, Save More ✨
+                  </span>
+                  <div className="flex-1 h-px bg-gradient-to-l from-transparent via-accent/30 to-accent/30" />
+                </div>
+              )}
+
               {/* Bulk Pricing Tiers */}
               {(() => {
                 const tiers = (product?.bulkPricing || [])
@@ -186,11 +198,20 @@ const VariantSelectorModal = ({
                     .reverse()
                     .findIndex((t) => localQuantity >= Number(t.quantity));
                 return (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div
+                    className={`grid gap-2 ${
+                      tiers.length === 2
+                        ? "grid-cols-2"
+                        : tiers.length >= 3
+                          ? "grid-cols-3"
+                          : "grid-cols-1"
+                    }`}
+                  >
                     {tiers.map((tier, i) => {
                       const perItem = Math.round(
                         Number(tier.price) / Number(tier.quantity),
                       );
+                      const total = Number(tier.price);
                       const isActive =
                         i === bestIdx && localQuantity >= Number(tier.quantity);
                       return (
@@ -200,14 +221,34 @@ const VariantSelectorModal = ({
                           onClick={() =>
                             setLocalQuantity(Number(tier.quantity))
                           }
-                          className={`inline-flex items-center gap-1.5 border rounded-full px-3 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
+                          className={`flex flex-col items-center rounded-xl border-2 px-2 py-3 transition-all cursor-pointer ${
                             isActive
-                              ? "bg-orange-500 border-orange-500 text-white"
-                              : "bg-orange-50 border-orange-200 text-orange-700"
+                              ? "border-accent bg-accent/5"
+                              : "border-orange-200 bg-orange-50/50 hover:border-orange-300"
                           }`}
                         >
-                          Buy {tier.quantity} at Rs {perItem.toLocaleString()}
-                          /each
+                          <span className="text-[11px] font-bold text-gray-700">
+                            Buy {tier.quantity}
+                          </span>
+
+                          <span
+                            className={`text-sm font-black mt-1 ${
+                              isActive ? "text-accent" : "text-orange-600"
+                            }`}
+                          >
+                            Rs {perItem.toLocaleString()}/each
+                          </span>
+
+                          <span className="text-[10px] text-gray-400 mt-1">
+                            Total{" "}
+                            <span
+                              className={`font-bold ${
+                                isActive ? "text-accent" : "text-gray-600"
+                              }`}
+                            >
+                              Rs {total.toLocaleString()}
+                            </span>
+                          </span>
                         </button>
                       );
                     })}
