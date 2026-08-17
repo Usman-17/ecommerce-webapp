@@ -88,7 +88,7 @@ const CollectionsDropdown = () => {
         }}
       >
         <div className="bg-[#fffaf5] border-t border-gray-200 shadow-lg">
-          <div className="px-[4vw] py-8 grid grid-cols-4 gap-8">
+          <div className="px-[4vw] py-8 grid grid-cols-6 gap-8">
             {groupedCategories
               .filter((cat) => cat.items.length > 0)
               .map((cat) => (

@@ -7,7 +7,7 @@ import { useGetAllProducts } from "../hooks/useGetAllProducts";
 // Imports End----
 
 const RecommendedProducts = ({
-  limit = 12,
+  limit = 0,
   allProducts: propAllProducts,
   productIsLoading: propProductIsLoading,
 }) => {
