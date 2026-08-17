@@ -38,7 +38,7 @@ const ProductOptions = ({
 
   return (
     <div
-      className={`pt-3 space-y-4 ${shakeOptions ? "animate-shake" : ""}`}
+      className={`space-y-4 ${shakeOptions ? "animate-shake" : ""}`}
       onAnimationEnd={() => setShakeOptions?.(false)}
     >
       {Object.entries(groupedVariants).map(([type, typeVariants]) => {

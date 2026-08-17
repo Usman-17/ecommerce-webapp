@@ -330,7 +330,7 @@ const ProductPage = () => {
                   </span>
                 )}
 
-                <h1 className="text-lg sm:text-2xl lg:text-2xl font-bold text-[#0f172a] leading-snug tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.08)] flex items-center gap-2 flex-wrap sm:mt-2">
+                <h1 className="text-lg sm:text-2xl lg:text-2xl font-bold text-[#0f172a] leading-snug tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.08)] flex items-center gap-2 flex-wrap sm:mt-1">
                   {product.title}
                 </h1>
 
