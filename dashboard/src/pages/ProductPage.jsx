@@ -83,11 +83,7 @@ const SortableImage = ({ img, index, onDelete }) => {
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="relative group"
-    >
+    <div ref={setNodeRef} style={style} className="relative group">
       <img
         src={img}
         alt=""
@@ -119,8 +115,12 @@ const ProductPage = () => {
   const queryClient = useQueryClient();
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 150, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
   const [activeTab, setActiveTab] = useState("Basic Info");
   const [isSavingAndClose, setIsSavingAndClose] = useState(false);
@@ -294,13 +294,17 @@ const ProductPage = () => {
         existingImages: data.productImages || [],
       });
 
-      setProductImgPreview(data.productImages?.map((img) => img.url) || []);
+      setProductImgPreview(
+        data.productImages?.filter(Boolean).map((img) => img.url) || [],
+      );
       setProductImages([]);
 
       if (data.variants && data.variants.length > 0) {
         setVariants(
           data.variants.map((v) => {
-            const variantImages = v.images || (v.image ? [v.image] : []);
+            const variantImages = (
+              v.images || (v.image ? [v.image] : [])
+            ).filter(Boolean);
             return {
               _id: v._id,
               name: v.name || "",
@@ -309,7 +313,9 @@ const ProductPage = () => {
               price: v.price ?? "",
               isActive: v.isActive !== false,
               images: [],
-              imagePreviews: variantImages.map((img) => img.url),
+              imagePreviews: variantImages
+                .filter(Boolean)
+                .map((img) => img.url),
               existingImages: variantImages,
             };
           }),
@@ -330,8 +336,8 @@ const ProductPage = () => {
       setEditItem(record);
       setActiveTab("Basic Info");
       setAddModal(true);
-    } catch {
-      toast.error("Failed to load product");
+    } catch (err) {
+      toast.error(err.message || "Failed to load product");
     }
   };
 
@@ -1208,7 +1214,10 @@ const ProductPage = () => {
                       }
                     }}
                   >
-                    <SortableContext items={productImgPreview} strategy={rectSortingStrategy}>
+                    <SortableContext
+                      items={productImgPreview}
+                      strategy={rectSortingStrategy}
+                    >
                       <div className="flex flex-wrap mt-4 gap-3">
                         {productImgPreview.map((img, index) => (
                           <SortableImage
