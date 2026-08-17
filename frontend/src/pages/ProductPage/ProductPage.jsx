@@ -130,6 +130,22 @@ const ProductPage = () => {
     setQuantity(1);
   }
 
+  useEffect(() => {
+    if (quantity < 2) {
+      setSelectedOptions((prev) => {
+        const updated = { ...prev };
+        let changed = false;
+        Object.keys(updated).forEach((key) => {
+          if (updated[key] === "Mix") {
+            delete updated[key];
+            changed = true;
+          }
+        });
+        return changed ? updated : prev;
+      });
+    }
+  }, [quantity]);
+
   const images = useMemo(() => {
     if (!product?.productImages) return [];
     return product.productImages
@@ -155,7 +171,7 @@ const ProductPage = () => {
       ? selectedVariants[selectedVariants.length - 1]
       : null;
 
-  const activeVariantImage = matchedVariant?.image?.url || null;
+  const activeVariantImage = matchedVariant?.image?.url || mainImage;
 
   const handleSelect = (optionId, detailId) => {
     setSelectedOptions((prev) => ({
@@ -415,6 +431,8 @@ const ProductPage = () => {
                   handleSelect={handleSelect}
                   shakeOptions={shakeOptions}
                   setShakeOptions={setShakeOptions}
+                  hasBulkPricing={(product.bulkPricing || []).length > 0}
+                  quantity={quantity}
                 />
               </div>
 

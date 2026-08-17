@@ -140,6 +140,8 @@ const VariantSelectorModal = ({
                 handleSelect={handleSelect}
                 shakeOptions={shakeOptions}
                 setShakeOptions={setShakeOptions}
+                hasBulkPricing={(product.bulkPricing || []).length > 0}
+                quantity={localQuantity}
               />
 
               {/* Quantity */}

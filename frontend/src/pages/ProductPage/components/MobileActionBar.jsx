@@ -80,6 +80,10 @@ const MobileActionBar = ({
 
   const allVariantTypesSelected = missingVariantTypes.length === 0;
 
+  const isMixSelected = Object.values(selectedOptions).some((v) => v === "Mix");
+
+  const skipVariantValidation = isMixSelected;
+
   const variantErrorMessage = useMemo(() => {
     if (missingVariantTypes.length === 0) return "";
     if (missingVariantTypes.length === 1) {
@@ -107,7 +111,7 @@ const MobileActionBar = ({
       toast.error("Product price is not available.", { id: "price-error" });
       return false;
     }
-    if (hasVariants && !allVariantTypesSelected) {
+    if (hasVariants && !allVariantTypesSelected && !skipVariantValidation) {
       setShakeOptions(true);
       setTimeout(() => setShakeOptions(false), 500);
       toast.error(variantErrorMessage, {
@@ -132,12 +136,14 @@ const MobileActionBar = ({
       oldPrice: hasBulk ? currentPrice : null,
       quantity: qty,
       total: getBulkTotal(product?.bulkPricing, currentPrice, qty),
-      selectedOptions: opts,
+      selectedOptions: isMixSelected ? {} : opts,
       variantId: matchedVariant?._id || null,
-      selectedVariants: (selectedVariants || []).map((v) => ({
-        detailName: v.name,
-        variantId: v._id,
-      })),
+      selectedVariants: isMixSelected
+        ? [{ detailName: "Mix" }]
+        : (selectedVariants || []).map((v) => ({
+            detailName: v.name,
+            variantId: v._id,
+          })),
     };
 
     const existingCart = getCart();
@@ -194,7 +200,7 @@ const MobileActionBar = ({
       toast.error("Product price is not available.", { id: "price-error" });
       return false;
     }
-    if (hasVariants && !allVariantTypesSelected) {
+    if (hasVariants && !allVariantTypesSelected && !skipVariantValidation) {
       setShakeOptions(true);
       setTimeout(() => setShakeOptions(false), 500);
       toast.error(variantErrorMessage, { id: "variant-error" });
@@ -217,11 +223,13 @@ const MobileActionBar = ({
       oldPrice: hasBulk ? currentPrice : null,
       quantity: qty,
       total: getBulkTotal(product?.bulkPricing, currentPrice, qty),
-      selectedOptions,
+      selectedOptions: isMixSelected ? {} : selectedOptions,
       variantId: matchedVariant?._id || null,
-      selectedVariants: matchedVariant
-        ? [{ detailName: matchedVariant.name }]
-        : [],
+      selectedVariants: isMixSelected
+        ? [{ detailName: "Mix" }]
+        : matchedVariant
+          ? [{ detailName: matchedVariant.name }]
+          : [],
     };
     setInMemoryData("buyNowItem", buyNowItem);
     return true;

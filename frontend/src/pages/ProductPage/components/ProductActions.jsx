@@ -66,6 +66,10 @@ const ProductActions = ({
 
   const allVariantTypesSelected = missingVariantTypes.length === 0;
 
+  const isMixSelected = Object.values(selectedOptions).some((v) => v === "Mix");
+
+  const skipVariantValidation = isMixSelected;
+
   const variantErrorMessage = useMemo(() => {
     if (missingVariantTypes.length === 0) return "";
     if (missingVariantTypes.length === 1) {
@@ -93,7 +97,7 @@ const ProductActions = ({
       return;
     }
 
-    if (hasVariants && !allVariantTypesSelected) {
+    if (hasVariants && !allVariantTypesSelected && !skipVariantValidation) {
       onShakeOptions?.();
       toast.error(variantErrorMessage, { id: "variant-error" });
       return;
@@ -115,12 +119,14 @@ const ProductActions = ({
       oldPrice: hasBulkDiscount ? currentPrice : null,
       quantity: quantity,
       total: total,
-      selectedOptions,
+      selectedOptions: isMixSelected ? {} : selectedOptions,
       variantId: matchedVariant?._id || null,
-      selectedVariants: selectedVariants.map((v) => ({
-        detailName: v.name,
-        variantId: v._id,
-      })),
+      selectedVariants: isMixSelected
+        ? [{ detailName: "Mix" }]
+        : selectedVariants.map((v) => ({
+            detailName: v.name,
+            variantId: v._id,
+          })),
     };
 
     const existingCart = getCart();
@@ -159,7 +165,7 @@ const ProductActions = ({
       return;
     }
 
-    if (hasVariants && !allVariantTypesSelected) {
+    if (hasVariants && !allVariantTypesSelected && !skipVariantValidation) {
       onShakeOptions?.();
       toast.error(variantErrorMessage, { id: "variant-error" });
       return;
@@ -179,11 +185,13 @@ const ProductActions = ({
       oldPrice: hasBulkDiscount ? currentPrice : null,
       quantity: quantity,
       total: total,
-      selectedOptions,
+      selectedOptions: isMixSelected ? {} : selectedOptions,
       variantId: matchedVariant?._id || null,
-      selectedVariants: matchedVariant
-        ? [{ detailName: matchedVariant.name }]
-        : [],
+      selectedVariants: isMixSelected
+        ? [{ detailName: "Mix" }]
+        : matchedVariant
+          ? [{ detailName: matchedVariant.name }]
+          : [],
     };
 
     setInMemoryData("buyNowItem", buyNowItem);
