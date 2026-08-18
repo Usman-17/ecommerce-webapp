@@ -164,10 +164,18 @@ const ProductReviews = ({ reviews = [] }) => {
                           : ""
                       }`}
                     >
-                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-warm flex items-center justify-center shrink-0">
-                        <span className="text-sm font-semibold text-[#bfb3a8]">
-                          {(review.fullName || "A").charAt(0).toUpperCase()}
-                        </span>
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-warm flex items-center justify-center shrink-0 overflow-hidden">
+                        {review.userImage?.url ? (
+                          <img
+                            src={review.userImage.url}
+                            alt={review.fullName}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-sm font-semibold text-[#bfb3a8]">
+                            {(review.fullName || "A").charAt(0).toUpperCase()}
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex-1 min-w-0">
