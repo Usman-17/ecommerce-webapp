@@ -150,12 +150,9 @@ const ProductPage = () => {
     price: "",
     purchasePrice: "",
     secondaryPrice: "",
-    productImages: [],
-    existingImages: [],
   });
 
-  const [productImages, setProductImages] = useState([]);
-  const [productImgPreview, setProductImgPreview] = useState([]);
+  const [images, setImages] = useState([]);
   const [variants, setVariants] = useState([emptyVariant()]);
   const [bulkPricing, setBulkPricing] = useState([]);
 
@@ -252,11 +249,8 @@ const ProductPage = () => {
       price: "",
       purchasePrice: "",
       secondaryPrice: "",
-      productImages: [],
-      existingImages: [],
     });
-    setProductImages([]);
-    setProductImgPreview([]);
+    setImages([]);
     setVariants([emptyVariant()]);
     setBulkPricing([]);
     setActiveTab("Basic Info");
@@ -290,14 +284,15 @@ const ProductPage = () => {
         purchasePrice: data.purchasePrice || "",
         secondaryPrice: data.secondaryPrice || "",
         sold: data.sold || "",
-        productImages: data.productImages || [],
-        existingImages: data.productImages || [],
       });
 
-      setProductImgPreview(
-        data.productImages?.filter(Boolean).map((img) => img.url) || [],
+      setImages(
+        (data.productImages || []).filter(Boolean).map((img) => ({
+          type: "existing",
+          url: img.url,
+          public_id: img.public_id,
+        })),
       );
-      setProductImages([]);
 
       if (data.variants && data.variants.length > 0) {
         setVariants(
@@ -358,11 +353,8 @@ const ProductPage = () => {
       price: "",
       purchasePrice: "",
       secondaryPrice: "",
-      productImages: [],
-      existingImages: [],
     });
-    setProductImages([]);
-    setProductImgPreview([]);
+    setImages([]);
     setVariants([emptyVariant()]);
     setBulkPricing([]);
     setActiveTab("Basic Info");
@@ -385,7 +377,6 @@ const ProductPage = () => {
 
     const formDataToSend = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      if (key === "productImages" || key === "existingImages") return;
       if (Array.isArray(value)) {
         value.forEach((item) => formDataToSend.append(key, item));
       } else {
@@ -393,13 +384,18 @@ const ProductPage = () => {
       }
     });
 
-    productImages.forEach((file) => {
-      formDataToSend.append("productImages", file);
+    images.forEach((img) => {
+      if (img.type === "new") {
+        formDataToSend.append("productImages", img.file);
+      }
     });
 
+    const keptExisting = images
+      .filter((img) => img.type === "existing")
+      .map((img) => ({ url: img.url, public_id: img.public_id }));
     formDataToSend.append(
       "existingProductImages",
-      JSON.stringify(formData.productImages),
+      JSON.stringify(keptExisting),
     );
 
     const variantsForApi = variants.map((v) => {
@@ -467,31 +463,22 @@ const ProductPage = () => {
 
   const handleProductImgChange = (e) => {
     const files = Array.from(e.target.files);
-    setProductImages((prev) => [...prev, ...files]);
-    const newPreviews = files.map((file) => URL.createObjectURL(file));
-    setProductImgPreview((prev) => [...prev, ...newPreviews]);
+    setImages((prev) => [
+      ...prev,
+      ...files.map((file) => ({
+        type: "new",
+        file,
+        preview: URL.createObjectURL(file),
+      })),
+    ]);
   };
 
   const handleDeleteImage = (index) => {
-    setProductImages((prev) => prev.filter((_, i) => i !== index));
-    setProductImgPreview((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleDeleteExistingImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      productImages: prev.productImages.filter((_, i) => i !== index),
-    }));
-    setProductImgPreview((prev) => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleReorderImages = (oldIndex, newIndex) => {
-    setProductImgPreview((prev) => arrayMove(prev, oldIndex, newIndex));
-    setProductImages((prev) => arrayMove(prev, oldIndex, newIndex));
-    setFormData((prev) => ({
-      ...prev,
-      productImages: arrayMove(prev.productImages, oldIndex, newIndex),
-    }));
+    setImages((prev) => arrayMove(prev, oldIndex, newIndex));
   };
 
   const handleVariantChange = (index, field, value) => {
@@ -555,11 +542,12 @@ const ProductPage = () => {
     },
     {
       title: "Image",
-      dataIndex: "productImage",
+      dataIndex: "productImages",
       key: "productImage",
       width: 70,
-      render: (url) =>
-        url ? (
+      render: (images) => {
+        const url = images?.filter(Boolean)?.[0]?.url;
+        return url ? (
           <img
             src={url}
             alt="Product"
@@ -569,7 +557,8 @@ const ProductPage = () => {
           <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
             N/A
           </div>
-        ),
+        );
+      },
     },
     {
       title: "Title",
@@ -1199,36 +1188,35 @@ const ProductPage = () => {
                   />
                 </label>
 
-                {productImgPreview.length > 0 && (
+                {images.length > 0 && (
                   <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={(event) => {
                       const { active, over } = event;
                       if (active.id !== over?.id) {
-                        const oldIndex = productImgPreview.indexOf(active.id);
-                        const newIndex = productImgPreview.indexOf(over.id);
+                        const previewList = images.map((img) =>
+                          img.type === "new" ? img.preview : img.url,
+                        );
+                        const oldIndex = previewList.indexOf(active.id);
+                        const newIndex = previewList.indexOf(over.id);
                         handleReorderImages(oldIndex, newIndex);
                       }
                     }}
                   >
                     <SortableContext
-                      items={productImgPreview}
+                      items={images.map((img) =>
+                        img.type === "new" ? img.preview : img.url,
+                      )}
                       strategy={rectSortingStrategy}
                     >
                       <div className="flex flex-wrap mt-4 gap-3">
-                        {productImgPreview.map((img, index) => (
+                        {images.map((img, index) => (
                           <SortableImage
-                            key={img}
-                            img={img}
+                            key={img.type === "new" ? img.preview : img.url}
+                            img={img.type === "new" ? img.preview : img.url}
                             index={index}
-                            onDelete={() => {
-                              if (formData.productImages[index]) {
-                                handleDeleteExistingImage(index);
-                              } else {
-                                handleDeleteImage(index);
-                              }
-                            }}
+                            onDelete={() => handleDeleteImage(index)}
                           />
                         ))}
                       </div>
