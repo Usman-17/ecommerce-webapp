@@ -212,7 +212,10 @@ export const createProduct = async (req, res) => {
       category: category || undefined,
       subCategory: subCategory || undefined,
       area: area || undefined,
-      brand: brand || undefined,
+      brand:
+        brand && brand !== "undefined" && brand !== "null" && brand !== ""
+          ? brand
+          : undefined,
       sold: sold || "0",
       tags: normalizedTags,
       webLinks: normalizedWebLinks,
