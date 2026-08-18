@@ -304,7 +304,12 @@ const ProductPage = () => {
                 label: product.subCategoryName,
                 path: `/shop?area=${encodeURIComponent(product.areaName)}&category=${encodeURIComponent(product.categoryName)}&subcategory=${encodeURIComponent(product.subCategoryName)}`,
               },
-              { label: product.title },
+              {
+                label:
+                  product.title.length > 50
+                    ? product.title.slice(0, 50) + "..."
+                    : product.title,
+              },
             ].filter(Boolean)}
           />
         </div>
