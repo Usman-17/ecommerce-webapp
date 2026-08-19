@@ -323,9 +323,7 @@ const ProductPage = () => {
         (data.bulkPricing || []).map((bp) => ({
           ...bp,
           perItem:
-            bp.quantity && bp.price
-              ? String(Math.round(bp.price / bp.quantity))
-              : "",
+            bp.quantity && bp.price ? String(bp.price / bp.quantity) : "",
         })),
       );
       setEditItem(record);
@@ -1117,6 +1115,14 @@ const ProductPage = () => {
                         onChange={(e) => {
                           const updated = [...bulkPricing];
                           updated[i].quantity = e.target.value;
+                          if (e.target.value && updated[i].perItem) {
+                            updated[i].price =
+                              Number(updated[i].perItem) *
+                              Number(e.target.value);
+                          } else if (e.target.value && updated[i].price) {
+                            updated[i].perItem =
+                              Number(updated[i].price) / Number(e.target.value);
+                          }
                           setBulkPricing(updated);
                         }}
                         placeholder="e.g. 3"
@@ -1138,6 +1144,8 @@ const ProductPage = () => {
                             updated[i].price =
                               Number(e.target.value) *
                               Number(updated[i].quantity);
+                          } else if (!e.target.value) {
+                            updated[i].price = "";
                           }
                           setBulkPricing(updated);
                         }}
@@ -1149,11 +1157,25 @@ const ProductPage = () => {
                       <label className="text-[11px] text-gray-500 mb-1 block">
                         Total
                       </label>
-                      <div className="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-lg">
-                        {tier.quantity && tier.perItem
-                          ? `Rs. ${(Number(tier.perItem) * Number(tier.quantity)).toLocaleString()}`
-                          : "-"}
-                      </div>
+                      <input
+                        type="number"
+                        min="0"
+                        value={tier.price || ""}
+                        onChange={(e) => {
+                          const updated = [...bulkPricing];
+                          updated[i].price = e.target.value;
+                          if (e.target.value && updated[i].quantity) {
+                            updated[i].perItem =
+                              Number(e.target.value) /
+                              Number(updated[i].quantity);
+                          } else if (!e.target.value) {
+                            updated[i].perItem = "";
+                          }
+                          setBulkPricing(updated);
+                        }}
+                        placeholder="e.g. 549"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                      />
                     </div>
                     <button
                       type="button"
