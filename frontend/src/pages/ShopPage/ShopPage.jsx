@@ -245,10 +245,10 @@ const ShopPage = () => {
             <section>
               {filtersLoading ? (
                 <div
-                  className={`sm:grid ${getGridClass(gridColumns)} gap-1.5 sm:gap-2 columns-2 sm:columns-auto space-y-2 sm:space-y-0`}
+                  className={`sm:grid ${getGridClass(gridColumns)} gap-1 sm:gap-1.5 columns-2 sm:columns-auto`}
                 >
                   {[...Array(12)].map((_, i) => (
-                    <div key={i} className="break-inside-avoid mb-2 sm:mb-0">
+                    <div key={i} className="break-inside-avoid h-full">
                       <ProductCardSkeleton />
                     </div>
                   ))}
@@ -267,12 +267,12 @@ const ShopPage = () => {
                 </div>
               ) : (
                 <div
-                  className={`sm:grid ${getGridClass(gridColumns)} gap-1.5 sm:gap-2 columns-2 sm:columns-auto space-y-2 sm:space-y-0`}
+                  className={`sm:grid ${getGridClass(gridColumns)} gap-1 sm:gap-1.5 columns-2 sm:columns-auto`}
                 >
                   {sortedProducts.map((product) => (
                     <div
                       key={product._id}
-                      className="break-inside-avoid mb-2 sm:mb-0"
+                      className="break-inside-avoid h-full"
                     >
                       <ProductCard product={product} />
                     </div>

@@ -123,7 +123,7 @@ const ProductCard = ({ product }) => {
   }, [isSale, oldPrice, displayPrice, product]);
 
   return (
-    <article className="relative group">
+    <article className="relative group h-full">
       <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
         <WishlistButton
           isLiked={inWishlist}
@@ -133,7 +133,7 @@ const ProductCard = ({ product }) => {
       </div>
       <Link to={`/product/${product.slug}`}>
         <Motion.div
-          className="bg-[#fffaf5] rounded-lg sm:rounded-lg border border-gray-50/50  transition-all duration-500 relative cursor-pointer overflow-hidden active:scale-[0.98] sm:h-85 sm:flex sm:flex-col"
+          className="bg-[#fffaf5] rounded-lg sm:rounded-lg border border-gray-50/50  transition-all duration-500 relative cursor-pointer overflow-hidden active:scale-[0.98] h-full sm:flex sm:flex-col"
           onMouseLeave={handleMouseLeave}
           whileTap={{ scale: 0.98 }}
         >
