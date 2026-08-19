@@ -32,61 +32,63 @@ const ShopHeader = ({
       </div>
 
       {/* Breadcrumbs */}
-      <div className="mb-2 mt-1 sm:mt-0">
-        <Breadcrumbs
-          items={[
-            { label: "Shop", path: "/shop" },
-            ...(areaParam
-              ? [
-                  {
-                    label: areaParam,
-                    path: `/shop?area=${encodeURIComponent(areaParam)}`,
-                  },
-                  ...(categoryParam
-                    ? [
-                        {
-                          label: categoryParam,
-                          path: `/shop?area=${encodeURIComponent(areaParam)}&category=${encodeURIComponent(categoryParam)}`,
-                        },
-                      ]
-                    : []),
-                  ...(subcategoryParam
-                    ? [
-                        {
-                          label: subcategoryParam,
-                          path: `/shop?area=${encodeURIComponent(areaParam)}&category=${encodeURIComponent(categoryParam)}&subcategory=${encodeURIComponent(subcategoryParam)}`,
-                        },
-                      ]
-                    : []),
-                ]
-              : []),
-            ...(categoryParam && !areaParam
-              ? [
-                  {
-                    label: categoryParam,
-                    path: `/shop?category=${encodeURIComponent(categoryParam)}`,
-                  },
-                  ...(subcategoryParam
-                    ? [
-                        {
-                          label: subcategoryParam,
-                          path: `/shop?category=${encodeURIComponent(categoryParam)}&subcategory=${encodeURIComponent(subcategoryParam)}`,
-                        },
-                      ]
-                    : []),
-                ]
-              : []),
-            ...(subcategoryParam && !areaParam && !categoryParam
-              ? [
-                  {
-                    label: subcategoryParam,
-                    path: `/shop?subcategory=${encodeURIComponent(subcategoryParam)}`,
-                  },
-                ]
-              : []),
-          ]}
-        />
-      </div>
+      {(areaParam || categoryParam || subcategoryParam) && (
+        <div className="mb-2 mt-1 sm:mt-0">
+          <Breadcrumbs
+            items={[
+              { label: "Shop", path: "/shop" },
+              ...(areaParam
+                ? [
+                    {
+                      label: areaParam,
+                      path: `/shop?area=${encodeURIComponent(areaParam)}`,
+                    },
+                    ...(categoryParam
+                      ? [
+                          {
+                            label: categoryParam,
+                            path: `/shop?area=${encodeURIComponent(areaParam)}&category=${encodeURIComponent(categoryParam)}`,
+                          },
+                        ]
+                      : []),
+                    ...(subcategoryParam
+                      ? [
+                          {
+                            label: subcategoryParam,
+                            path: `/shop?area=${encodeURIComponent(areaParam)}&category=${encodeURIComponent(categoryParam)}&subcategory=${encodeURIComponent(subcategoryParam)}`,
+                          },
+                        ]
+                      : []),
+                  ]
+                : []),
+              ...(categoryParam && !areaParam
+                ? [
+                    {
+                      label: categoryParam,
+                      path: `/shop?category=${encodeURIComponent(categoryParam)}`,
+                    },
+                    ...(subcategoryParam
+                      ? [
+                          {
+                            label: subcategoryParam,
+                            path: `/shop?category=${encodeURIComponent(categoryParam)}&subcategory=${encodeURIComponent(subcategoryParam)}`,
+                          },
+                        ]
+                      : []),
+                  ]
+                : []),
+              ...(subcategoryParam && !areaParam && !categoryParam
+                ? [
+                    {
+                      label: subcategoryParam,
+                      path: `/shop?subcategory=${encodeURIComponent(subcategoryParam)}`,
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        </div>
+      )}
 
       {/* Area Categories Grid */}
       {areaParam && !categoryParam && areaCategories.length > 0 && (
