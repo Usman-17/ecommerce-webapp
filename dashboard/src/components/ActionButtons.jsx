@@ -20,7 +20,7 @@ const ActionButtons = ({
           title="Settings"
           onClick={() => onSettings(record)}
           disabled={isSettingsLoading}
-          className={`p-2 rounded-full border transition-all duration-200 shadow-sm flex items-center justify-center outline-none ${
+          className={`p-2 rounded-full border transition-all duration-200 shadow-sm flex items-center justify-center outline-none active:scale-90 ${
             darkMode
               ? "bg-[#1a1129] border-[#3b1f5a] text-green-400 hover:enabled:bg-[#2a1b44] hover:enabled:text-green-300"
               : "bg-white border-gray-300 text-green-600 hover:enabled:bg-green-50 hover:enabled:text-green-500"
@@ -49,7 +49,7 @@ const ActionButtons = ({
           title="Edit"
           onClick={() => !editDisabled && onEdit(record)}
           disabled={isEditLoading || editDisabled}
-          className={`p-2 rounded-full border transition-colors duration-200 shadow-sm flex items-center justify-center outline-none ${
+          className={`p-2 rounded-full border transition-all duration-200 shadow-sm flex items-center justify-center outline-none active:scale-90 ${
             darkMode
               ? "bg-[#1a1129] border-(--secondary-color)/30 text-(--secondary-color) hover:enabled:bg-[color-mix(in_srgb,var(--secondary-color)_15%,transparent)]"
               : "bg-white border-gray-300 text-(--secondary-color) hover:enabled:bg-[color-mix(in_srgb,var(--secondary-color)_8%,transparent)]"
@@ -80,7 +80,7 @@ const ActionButtons = ({
           title="Delete"
           onClick={() => !deleteDisabled && onDelete(record)}
           disabled={isDeleteLoading || deleteDisabled}
-          className={`p-2 rounded-full border transition-colors duration-200 shadow-sm flex items-center justify-center outline-none ${
+          className={`p-2 rounded-full border transition-all duration-200 shadow-sm flex items-center justify-center outline-none active:scale-90 ${
             darkMode
               ? "bg-[#1a1129] border-[#5a1f1f] text-red-500 hover:enabled:text-red-400"
               : "bg-white border-gray-300 text-red-600 hover:enabled:bg-red-50 hover:enabled:text-red-500"
