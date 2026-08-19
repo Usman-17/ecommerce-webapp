@@ -24,7 +24,7 @@ const PromoBanner = () => {
         </p>
 
         <Link
-          to="/shop"
+          to="/product/traditional-pearl-bead-drop-jhumka"
           className="mt-4 inline-flex items-center gap-2 bg-[#B3002D] hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg transition duration-300 hover:shadow-red-500/50 animate-pulse shake-on-hover"
         >
           Claim Now
