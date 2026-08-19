@@ -16,6 +16,7 @@ const QuickViewContent = ({
   const allImages = useMemo(
     () =>
       (displayProduct.productImages || [])
+        .filter(Boolean)
         .map((img) => img.url)
         .filter(Boolean),
     [displayProduct.productImages],

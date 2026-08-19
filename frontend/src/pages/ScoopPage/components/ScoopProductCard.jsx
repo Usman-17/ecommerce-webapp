@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
 import { Check, AlertCircle } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
 
 import { calculateProductPrice } from "../../../utils/productPriceUtils";
 
@@ -11,6 +11,7 @@ const ScoopProductCard = ({
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const imageContainerRef = useRef(null);
+  const touchStartX = useRef(null);
 
   const instanceId = product._instanceId || product._id;
 
@@ -28,25 +29,49 @@ const ScoopProductCard = ({
 
   const hasMultipleImages = allImages.length > 1;
 
-  const isTouchDevice =
-    "ontouchstart" in window || navigator.maxTouchPoints > 0;
-
-  const handleImageClick = (e) => {
-    if (hasMultipleImages && !isTouchDevice) {
-      e.stopPropagation();
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const width = rect.width;
-      const newIndex = Math.floor((x / width) * allImages.length);
-      const clampedIndex = Math.max(
-        0,
-        Math.min(newIndex, allImages.length - 1),
-      );
-      if (clampedIndex !== currentImageIndex) {
-        setCurrentImageIndex(clampedIndex);
-      }
+  const handleMouseMove = (e) => {
+    if (!hasMultipleImages || hasVariants) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+    const newIndex = Math.floor((x / width) * allImages.length);
+    const clampedIndex = Math.max(0, Math.min(newIndex, allImages.length - 1));
+    if (clampedIndex !== currentImageIndex) {
+      setCurrentImageIndex(clampedIndex);
     }
+  };
 
+  const handleMouseLeave = () => {
+    if (hasVariants) return;
+    setCurrentImageIndex(0);
+  };
+
+  const handleTouchStart = (e) => {
+    if (!hasMultipleImages || hasVariants) return;
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = useCallback(
+    (e) => {
+      if (!hasMultipleImages || hasVariants || touchStartX.current === null) return;
+      const diff = e.touches[0].clientX - touchStartX.current;
+      if (Math.abs(diff) > 30) {
+        if (diff > 0 && currentImageIndex > 0) {
+          setCurrentImageIndex((prev) => prev - 1);
+        } else if (diff < 0 && currentImageIndex < allImages.length - 1) {
+          setCurrentImageIndex((prev) => prev + 1);
+        }
+        touchStartX.current = null;
+      }
+    },
+    [hasMultipleImages, hasVariants, currentImageIndex, allImages.length],
+  );
+
+  const handleTouchEnd = () => {
+    touchStartX.current = null;
+  };
+
+  const handleImageClick = () => {
     if (onQuickViewOpen) {
       onQuickViewOpen(product);
     }
@@ -54,7 +79,7 @@ const ScoopProductCard = ({
 
   return (
     <div
-      className={`bg-white rounded-lg border overflow-hidden transition-all duration-300 cursor-pointer ${
+      className={`group bg-white rounded-lg border overflow-hidden transition-all duration-300 cursor-pointer ${
         allSelected
           ? "border-green-200 shadow-sm shadow-green-50"
           : "border-gray-100 shadow-sm"
@@ -65,23 +90,46 @@ const ScoopProductCard = ({
       <div
         ref={imageContainerRef}
         onClick={handleImageClick}
-        className="relative aspect-square overflow-hidden bg-gray-50"
-        style={{ touchAction: "manipulation" }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="relative aspect-square overflow-hidden bg-gray-50 cursor-pointer"
+        style={{ touchAction: "pan-x" }}
       >
         {allImages.length > 0 ? (
-          <img
-            src={
-              selectedVariants?.[instanceId]?.image?.url ||
-              allImages[currentImageIndex]
-            }
-            alt={`${product.title} - Image ${currentImageIndex + 1}`}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
+          allImages.map((src, idx) => (
+            <img
+              key={idx}
+              src={selectedVariants?.[instanceId]?.image?.url || src}
+              alt={`${product.title} - Image ${idx + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                idx === currentImageIndex ? "opacity-100" : "opacity-0"
+              }`}
+              loading="lazy"
+              decoding="async"
+            />
+          ))
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">
             No Image
+          </div>
+        )}
+
+        {/* Dots indicator */}
+        {hasMultipleImages && !hasVariants && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {allImages.map((_, idx) => (
+              <span
+                key={idx}
+                className={`block rounded-full transition-all duration-300 ${
+                  idx === currentImageIndex
+                    ? "w-4 h-1.5 bg-white shadow-sm"
+                    : "w-1.5 h-1.5 bg-white/50"
+                }`}
+              />
+            ))}
           </div>
         )}
 
