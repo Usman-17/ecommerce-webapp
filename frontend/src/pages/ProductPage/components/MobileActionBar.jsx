@@ -17,7 +17,7 @@ const getBulkTotal = (bulkPricing, unitPrice, qty) => {
   const matched = tiers.find((t) => qty >= t.quantity);
   if (matched) {
     const perItem = Number(matched.price) / Number(matched.quantity);
-    return Math.round(perItem * qty);
+    return Math.floor(perItem * qty);
   }
   return unitPrice * qty;
 };
@@ -99,7 +99,7 @@ const MobileActionBar = ({
     const matched = tiers.find((t) => qty >= Number(t.quantity));
     if (matched) {
       return {
-        perItem: Math.round(Number(matched.price) / Number(matched.quantity)),
+        perItem: Math.floor(Number(matched.price) / Number(matched.quantity)),
         hasBulk: true,
       };
     }

@@ -37,7 +37,7 @@ const ProductActions = ({
     const matchedTier = tiers.find((t) => quantity >= t.quantity);
     if (matchedTier) {
       const perItem = Number(matchedTier.price) / Number(matchedTier.quantity);
-      return Math.round(perItem * quantity);
+      return Math.floor(perItem * quantity);
     }
     return currentPrice * quantity;
   }, [currentPrice, quantity, product?.bulkPricing]);
@@ -85,7 +85,7 @@ const ProductActions = ({
     const matched = tiers.find((t) => quantity >= t.quantity);
     return {
       perItemPrice: matched
-        ? Math.round(Number(matched.price) / Number(matched.quantity))
+        ? Math.floor(Number(matched.price) / Number(matched.quantity))
         : currentPrice,
       hasBulkDiscount: !!matched,
     };
@@ -243,7 +243,7 @@ const ProductActions = ({
           {activeTier && (
             <p className="text-[10px] text-green-600 font-medium">
               Bulk deal! Rs{" "}
-              {Math.round(
+              {Math.floor(
                 Number(activeTier.price) / Number(activeTier.quantity),
               )}
               /item

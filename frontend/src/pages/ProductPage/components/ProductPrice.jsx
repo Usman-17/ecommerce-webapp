@@ -68,10 +68,10 @@ const ProductPrice = ({
           }`}
         >
           {sortedTiers.map((tier, i) => {
-            const perItem = Math.round(
+            const perItem = Math.floor(
               Number(tier.price) / Number(tier.quantity),
             );
-            const total = Number(tier.price);
+            const total = Math.floor(Number(tier.price));
             const bestTierIdx =
               sortedTiers.length -
               1 -
@@ -112,7 +112,7 @@ const ProductPrice = ({
                       isActive ? "text-accent" : "text-gray-600"
                     }`}
                   >
-                    Rs {total.toLocaleString()}
+                    Rs {total.toLocaleString("en-US", { maximumFractionDigits: 0 })}
                   </span>
                 </span>
               </button>

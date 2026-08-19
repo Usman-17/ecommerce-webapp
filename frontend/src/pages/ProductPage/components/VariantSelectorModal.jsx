@@ -211,10 +211,10 @@ const VariantSelectorModal = ({
                     }`}
                   >
                     {tiers.map((tier, i) => {
-                      const perItem = Math.round(
+                      const perItem = Math.floor(
                         Number(tier.price) / Number(tier.quantity),
                       );
-                      const total = Number(tier.price);
+                      const total = Math.floor(Number(tier.price));
                       const isActive =
                         i === bestIdx && localQuantity >= Number(tier.quantity);
                       return (
@@ -249,7 +249,10 @@ const VariantSelectorModal = ({
                                 isActive ? "text-accent" : "text-gray-600"
                               }`}
                             >
-                              Rs {total.toLocaleString()}
+                              Rs{" "}
+                              {total.toLocaleString("en-US", {
+                                maximumFractionDigits: 0,
+                              })}
                             </span>
                           </span>
                         </button>
@@ -278,7 +281,7 @@ const VariantSelectorModal = ({
                     if (matched) {
                       const perItem =
                         Number(matched.price) / Number(matched.quantity);
-                      return Math.round(
+                      return Math.floor(
                         perItem * localQuantity,
                       ).toLocaleString();
                     }
