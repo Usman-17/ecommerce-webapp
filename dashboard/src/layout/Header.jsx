@@ -1,9 +1,18 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useState, useEffect, useRef } from "react";
-import { UserRound, LogOut, Menu, ChevronDown, Lock } from "lucide-react";
+import {
+  UserRound,
+  LogOut,
+  Menu,
+  ChevronDown,
+  Lock,
+  Bell,
+  Package,
+} from "lucide-react";
 
 import useLogout from "../hooks/useLogout";
 import useGetAuth from "../hooks/useGetAuth";
+import useNewOrders from "../hooks/useNewOrders";
 import { useSidebar } from "../context/SidebarContext";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 // Imports End----
@@ -12,9 +21,13 @@ const Header = () => {
   const { logoutMutation } = useLogout();
   const { toggleSidebar, toggleMobileSidebar, isMobileOpen } = useSidebar();
   const { data: authUser } = useGetAuth();
+  const navigate = useNavigate();
+  const { orders, unseenCount, markAsSeen } = useNewOrders();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const dropdownRef = useRef(null);
+  const notifRef = useRef(null);
 
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {
@@ -28,6 +41,9 @@ const Header = () => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -52,6 +68,103 @@ const Header = () => {
             {/* Menu Button End */}
 
             <div className="flex items-center justify-end gap-3">
+              {/* Notification Bell */}
+              <div className="relative" ref={notifRef}>
+                <button
+                  onClick={() => {
+                    setNotifOpen(!notifOpen);
+                    if (!notifOpen) markAsSeen();
+                  }}
+                  className="relative flex items-center justify-center w-9 h-9 text-gray-500 rounded-lg transition-colors cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                >
+                  <Bell size={20} />
+                  {unseenCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-red-500 rounded-full">
+                      {unseenCount > 99 ? "99+" : unseenCount}
+                    </span>
+                  )}
+                </button>
+
+                {notifOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                      <p className="text-sm font-semibold text-gray-900">
+                        New Orders
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        Last 24 hours
+                      </span>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {orders.length === 0 ? (
+                        <div className="px-4 py-8 text-center text-sm text-gray-400">
+                          No new orders
+                        </div>
+                      ) : (
+                        orders.map((order) => (
+                          <button
+                            key={order.id}
+                            onClick={() => {
+                              setNotifOpen(false);
+                              navigate("/orders");
+                            }}
+                            className="w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-50 last:border-b-0 text-left"
+                          >
+                            <div className="flex-shrink-0 mt-0.5">
+                              <Package size={16} className="text-blue-500" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-800 truncate">
+                                {order.customerName || "Customer"}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {order.itemsCount} item
+                                {order.itemsCount !== 1 ? "s" : ""} · Rs{" "}
+                                {order.amount?.toLocaleString()}
+                              </p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span
+                                  className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                                    order.status === "Order Placed"
+                                      ? "bg-blue-100 text-blue-700"
+                                      : order.status === "Shipped"
+                                        ? "bg-purple-100 text-purple-700"
+                                        : order.status === "Delivered"
+                                          ? "bg-green-100 text-green-700"
+                                          : order.status === "Cancelled"
+                                            ? "bg-red-100 text-red-700"
+                                            : "bg-gray-100 text-gray-700"
+                                  }`}
+                                >
+                                  {order.status}
+                                </span>
+                                <span className="text-[10px] text-gray-400">
+                                  {order.timeAgo}
+                                </span>
+                              </div>
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                    {orders.length > 0 && (
+                      <div className="px-4 py-2.5 border-t border-gray-100">
+                        <button
+                          onClick={() => {
+                            setNotifOpen(false);
+                            navigate("/orders");
+                          }}
+                          className="w-full text-center text-xs font-medium text-blue-600 hover:text-blue-700 cursor-pointer"
+                        >
+                          View all orders
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              {/* Notification Bell End */}
+
               {/* 2 User Dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <button
