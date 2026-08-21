@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 
 import ProductCard from "../../../components/ProductCard";
 import SectionHeader from "../../../components/SectionHeader";
-import InViewAnimation from "../../../components/InViewAnimation";
 
 import { useGetAllProducts } from "../../../hooks/useGetAllProducts";
 // Imports End-----
@@ -87,23 +86,22 @@ const PriceRangeSection = () => {
           {availablePrices.map((price, i) => {
             const isActive = price === effectiveActivePrice;
             return (
-              <InViewAnimation key={price} delay={0.1 + i * 0.1}>
-                <button
-                  onClick={() => setActivePrice(price)}
-                  className={`hover:cursor-pointer font-semibold transition-all duration-300 group text-sm sm:text-lg sm:relative sm:bg-transparent sm:px-0 sm:py-0
+              <button
+                key={price}
+                onClick={() => setActivePrice(price)}
+                className={`hover:cursor-pointer font-semibold transition-all duration-300 group text-sm sm:text-lg sm:relative sm:bg-transparent sm:px-0 sm:py-0
                     ${
                       isActive
                         ? "text-[#CC0D39] border-2 border-[#CC0D39] sm:text-[#CC0D39] sm:border-0 sm:bg-transparent rounded-full sm:rounded-none px-4 py-1.5 sm:px-0 sm:py-0"
                         : "bg-white/10 text-gray-700 border border-gray-200 sm:border-0 sm:bg-transparent rounded-full sm:rounded-none px-4 py-1.5 sm:px-0 sm:py-0 hover:bg-gray-50 sm:hover:bg-transparent sm:hover:text-[#CC0D39]"
                     }`}
-                >
-                  {i === 0 && <span className="sm:hidden">Under </span>}
-                  Rs. {price.toLocaleString()}
-                  <span
-                    className={`hidden sm:block absolute -bottom-1 left-0 h-0.5 bg-[#CC0D39] transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
-                  />
-                </button>
-              </InViewAnimation>
+              >
+                {i === 0 && <span className="sm:hidden">Under </span>}
+                Rs. {price.toLocaleString()}
+                <span
+                  className={`hidden sm:block absolute -bottom-1 left-0 h-0.5 bg-[#CC0D39] transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                />
+              </button>
             );
           })}
         </div>

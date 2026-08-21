@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import ProductCard from "../../../components/ProductCard";
 import SectionHeader from "../../../components/SectionHeader";
-import InViewAnimation from "../../../components/InViewAnimation";
 
 import { useGetAllProducts } from "../../../hooks/useGetAllProducts";
 // Imports End-----
@@ -58,16 +57,10 @@ const MakeupSection = () => {
           aria-label="Makeup products"
           className="flex overflow-x-auto overflow-y-hidden no-scrollbar gap-1 sm:gap-4 -mx-3 pl-12 pr-5 sm:mx-0 sm:pl-0 sm:pr-0"
         >
-          {makeupProducts.map((product, idx) => (
-            <InViewAnimation
-              key={product.slug}
-              delay={0.04 * idx}
-              className="shrink-0"
-            >
-              <div className="w-36 sm:w-56 shrink-0">
+          {makeupProducts.map((product) => (
+              <div key={product.slug} className="w-36 sm:w-56 shrink-0">
                 <ProductCard product={product} />
               </div>
-            </InViewAnimation>
           ))}
         </div>
 

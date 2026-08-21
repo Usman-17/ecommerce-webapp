@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion as Motion } from "framer-motion";
 
 import ProductCard from "./ProductCard";
 import SectionHeader from "./SectionHeader";
@@ -59,15 +58,9 @@ const RecommendedProducts = ({
               </div>
             ))
           : products.map((product, idx) => (
-              <Motion.div
-                key={product.slug}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.04 }}
-              >
+              <div key={product.slug}>
                 <ProductCard product={product} index={idx} />
-              </Motion.div>
+              </div>
             ))}
       </div>
 
@@ -80,16 +73,9 @@ const RecommendedProducts = ({
               </div>
             ))
           : products.map((product, idx) => (
-              <Motion.div
-                key={product.slug}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.04 }}
-                className="break-inside-avoid"
-              >
+              <div key={product.slug} className="break-inside-avoid">
                 <ProductCard product={product} index={idx} />
-              </Motion.div>
+              </div>
             ))}
       </div>
     </section>
