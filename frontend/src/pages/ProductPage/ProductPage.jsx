@@ -1,8 +1,8 @@
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
-import { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronRight, Star, Share2 } from "lucide-react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 import { useWishlist } from "../../hooks/useWishlist";
 import { useGetAllProducts } from "../../hooks/useGetAllProducts";
@@ -73,11 +73,6 @@ const ProductPage = () => {
 
   const isLiked = isInWishlist(product?._id);
 
-  const mainImageUrl = useMemo(
-    () => product?.productImages?.[0]?.url || "",
-    [product],
-  );
-
   const handleWishlistToggle = () => {
     if (!product) return;
     if (isLiked) {
@@ -86,12 +81,16 @@ const ProductPage = () => {
     } else {
       addToWishlist({
         _id: product._id,
-        productId: product._id,
-        productName: product.title,
-        productSlug: product.slug,
-        productImageURL: mainImageUrl,
-        netSalePrice: product.price,
-        productSalePrice: product.secondaryPrice,
+        title: product.title,
+        slug: product.slug,
+        productImages: product.productImages,
+        price: product.price,
+        salePrice: product.salePrice,
+        secondaryPrice: product.secondaryPrice,
+        tags: product.tags,
+        category: product.category,
+        subCategory: product.subCategory,
+        areaName: product.areaName,
       });
       trackAddToWishlist(product);
     }
