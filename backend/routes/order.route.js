@@ -8,6 +8,7 @@ import {
   allOrders,
   cancelWebOrder,
   placeOrder,
+  recentOrders,
   trackOrder,
   updateOrderStatus,
   userOrders,
@@ -23,5 +24,6 @@ router.post("/cancel", cancelWebOrder);
 
 // Admin Routes
 router.get("/all", protectRoute, isAdmin, allOrders);
+router.get("/recent", protectRoute, isAdmin, recentOrders);
 
 export default router;

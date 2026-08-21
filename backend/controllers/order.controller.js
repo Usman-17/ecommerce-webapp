@@ -402,3 +402,36 @@ export const cancelWebOrder = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// PATH     : /api/order/recent
+// METHOD   : GET
+// ACCESS   : Protected & Admin
+// DESC     : Get recent orders (last 24h) for notifications
+export const recentOrders = async (req, res) => {
+  try {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const orders = await Order.find({ createdAt: { $gte: since } })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .select("trackingNo amount address status orderType createdAt items")
+      .lean();
+
+    const formatted = orders.map((order) => ({
+      id: order._id,
+      trackingNo: order.trackingNo,
+      customerName: `${order.address?.firstName || ""} ${order.address?.lastName || ""}`.trim(),
+      customerPhone: order.address?.phone || "",
+      amount: order.amount,
+      status: order.status,
+      orderType: order.orderType,
+      itemsCount: order.items?.length || 0,
+      createdAt: order.createdAt,
+    }));
+
+    return res.status(200).json(formatted);
+  } catch (error) {
+    console.error("Error in recentOrders Controller:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
