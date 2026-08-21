@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import InViewAnimation from "../../../components/InViewAnimation";
 import SectionHeader from "../../../components/SectionHeader";
 
 import { useGetAllCategories } from "../../../hooks/useGetAllCategories";
@@ -99,40 +98,35 @@ const CategorySection = () => {
               onTouchMove={handleTouchMove}
               className="flex overflow-x-auto overflow-y-hidden no-scrollbar gap-3 sm:gap-6 snap-x snap-mandatory px-4 sm:px-0"
             >
-              {categories.map((cat, idx) => {
+              {categories.map((cat) => {
                 const areaName = areaMap[cat.areaId];
                 const areaParam = areaName
                   ? `&area=${encodeURIComponent(areaName)}`
                   : "";
                 return (
-                  <InViewAnimation
+                  <Link
                     key={cat._id}
-                    delay={0.04 * idx}
-                    className="shrink-0 snap-center"
+                    to={`/shop?category=${encodeURIComponent(cat.name || "")}${areaParam}`}
+                    onClick={handleCategoryClick}
+                    className="flex flex-col items-center gap-3 group shrink-0 snap-center"
                   >
-                    <Link
-                      to={`/shop?category=${encodeURIComponent(cat.name || "")}${areaParam}`}
-                      onClick={handleCategoryClick}
-                      className="flex flex-col items-center gap-3 group shrink-0"
-                    >
-                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-warm border border-[#f0e4da] shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-[#CC0D39]/30 group-hover:scale-105 mt-2">
-                        <img
-                          src={cat.imageUrl || "/category.png"}
-                          alt={cat.name || "Category"}
-                          loading="lazy"
-                          width={112}
-                          height={112}
-                          onError={(e) => {
-                            e.currentTarget.src = "/category.png";
-                          }}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      </div>
-                      <span className="max-w-20 sm:max-w-xs text-[11px] sm:text-xs font-bold text-gray-600 text-center leading-tight line-clamp-1 group-hover:text-[#CC0D39] transition-colors">
-                        {cat.name}
-                      </span>
-                    </Link>
-                  </InViewAnimation>
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-warm border border-[#f0e4da] shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-[#CC0D39]/30 group-hover:scale-105 mt-2">
+                      <img
+                        src={cat.imageUrl || "/category.png"}
+                        alt={cat.name || "Category"}
+                        loading="lazy"
+                        width={112}
+                        height={112}
+                        onError={(e) => {
+                          e.currentTarget.src = "/category.png";
+                        }}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    </div>
+                    <span className="max-w-20 sm:max-w-xs text-[11px] sm:text-xs font-bold text-gray-600 text-center leading-tight line-clamp-1 group-hover:text-[#CC0D39] transition-colors">
+                      {cat.name}
+                    </span>
+                  </Link>
                 );
               })}
             </div>

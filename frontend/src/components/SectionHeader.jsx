@@ -1,16 +1,14 @@
 import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
-import InViewAnimation from "./InViewAnimation";
 
 const SectionHeader = ({
   label,
   title,
   description,
   viewAllLink,
-  delay = 0.1,
 }) => {
   return (
-    <InViewAnimation delay={delay}>
+    <>
       <div className="flex justify-between items-center mb-2">
         <div className="text-center sm:text-left w-full">
           <p className="text-[13px] uppercase tracking-[3px] font-bold text-[#CC0D39] mb-1 flex items-center justify-center sm:justify-start gap-2">
@@ -38,7 +36,7 @@ const SectionHeader = ({
           {description}
         </p>
       )}
-    </InViewAnimation>
+    </>
   );
 };
 
