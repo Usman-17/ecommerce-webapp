@@ -6,7 +6,7 @@ export const CLARITY_ID = import.meta.env.VITE_CLARITY_ID || "";
 export const SNAPCHAT_PIXEL_ID = import.meta.env.VITE_SNAPCHAT_PIXEL_ID || "";
 export const LINKEDIN_PARTNER_ID = import.meta.env.VITE_LINKEDIN_PARTNER_ID || "";
 
-export const IS_ANALYTICS_ENABLED = import.meta.env.PROD && (GA_MEASUREMENT_ID || GTM_ID || CLARITY_ID);
+export const IS_ANALYTICS_ENABLED = !!(GA_MEASUREMENT_ID || GTM_ID || CLARITY_ID);
 export const IS_DEBUG_MODE = import.meta.env.DEV;
 
 export const CURRENCY = "PKR";

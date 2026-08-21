@@ -368,22 +368,28 @@ const PlaceOrderPage = () => {
       localStorage.removeItem("appliedCoupon");
       window.dispatchEvent(new Event("cartUpdated"));
       successVibrate();
-      trackPurchase({
-        transactionId: data?.id || String(Date.now()),
-        items: itemsToShow.map((item) => ({
-          name: item.name || item.productName,
-          productId: item.productId,
-          productPackId: item.packId || item.selectedOptions?.pack,
-          category: item.category || "",
-          subCategory: item.subCategory || "",
-          price: item.price,
-          quantity: item.quantity,
-        })),
-        subtotal,
-        shippingFee,
-        discount: 0,
-        total,
-      });
+
+      const orderId = data?.id || String(Date.now());
+      const purchaseKey = `purchase_fired_${orderId}`;
+      if (!sessionStorage.getItem(purchaseKey)) {
+        sessionStorage.setItem(purchaseKey, "1");
+        trackPurchase({
+          transactionId: orderId,
+          items: itemsToShow.map((item) => ({
+            name: item.name || item.productName,
+            productId: item.productId,
+            productPackId: item.packId || item.selectedOptions?.pack,
+            category: item.category || "",
+            subCategory: item.subCategory || "",
+            price: item.price,
+            quantity: item.quantity,
+          })),
+          subtotal,
+          shippingFee,
+          discount: 0,
+          total,
+        });
+      }
     },
 
     onError: (error) => {
