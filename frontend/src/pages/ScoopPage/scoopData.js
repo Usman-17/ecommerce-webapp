@@ -6,6 +6,8 @@ export const SCOOP_CONFIG = {
     minItems: 5,
     maxItems: 6,
     price: 800,
+    minTotalRetail: 1000,
+    maxTotalRetail: 1300,
     pricing: {
       1: 800,
       2: 1550,
@@ -14,6 +16,7 @@ export const SCOOP_CONFIG = {
     description: "A curated handful of surprise goodies to brighten your day.",
     popular: false,
   },
+
   regular: {
     id: "regular",
     name: "Regular Scoop",
@@ -21,6 +24,8 @@ export const SCOOP_CONFIG = {
     minItems: 8,
     maxItems: 10,
     price: 1300,
+    minTotalRetail: 1600,
+    maxTotalRetail: 2000,
     pricing: {
       1: 1300,
       2: 2500,
@@ -30,6 +35,7 @@ export const SCOOP_CONFIG = {
       "Our most loved scoop - the perfect mix of treats and treasures.",
     popular: true,
   },
+
   large: {
     id: "large",
     name: "Large Scoop",
@@ -37,6 +43,8 @@ export const SCOOP_CONFIG = {
     minItems: 12,
     maxItems: 14,
     price: 1600,
+    minTotalRetail: 2000,
+    maxTotalRetail: 2400,
     pricing: {
       1: 1600,
       2: 3000,
@@ -59,7 +67,12 @@ function getTotalRetail(products) {
   return products.reduce((sum, p) => sum + getProductRetailPrice(p), 0);
 }
 
-export function getRandomProducts(allProducts, count, minTotalPrice = 0) {
+export function getRandomProducts(
+  allProducts,
+  count,
+  minTotalPrice = 0,
+  maxTotalPrice = 0,
+) {
   if (!allProducts || allProducts.length === 0) return [];
 
   const shuffled = [...allProducts].sort(() => Math.random() - 0.5);
@@ -75,12 +88,44 @@ export function getRandomProducts(allProducts, count, minTotalPrice = 0) {
 
   if (minTotalPrice > 0 && getTotalRetail(selected) < minTotalPrice) {
     const remaining = shuffled.slice(count);
-    for (let i = 0; i < remaining.length && getTotalRetail(selected) < minTotalPrice; i++) {
+    for (
+      let i = 0;
+      i < remaining.length && getTotalRetail(selected) < minTotalPrice;
+      i++
+    ) {
       const cheapest = selected.reduce((minIdx, p, idx) => {
-        return getProductRetailPrice(p) < getProductRetailPrice(selected[minIdx]) ? idx : minIdx;
+        return getProductRetailPrice(p) <
+          getProductRetailPrice(selected[minIdx])
+          ? idx
+          : minIdx;
       }, 0);
-      if (getProductRetailPrice(remaining[i]) > getProductRetailPrice(selected[cheapest])) {
+      if (
+        getProductRetailPrice(remaining[i]) >
+        getProductRetailPrice(selected[cheapest])
+      ) {
         selected[cheapest] = remaining[i];
+      }
+    }
+  }
+
+  if (maxTotalPrice > 0 && getTotalRetail(selected) > maxTotalPrice) {
+    const remaining = shuffled.slice(count);
+    for (
+      let i = 0;
+      i < remaining.length && getTotalRetail(selected) > maxTotalPrice;
+      i++
+    ) {
+      const mostExpensive = selected.reduce((maxIdx, p, idx) => {
+        return getProductRetailPrice(p) >
+          getProductRetailPrice(selected[maxIdx])
+          ? idx
+          : maxIdx;
+      }, 0);
+      if (
+        getProductRetailPrice(remaining[i]) <
+        getProductRetailPrice(selected[mostExpensive])
+      ) {
+        selected[mostExpensive] = remaining[i];
       }
     }
   }
